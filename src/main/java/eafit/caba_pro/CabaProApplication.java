@@ -1,4 +1,4 @@
-package grupo4.demo;
+package eafit.caba_pro;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
