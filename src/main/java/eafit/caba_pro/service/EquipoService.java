@@ -1,7 +1,7 @@
 package eafit.caba_pro.service;
 
-import eafit.caba_pro.model.Team;
-import eafit.caba_pro.repository.TeamRepository;
+import eafit.caba_pro.model.Equipo;
+import eafit.caba_pro.repository.EquipoRepository;
 
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.stereotype.Service;
@@ -10,36 +10,33 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class TeamService {
-    private final TeamRepository teamRepository;
+public class EquipoService {
+    private final EquipoRepository teamRepository;
 
-    public TeamService(TeamRepository teamRepository){
+    public EquipoService(EquipoRepository teamRepository){
         this.teamRepository = teamRepository;
     }
 
     @Transactional(readOnly = true)
-    public List <Team> findAll(){
+    public List <Equipo> findAll(){
         return teamRepository.findAll();
     }
 
     @Transactional(readOnly = true)
-    public Optional <Team> findById(Long id){
+    public Optional <Equipo> findById(Long id){
         return teamRepository.findById(id);
     }
 
     @Transactional
-    public void createTeam(Team team){
-        if(team.getState() == null)
-            team.setState(true);
-
-        if(team.getLogo() == null)
-            team.setLogo("https://placehold.co/64x64");
+    public void createTeam(Equipo team){
+        if(team.getLogoUrl() == null)
+            team.setLogoUrl("https://placehold.co/64x64");
 
         teamRepository.save(team);
     }
 
     @Transactional
-    public void save(Team team){
+    public void save(Equipo team){
         teamRepository.save(team);
     }
 
