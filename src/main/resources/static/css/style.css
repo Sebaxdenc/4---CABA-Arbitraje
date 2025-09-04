@@ -1,0 +1,34 @@
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: #f3f4f6; 
+}
+
+
+.preview-button {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: #4f46e5; 
+    color: white;
+    padding: 12px 24px;
+    border-radius: 9999px; 
+    font-weight: 600;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+                0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    transition: background-color 0.3s ease;
+    z-index: 1000;
+}
+.preview-button:hover {
+    background-color: #4338ca; 
+}
+
+
+.hero {
+    background-image: linear-gradient(
+        rgba(0,0,0,0.6),
+        rgba(0,0,0,0.6)
+      ),
+      url('https://images.unsplash.com/photo-1544321041-9c60e008d3e2?q=80&w=1740&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D');
+    background-size: cover;
+    background-position: center;
+}
