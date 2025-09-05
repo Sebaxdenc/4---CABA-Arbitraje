@@ -19,7 +19,7 @@ public class Equipo {
     @Column(nullable = false)
     @NotBlank(message = "El nombre es necesario")
     private String nombre;
-    
+
     @Column(nullable = false)
     private boolean estado;
     

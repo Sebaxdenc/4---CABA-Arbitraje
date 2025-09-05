@@ -4,6 +4,7 @@ import eafit.caba_pro.model.Equipo;
 import eafit.caba_pro.repository.EquipoRepository;
 
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -11,20 +12,18 @@ import java.util.Optional;
 
 @Service
 public class EquipoService {
-    private final EquipoRepository teamRepository;
 
-    public EquipoService(EquipoRepository teamRepository){
-        this.teamRepository = teamRepository;
-    }
+    @Autowired
+    EquipoRepository equipoRepository;    
 
     @Transactional(readOnly = true)
     public List <Equipo> findAll(){
-        return teamRepository.findAll();
+        return equipoRepository.findAll();
     }
 
     @Transactional(readOnly = true)
     public Optional <Equipo> findById(Long id){
-        return teamRepository.findById(id);
+        return equipoRepository.findById(id);
     }
 
     @Transactional
@@ -32,12 +31,12 @@ public class EquipoService {
         if(team.getLogoUrl() == null)
             team.setLogoUrl("https://placehold.co/64x64");
 
-        teamRepository.save(team);
+        equipoRepository.save(team);
     }
 
     @Transactional
     public void save(Equipo team){
-        teamRepository.save(team);
+        equipoRepository.save(team);
     }
 
     
