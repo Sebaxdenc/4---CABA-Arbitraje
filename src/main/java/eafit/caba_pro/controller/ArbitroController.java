@@ -1,5 +1,7 @@
 package eafit.caba_pro.controller;
+import eafit.caba_pro.service.UsuarioService;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
 import eafit.caba_pro.model.Arbitro;
@@ -20,6 +22,8 @@ import java.time.YearMonth;
 import java.util.Map;
 import java.util.Optional;
 
+
+
 @Controller
 @RequestMapping("/arbitro")
 public class ArbitroController {
@@ -34,8 +38,10 @@ public class ArbitroController {
 
     // ========== ENDPOINTS WEB (TEMPLATES) ==========
 
+
     @GetMapping
     public String dashboard(){
+        //return "dsa";
         return "arbitro/dashboard";
     }
 
@@ -246,5 +252,5 @@ public class ArbitroController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
-    
+
 }

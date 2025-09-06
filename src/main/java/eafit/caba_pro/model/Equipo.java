@@ -34,4 +34,10 @@ public class Equipo {
     
     @Column(nullable = false)
     private String logoUrl;
+
+    // @OneToOne(fetch = FetchType.EAGER)
+    // @JoinColumn(name="entrenador_id")
+
+    // private Entrenador entrenador;
+
 } 
