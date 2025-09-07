@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Programación de Partidos</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body class="flex bg-gray-100 min-h-screen">
+  <aside th:replace="~{admin/sidebar :: sidebar('partidos')}"></aside>
+
+  <div class="flex-1 overflow-x-hidden overflow-y-auto">
+    <header th:replace="~{admin/header :: header('Programación de Partidos')}"></header>
+
+    <main class="p-6 space-y-6">
+
+      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-2">
+        <h3 class="text-2xl font-semibold text-gray-800">Partidos</h3>
+        <a th:href="@{/partido/partidos/create}"
+           class="mt-4 sm:mt-0 px-4 py-2 bg-indigo-600 text-white rounded-lg shadow hover:bg-indigo-700">+ Agendar Partido</a>
+      </div>
+      <div class="bg-white p-6 rounded-lg shadow">
+        <input type="text" placeholder="Buscar partido..."
+               class="w-full mb-4 px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+
+
+            <div id="partidos" class="page-content hidden">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6">
+                    <h3 class="text-2xl font-semibold text-gray-800">Programación de Partidos</h3>
+                    <button class="mt-4 sm:mt-0 px-4 py-2 bg-indigo-600 text-white rounded-lg shadow-md hover:bg-indigo-700 transition-colors duration-200">
+                        + Agendar Partido
+                    </button>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <h4 class="text-lg font-semibold text-gray-800 mb-4">Partidos del Mes</h4>
+                    <ul class="space-y-4">
+                        <li class="bg-gray-50 p-4 rounded-lg">
+                            <div class="flex justify-between items-center">
+                                <p class="font-semibold">Torneo de Clausura - Semifinal</p>
+                                <span class="text-sm text-gray-600">22 de septiembre</span>
+                            </div>
+                            <div class="mt-2 text-sm text-gray-500">
+                                <p><strong>Lugar:</strong> Polideportivo Central</p>
+                                <p><strong>Árbitros:</strong> Juan Pérez (Primer Árbitro), Ana López (Apuntadora), Carlos Ramírez (Cronometrista)</p>
+                            </div>
+                        </li>
+                        <li class="bg-gray-50 p-4 rounded-lg">
+                            <div class="flex justify-between items-center">
+                                <p class="font-semibold">Liga Femenina - Jornada 5</p>
+                                <span class="text-sm text-gray-600">25 de septiembre</span>
+                            </div>
+                            <div class="mt-2 text-sm text-gray-500">
+                                <p><strong>Lugar:</strong> Gimnasio Metropolitano</p>
+                                <p><strong>Árbitros:</strong> Laura Torres (Primer Árbitro), Pedro González (Apuntador)</p>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+    </main>
+  </div>
+</body>
+</html>

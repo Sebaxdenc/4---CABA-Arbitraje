@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Reportes</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body class="flex bg-gray-100 min-h-screen">
+  <aside th:replace="~{admin/sidebar :: sidebar('reportes')}"></aside>
+
+  <div class="flex-1 overflow-x-hidden overflow-y-auto">
+    <header th:replace="~{admin/header :: header('Generar Reportes')}"></header>
+
+    <main class="p-6 space-y-6">
+      <div class="bg-white p-6 rounded-lg shadow">
+        <h4 class="text-lg font-semibold text-gray-800 mb-4">Reporte de Liquidación Mensual</h4>
+        <p class="text-sm text-gray-600 mb-4">Selecciona un mes y año para generar un PDF.</p>
+
+        <form th:action="@{/admin/reportes/pdf}" method="get" class="flex flex-col sm:flex-row gap-4">
+          <select name="mes"
+                  class="block w-full sm:w-1/2 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+            <option th:each="m,i : ${#lists.arrayList('Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre')}"
+                    th:value="${i.index + 1}"
+                    th:text="${m}"
+                    th:selected="${(mes ?: 9)==(i.index+1)}">Septiembre</option>
+          </select>
+          <select name="anio"
+                  class="block w-full sm:w-1/2 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+            <option th:each="y : ${#numbers.sequence(2023, 2027)}"
+                    th:value="${y}" th:text="${y}" th:selected="${(anio ?: 2025)==y}">2025</option>
+          </select>
+
+          <button type="submit"
+                  class="px-4 py-2 bg-indigo-600 text-white rounded-lg shadow-md hover:bg-indigo-700">Generar PDF</button>
+        </form>
+      </div>
+    </main>
+  </div>
+</body>
+</html>

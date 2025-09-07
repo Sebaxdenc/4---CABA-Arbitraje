@@ -1,18 +1,22 @@
 package eafit.caba_pro.service;
 
-import eafit.caba_pro.model.Arbitro;
-import eafit.caba_pro.model.Partido;
-import eafit.caba_pro.repository.ArbitroRepository;
-import eafit.caba_pro.repository.PartidoRepository;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
-
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
+
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
+
+import eafit.caba_pro.model.Arbitro;
+import eafit.caba_pro.model.Partido;
+import eafit.caba_pro.repository.ArbitroRepository;
+import eafit.caba_pro.repository.PartidoRepository;
 
 @Service
 @Transactional(readOnly = true)
@@ -217,5 +221,19 @@ public class ArbitroService {
      */
     public List<Arbitro> getArbitrosSinPartidos() {
         return arbitroRepository.findArbitrosSinPartidos();
+    }
+
+    @Transactional(readOnly = true)
+    public ResponseEntity<byte[]> buildPhotoResponse(Long id) {
+        Optional<Arbitro> opt = arbitroRepository.findById(id);
+        if (opt.isEmpty() || !opt.get().hasPhoto()) return ResponseEntity.notFound().build();
+
+        Arbitro a = opt.get();
+        String ct = (a.getPhotoContentType() != null) ? a.getPhotoContentType() : MediaType.IMAGE_JPEG_VALUE;
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_TYPE, ct)
+                .header(HttpHeaders.CACHE_CONTROL, "max-age=3600")
+                .body(a.getPhotoData());
     }
 }
