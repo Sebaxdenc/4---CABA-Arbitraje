@@ -40,6 +40,42 @@
         </div>
 
       </div>
+
+      <!-- Sección de Árbitros Recientes -->
+      <div class="bg-white p-6 rounded-lg shadow">
+        <h3 class="text-lg font-semibold text-gray-800 mb-4">Árbitros Registrados Recientemente</h3>
+        <div class="space-y-4">
+          <div th:each="arbitro : ${arbitrosRecientes}" class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+            <div class="flex items-center space-x-3">
+              <div class="w-8 h-8 bg-indigo-100 rounded-full flex items-center justify-center">
+                <span class="text-indigo-600 text-sm font-medium" th:text="${arbitro.nombre.substring(0,1)}">A</span>
+              </div>
+              <div>
+                <p class="text-sm font-medium text-gray-900" th:text="${arbitro.nombre}">Nombre del Árbitro</p>
+                <p class="text-xs text-gray-500" th:text="${arbitro.speciality}">Especialidad</p>
+              </div>
+            </div>
+            <span class="text-xs text-gray-400" th:text="${arbitro.scale}">Escala</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sección de Próximos Partidos -->
+      <div class="bg-white p-6 rounded-lg shadow">
+        <h3 class="text-lg font-semibold text-gray-800 mb-4">Próximos Partidos</h3>
+        <div class="space-y-4">
+          <div th:each="partido : ${proximosPartidos}" class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+            <div>
+              <p class="text-sm font-medium text-gray-900" th:text="${partido.partidoCompleto}">Equipo A vs Equipo B</p>
+              <p class="text-xs text-gray-500" th:text="${#temporals.format(partido.fecha, 'dd/MM/yyyy')} + ' - ' + ${#temporals.format(partido.hora, 'HH:mm')}">Fecha y hora</p>
+            </div>
+            <div class="text-right">
+              <p class="text-xs text-gray-500" th:if="${partido.arbitro != null}" th:text="'Árbitro: ' + ${partido.arbitro.nombre}">Árbitro asignado</p>
+              <p class="text-xs text-red-500" th:if="${partido.arbitro == null}">Sin árbitro asignado</p>
+            </div>
+          </div>
+        </div>
+      </div>
     </main>
   </div>
 </body>
