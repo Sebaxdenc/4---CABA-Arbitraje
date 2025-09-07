@@ -61,23 +61,12 @@
 
     <!-- Contenido Principal -->
     <main class="flex-1 flex flex-col overflow-hidden">
-        <!-- Barra superior del header -->
-        <header class="flex-shrink-0 bg-white shadow-md">
-            <div class="px-6 py-4 flex items-center justify-between">
-                <button id="menu-toggle" class="md:hidden p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500">
-                    <svg class="h-6 w-6 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-                    </svg>
-                </button>
-                <h2 class="text-xl font-semibold text-gray-800" id="page-title">Panel Principal</h2>
-                <div class="flex items-center space-x-4">
-                    <p class="text-sm text-gray-600 hidden md:block">¡Bienvenido, Arbitro!</p>
-                    <button class="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg shadow-md hover:bg-gray-300 transition-colors duration-200">
-                        Cerrar Sesión
-                    </button>
-                </div>
-            </div>
-        </header>
+
+        <!-- En cualquier template -->
+        <!-- <div th:replace="fragments/ArbitroFragments/up_bar :: up_bar('Dashboard', 'Juan Pérez')"></div> -->
+
+        <!-- En cualquier template             despues llamo al normal para que se muestre el nombre-->
+        <div th:replace="fragments/ArbitroFragments/up_bar :: up_bar_simple"></div>
 
         <!-- Contenido de las páginas (simulado con JavaScript) -->
         <div id="content-container" class="flex-1 overflow-x-hidden overflow-y-auto p-6 space-y-6">
