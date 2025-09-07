@@ -1,26 +1,23 @@
 package eafit.caba_pro.controller;
-import eafit.caba_pro.service.UsuarioService;
+import java.time.YearMonth;
+import java.util.Map;
+import java.util.Optional;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-
-import eafit.caba_pro.model.Arbitro;
-import eafit.caba_pro.service.ArbitroService;
-import eafit.caba_pro.service.PartidoService;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
-import jakarta.validation.Valid;
-import java.time.YearMonth;
-import java.util.Map;
-import java.util.Optional;
+import eafit.caba_pro.model.Arbitro;
+import eafit.caba_pro.service.ArbitroService;
+import eafit.caba_pro.service.PartidoService;
 
 
 
@@ -122,82 +119,6 @@ public class ArbitroController {
         return ResponseEntity.ok(calendarioData);
     }
 
-    @GetMapping("/arbitros/create")
-    public String create(Model model) {
-        model.addAttribute("arbitro", new Arbitro());
-        return "arbitro/create";
-    }
-
-    // Crear árbitro con foto
-
-    @PostMapping("/arbitros/save")
-    public String save(@Valid @ModelAttribute("arbitro") Arbitro arbitro,
-                      @RequestParam(value = "photoFile", required = false) MultipartFile photoFile,
-                      BindingResult result, Model model, RedirectAttributes redirectAttributes) {
-        if (result.hasErrors()) {
-            model.addAttribute("errorMessage", "Por favor corrige los errores en el formulario");
-            return "arbitro/create";
-        }
-
-        try {
-            // Usar el service para crear con foto
-            Arbitro savedArbitro = arbitroService.createArbitroWithPhoto(arbitro, photoFile);
-
-            // Log para debugging
-            System.out.println(" Árbitro guardado: " + savedArbitro.getNombre());
-            System.out.println("- ID: " + savedArbitro.getId());
-            System.out.println("- Tiene imagen: " + savedArbitro.hasPhoto());
-            if (savedArbitro.hasPhoto()) {
-                System.out.println("- Tamaño imagen: " + savedArbitro.getPhotoData().length + " bytes");
-                System.out.println("- Tipo imagen: " + savedArbitro.getPhotoContentType());
-                System.out.println("- URL imagen: " + savedArbitro.getPhotoUrl());
-            }
-
-            redirectAttributes.addFlashAttribute("successMessage", 
-                "¡Árbitro '" + savedArbitro.getNombre() + "' creado exitosamente!");
-
-            return "redirect:/arbitros";
-            
-        } catch (RuntimeException e) {
-            // Errores de validación de negocio (cédula duplicada, etc.)
-            model.addAttribute("errorMessage", e.getMessage());
-            return "arbitro/create";
-        } catch (Exception e) {
-            System.err.println("Error al crear árbitro: " + e.getMessage());
-            e.printStackTrace();
-            
-            model.addAttribute("errorMessage", "Error al crear el árbitro. Por favor intenta nuevamente.");
-            return "arbitro/create";
-        }
-    }
-
-    @PostMapping("/arbitros/delete/{id}")
-    public String delete(@PathVariable Long id, RedirectAttributes redirectAttributes) {
-        try {
-            // Buscar el árbitro para obtener su nombre antes de eliminar
-            Optional<Arbitro> arbitro = arbitroService.findById(id);
-            String arbitroName = arbitro.map(Arbitro::getNombre).orElse(null);
-            
-            boolean deleted = arbitroService.deleteById(id);
-            
-            if (deleted) {
-                redirectAttributes.addFlashAttribute("successMessage", 
-                    "¡Árbitro" + (arbitroName != null ? " '" + arbitroName + "'" : "") + " eliminado exitosamente!");
-            } else {
-                redirectAttributes.addFlashAttribute("errorMessage", 
-                    "No se pudo encontrar el árbitro a eliminar.");
-            }
-        } catch (RuntimeException e) {
-            // Errores de negocio (como integridad referencial)
-            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
-        } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("errorMessage", 
-                "Error interno al eliminar el árbitro. Por favor intenta nuevamente.");
-            System.err.println("Error al eliminar árbitro con ID " + id + ": " + e.getMessage());
-        }
-        
-        return "redirect:/arbitros";
-    }
 
     // ========== ENDPOINTS REST API (JSON/BLOB) ==========
 

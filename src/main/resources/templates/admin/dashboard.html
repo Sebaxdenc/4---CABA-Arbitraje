@@ -1,245 +1,46 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="https://www.thymeleaf.org/extras/spring-security">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CABA Pro - Mockup</title>
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-
-
-    <link rel="stylesheet" th:href="@{/css/style.css}">
-
+  <meta charset="UTF-8">
+  <title>CABA Pro - Admin</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
 <body class="flex bg-gray-100 min-h-screen">
 
-    <!-- Sidebar de Navegación -->
-    <aside id="sidebar" class="flex-shrink-0 w-64 bg-white shadow-lg transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out z-50">
-        <div class="p-6 border-b border-gray-200 flex justify-between items-center">
-            <div>
-                <h1 class="text-xl font-bold text-gray-800">CABA Pro</h1>
-                <p class="text-sm text-gray-500 mt-1">Gestión de Arbitraje</p>
-            </div>
-            <button id="menu-close" class="md:hidden p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500">
-                <svg class="h-6 w-6 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                </svg>
-            </button>
+  <!-- Sidebar -->
+  <aside th:replace="~{admin/sidebar :: sidebar('dashboard')}"></aside>
+
+  <!-- Contenido -->
+  <div class="flex-1 overflow-x-hidden overflow-y-auto">
+    <header th:replace="~{admin/header :: header('Dashboard')}"></header>
+    
+
+    <main class="p-6 space-y-6">
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div class="bg-white p-4 rounded-lg shadow">
+          <h4 class="text-lg font-semibold text-gray-800 mb-2">Total Árbitros</h4>
+          <p class="text-3xl font-bold text-indigo-600" th:text="${totalArbitros}">0</p>
+        </div>
+        <div class="bg-white p-4 rounded-lg shadow">
+          <h4 class="text-lg font-semibold text-gray-800 mb-2">Partidos este Mes</h4>
+          <p class="text-3xl font-bold text-indigo-600" th:text="${partidosEsteMes}">0</p>
+        </div>
+        <div class="bg-white p-4 rounded-lg shadow">
+          <h4 class="text-lg font-semibold text-gray-800 mb-2">Ingresos este Mes</h4>
+          <p class="text-3xl font-bold text-indigo-600" th:text="${#numbers.formatCurrency(ingresosEsteMes, 'es_CO')}">$0</p>
+        </div>
+        <div class="bg-white p-4 rounded-lg shadow">
+          <h4 class="text-lg font-semibold text-gray-800 mb-2">Pagos Pendientes</h4>
+          <p class="text-3xl font-bold text-indigo-600" th:text="${pagosPendientes}">$0</p>
         </div>
 
-        <nav class="p-4 space-y-2">
-            <!-- Sección de administrador (Mock) -->
-            <h2 class="text-xs uppercase font-semibold text-gray-400 mt-4 mb-2">Panel de Administrador</h2>
-            <a href="#" data-page="arbitros" class="flex items-center space-x-3 p-3 rounded-lg text-gray-600 hover:bg-indigo-50 hover:text-indigo-600 transition-colors duration-200">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                    <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />
-                </svg>
-                <span>Gestión de Árbitros</span>
-            </a>
-            <a href="#" data-page="partidos" class="flex items-center space-x-3 p-3 rounded-lg text-gray-600 hover:bg-indigo-50 hover:text-indigo-600 transition-colors duration-200">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                    <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd" />
-                </svg>
-                <span>Programación de Partidos</span>
-            </a>
-            <a href="#" data-page="finanzas" class="flex items-center space-x-3 p-3 rounded-lg text-gray-600 hover:bg-indigo-50 hover:text-indigo-600 transition-colors duration-200">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                    <path fill-rule="evenodd" d="M10 2a1 1 0 00-1 1v1a1 1 0 002 0V3a1 1 0 00-1-1zM4 4h3a3 3 0 006 0h3a2 2 0 012 2v9a2 2 0 01-2 2h-1.414l-1.828 1.828A2 2 0 0110 18.243l-1.828-1.828H4a2 2 0 01-2-2V6a2 2 0 012-2zm2 .5a.5.5 0 00-.5.5v8a.5.5 0 00.5.5h8a.5.5 0 00.5-.5V5a.5.5 0 00-.5-.5H6z" clip-rule="evenodd" />
-                </svg>
-                <span>Gestión Financiera</span>
-            </a>
-            <a href="#" data-page="reportes" class="flex items-center space-x-3 p-3 rounded-lg text-gray-600 hover:bg-indigo-50 hover:text-indigo-600 transition-colors duration-200">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd" />
-                </svg>
-                <span>Reportes</span>
-            </a>
-        </nav>
-    </aside>
-
-    <!-- Contenido Principal -->
-    <main class="flex-1 flex flex-col overflow-hidden">
-        <!-- Barra superior del header -->
-        <header class="flex-shrink-0 bg-white shadow-md">
-            <div class="px-6 py-4 flex items-center justify-between">
-                <button id="menu-toggle" class="md:hidden p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500">
-                    <svg class="h-6 w-6 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-                    </svg>
-                </button>   
-                <h2 class="text-xl font-semibold text-gray-800" id="page-title">Panel Principal</h2>
-                <div class="flex items-center space-x-4">
-                    <p class="text-sm text-gray-600 hidden md:block">¡Bienvenido, Administrador!</p>
-                    <button class="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg shadow-md hover:bg-gray-300 transition-colors duration-200">
-                        Cerrar Sesión
-                    </button>
-                </div>
-            </div>
-        </header>
-
-        <!-- Contenido de las páginas (simulado con JavaScript) -->
-        <div id="content-container" class="flex-1 overflow-x-hidden overflow-y-auto p-6 space-y-6">
-            <!-- Gestión de Árbitros (Admin) -->
-            <div id="arbitros" class="page-content hidden">
-                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6">
-                    <h3 class="text-2xl font-semibold text-gray-800">Gestión de Árbitros</h3>
-                    <button class="mt-4 sm:mt-0 px-4 py-2 bg-indigo-600 text-white rounded-lg shadow-md hover:bg-indigo-700 transition-colors duration-200">
-                        + Agregar Árbitro
-                    </button>
-                </div>
-                <div class="bg-white p-6 rounded-lg shadow-md">
-                    <input type="text" placeholder="Buscar árbitro..." class="w-full mb-4 px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                    <div class="overflow-x-auto">
-                        <table class="min-w-full divide-y divide-gray-200">
-                            <thead class="bg-gray-50">
-                                <tr>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nombre</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Especialidad</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Escalafón</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
-                                </tr>
-                            </thead>
-                            <tbody class="bg-white divide-y divide-gray-200">
-                                <tr>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Juan Pérez</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Campo</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">FIBA</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                        <button class="text-indigo-600 hover:text-indigo-900">Editar</button>
-                                        <button class="ml-4 text-red-600 hover:text-red-900">Eliminar</button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">María Gómez</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Mesa</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Primera</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                        <button class="text-indigo-600 hover:text-indigo-900">Editar</button>
-                                        <button class="ml-4 text-red-600 hover:text-red-900">Eliminar</button>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Programación de Partidos (Admin) -->
-            <div id="partidos" class="page-content hidden">
-                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6">
-                    <h3 class="text-2xl font-semibold text-gray-800">Programación de Partidos</h3>
-                    <button class="mt-4 sm:mt-0 px-4 py-2 bg-indigo-600 text-white rounded-lg shadow-md hover:bg-indigo-700 transition-colors duration-200">
-                        + Agendar Partido
-                    </button>
-                </div>
-                <div class="bg-white p-6 rounded-lg shadow-md">
-                    <h4 class="text-lg font-semibold text-gray-800 mb-4">Partidos del Mes</h4>
-                    <ul class="space-y-4">
-                        <li class="bg-gray-50 p-4 rounded-lg">
-                            <div class="flex justify-between items-center">
-                                <p class="font-semibold">Torneo de Clausura - Semifinal</p>
-                                <span class="text-sm text-gray-600">22 de septiembre</span>
-                            </div>
-                            <div class="mt-2 text-sm text-gray-500">
-                                <p><strong>Lugar:</strong> Polideportivo Central</p>
-                                <p><strong>Árbitros:</strong> Juan Pérez (Primer Árbitro), Ana López (Apuntadora), Carlos Ramírez (Cronometrista)</p>
-                            </div>
-                        </li>
-                        <li class="bg-gray-50 p-4 rounded-lg">
-                            <div class="flex justify-between items-center">
-                                <p class="font-semibold">Liga Femenina - Jornada 5</p>
-                                <span class="text-sm text-gray-600">25 de septiembre</span>
-                            </div>
-                            <div class="mt-2 text-sm text-gray-500">
-                                <p><strong>Lugar:</strong> Gimnasio Metropolitano</p>
-                                <p><strong>Árbitros:</strong> Laura Torres (Primer Árbitro), Pedro González (Apuntador)</p>
-                            </div>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-
-            <!-- Gestión Financiera (Admin) -->
-            <div id="finanzas" class="page-content hidden">
-                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6">
-                    <h3 class="text-2xl font-semibold text-gray-800">Gestión Financiera</h3>
-                </div>
-                <div class="bg-white p-6 rounded-lg shadow-md">
-                    <h4 class="text-lg font-semibold text-gray-800 mb-4">Reporte de Liquidación (Septiembre)</h4>
-                    <div class="overflow-x-auto">
-                        <table class="min-w-full divide-y divide-gray-200">
-                            <thead class="bg-gray-50">
-                                <tr>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Árbitro</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Escalafón</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Partidos</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total a Pagar</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
-                                </tr>
-                            </thead>
-                            <tbody class="bg-white divide-y divide-gray-200">
-                                <tr>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Juan Pérez</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">FIBA</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">5</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-semibold">$ 5,000</td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">Pendiente</span>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">María Gómez</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Primera</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">8</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-semibold">$ 8,500</td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Pagado</span>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Reportes -->
-            <div id="reportes" class="page-content hidden">
-                <h3 class="text-2xl font-semibold text-gray-800 mb-6">Generar Reportes</h3>
-                <div class="bg-white p-6 rounded-lg shadow-md">
-                    <h4 class="text-lg font-semibold text-gray-800 mb-4">Reporte de Liquidación Mensual</h4>
-                    <p class="text-sm text-gray-600 mb-4">Selecciona un mes y año para generar un reporte de liquidación en PDF.</p>
-                    <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
-                        <select class="block w-full sm:w-1/2 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
-                            <option>Enero</option>
-                            <option>Febrero</option>
-                            <option>Marzo</option>
-                            <option>Abril</option>
-                            <option>Mayo</option>
-                            <option>Junio</option>
-                            <option>Julio</option>
-                            <option>Agosto</option>
-                            <option selected>Septiembre</option>
-                            <option>Octubre</option>
-                            <option>Noviembre</option>
-                            <option>Diciembre</option>
-                        </select>
-                        <select class="block w-full sm:w-1/2 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
-                            <option>2023</option>
-                            <option selected>2024</option>
-                            <option>2025</option>
-                        </select>
-                    </div>
-                    <button class="mt-6 px-4 py-2 bg-indigo-600 text-white rounded-lg shadow-md hover:bg-indigo-700 transition-colors duration-200">
-                        Generar PDF
-                    </button>
-                </div>
-            </div>
-
-        </div>
+      </div>
     </main>
-    <link rel="script" th:href="@{/js/dashboard.js}">
+  </div>
 </body>
 </html>
