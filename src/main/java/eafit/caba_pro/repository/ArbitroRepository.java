@@ -17,7 +17,10 @@ public interface ArbitroRepository extends JpaRepository<Arbitro, Long> {
     
     // Búsqueda por cédula (para validar duplicados)
     Optional<Arbitro> findByCedula(String cedula);
-    
+
+    // Búsqueda por nombre de usuario (para login)
+    Optional<Arbitro> findByUsername(String username);
+
     // Verificación de existencia (para validaciones)
     boolean existsByCedula(String cedula);
     boolean existsByPhone(String phone);

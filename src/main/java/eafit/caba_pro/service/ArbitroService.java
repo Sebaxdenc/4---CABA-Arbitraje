@@ -31,6 +31,22 @@ public class ArbitroService {
         this.partidoRepository = partidoRepository;
     }
 
+    // ========== OPERACIONES DE LECTURA ==========
+
+    /**
+     * Buscar árbitro por cédula
+     */
+    public Optional<Arbitro> findByCedula(String cedula) {
+        return arbitroRepository.findByCedula(cedula);
+    }
+
+    /**
+     * Buscar árbitro por nombre de usuario
+     */
+    public Optional<Arbitro> findByUsername(String username) {
+        return arbitroRepository.findByUsername(username);
+    }
+
     /**
      * Obtener todos los árbitros
      */

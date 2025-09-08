@@ -1,5 +1,7 @@
 package eafit.caba_pro.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -30,6 +32,7 @@ public class Usuario {
     
     // Relación uno a uno con Arbitro (lado inverso)
     @OneToOne(mappedBy = "usuario", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore // Evitar serialización circular
     private Arbitro arbitro;
     
 }
