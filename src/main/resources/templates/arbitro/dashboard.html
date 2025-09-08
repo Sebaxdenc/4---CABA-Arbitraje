@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -38,7 +38,7 @@
                 </svg>
                 <span>Panel Principal</span>
             </a>
-            <a href="#" data-page="calendario" class="flex items-center space-x-3 p-3 rounded-lg text-gray-600 hover:bg-indigo-50 hover:text-indigo-600 transition-colors duration-200">
+            <a th:href="@{/arbitro/calendario}" class="flex items-center space-x-3 p-3 rounded-lg text-gray-600 hover:bg-indigo-50 hover:text-indigo-600 transition-colors duration-200">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                     <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd" />
                 </svg>
@@ -63,10 +63,7 @@
     <main class="flex-1 flex flex-col overflow-hidden">
 
         <!-- En cualquier template -->
-        <!-- <div th:replace="fragments/ArbitroFragments/up_bar :: up_bar('Dashboard', 'Juan Pérez')"></div> -->
-
-        <!-- En cualquier template             despues llamo al normal para que se muestre el nombre-->
-        <div th:replace="fragments/ArbitroFragments/up_bar :: up_bar_simple"></div>
+        <div th:replace="fragments/ArbitroFragments/up_bar :: up_bar(${titulo}, ${nombre})"></div>
 
         <!-- Contenido de las páginas (simulado con JavaScript) -->
         <div id="content-container" class="flex-1 overflow-x-hidden overflow-y-auto p-6 space-y-6">
@@ -116,27 +113,7 @@
             <div id="calendario" class="page-content hidden">
                  <h3 class="text-2xl font-semibold text-gray-800 mb-6">Mi Calendario de Partidos</h3>
                 <div class="bg-white p-6 rounded-lg shadow-md">
-                    <div class="mb-4 text-center">
-                        <p class="text-xl font-bold text-gray-800">Septiembre 2025</p>
-                    </div>
-                    <!-- Simulación de un calendario, podrías usar un componente real aquí -->
-                    <div class="grid grid-cols-7 gap-1 text-center text-sm">
-                        <div class="font-bold text-gray-500">Lun</div>
-                        <div class="font-bold text-gray-500">Mar</div>
-                        <div class="font-bold text-gray-500">Mié</div>
-                        <div class="font-bold text-gray-500">Jue</div>
-                        <div class="font-bold text-gray-500">Vie</div>
-                        <div class="font-bold text-gray-500">Sáb</div>
-                        <div class="font-bold text-gray-500">Dom</div>
-                        <!-- Rellenar días del mes -->
-                        <div class="py-2"></div>
-                        <div class="py-2">1</div>
-                        <div class="py-2">2</div>
-                        <div class="py-2">3</div>
-                        <div class="py-2">4</div>
-                        <div class="py-2">5</div>
-                        <div class="py-2 bg-indigo-200 rounded-full text-indigo-800 font-semibold">6</div>
-                    </div>
+                    
                 </div>
             </div>
 

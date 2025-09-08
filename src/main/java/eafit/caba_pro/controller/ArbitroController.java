@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import eafit.caba_pro.model.Arbitro;
 import eafit.caba_pro.service.ArbitroService;
 import eafit.caba_pro.service.PartidoService;
-
+import eafit.caba_pro.service.UsuarioService;
 
 
 @Controller
@@ -27,19 +27,27 @@ public class ArbitroController {
 
     private final ArbitroService arbitroService;
     private final PartidoService partidoService;
+    private final UsuarioService usuarioService;
 
-    public ArbitroController(ArbitroService arbitroService, PartidoService partidoService) {
+    public ArbitroController(ArbitroService arbitroService, PartidoService partidoService, UsuarioService usuarioService) {
         this.arbitroService = arbitroService;
         this.partidoService = partidoService;
+        this.usuarioService = usuarioService;
     }
 
     // ========== ENDPOINTS WEB (TEMPLATES) ==========
 
 
     @GetMapping
-    public String dashboard(){
-        //return "dsa";
-        return "arbitro/dashboard";
+    public String dashboard(Model model){
+        Optional<Arbitro> arbitro = arbitroService.findByUsername(usuarioService.getCurrentUsername());
+
+        model.addAttribute("titulo", "Dashboard");
+        model.addAttribute("nombre", arbitro.get().getNombre());
+            model.addAttribute("arbitro", arbitro.get());
+            Map<String, Object> estadisticas = partidoService.getEstadisticasArbitro(arbitro.get());
+            model.addAttribute("estadisticas", estadisticas);
+            return "arbitro/dashboard";
     }
 
     @GetMapping("/arbitros")
@@ -50,7 +58,8 @@ public class ArbitroController {
 
     @GetMapping("/arbitros/{id}")
     public String show(@PathVariable Long id, Model model) {
-        Optional<Arbitro> arbitro = arbitroService.findById(id);
+        
+        Optional<Arbitro> arbitro = arbitroService.findByUsername(usuarioService.getCurrentUsername());
         
         if (arbitro.isPresent()) {
             model.addAttribute("arbitro", arbitro.get());
@@ -65,14 +74,13 @@ public class ArbitroController {
         // Si no se encuentra el árbitro, redirigir a la lista
         return "redirect:/arbitros";
     }
-    
-    @GetMapping("/arbitros/{id}/calendario")
-    public String calendario(@PathVariable Long id, 
-                           @RequestParam(required = false) Integer year,
-                           @RequestParam(required = false) Integer month,
-                           Model model) {
-        Optional<Arbitro> arbitroOpt = arbitroService.findById(id);
-        
+
+    @GetMapping("/calendario")
+    public String calendario(@RequestParam(required = false) Integer year,
+                             @RequestParam(required = false) Integer month,
+                             Model model) {
+        Optional<Arbitro> arbitroOpt = arbitroService.findByUsername(usuarioService.getCurrentUsername());
+
         if (!arbitroOpt.isPresent()) {
             return "redirect:/arbitros";
         }

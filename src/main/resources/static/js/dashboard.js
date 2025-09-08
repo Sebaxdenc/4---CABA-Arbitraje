@@ -9,23 +9,28 @@ document.addEventListener('DOMContentLoaded', () => {
     // Manejar la navegación de la barra lateral
     navLinks.forEach(link => {
         link.addEventListener('click', (event) => {
-            event.preventDefault();
             const targetPage = link.getAttribute('data-page');
-
-            // Ocultar todas las páginas
-            pages.forEach(page => page.classList.add('hidden'));
-
-            // Mostrar la página objetivo y actualizar el título
-            const activePage = document.getElementById(targetPage);
-            if (activePage) {
-                activePage.classList.remove('hidden');
-                pageTitle.textContent = link.querySelector('span').textContent;
-            }
             
-            // Ocultar la barra lateral en móviles
-            if (window.innerWidth < 768) {
-                sidebar.classList.add('-translate-x-full');
+            // Solo interceptar enlaces que tengan data-page (navegación interna)
+            if (targetPage) {
+                event.preventDefault();
+                
+                // Ocultar todas las páginas
+                pages.forEach(page => page.classList.add('hidden'));
+
+                // Mostrar la página objetivo y actualizar el título
+                const activePage = document.getElementById(targetPage);
+                if (activePage) {
+                    activePage.classList.remove('hidden');
+                    pageTitle.textContent = link.querySelector('span').textContent;
+                }
+                
+                // Ocultar la barra lateral en móviles
+                if (window.innerWidth < 768) {
+                    sidebar.classList.add('-translate-x-full');
+                }
             }
+            // Si no tiene data-page, dejar que funcione normalmente (como th:href)
         });
     });
 

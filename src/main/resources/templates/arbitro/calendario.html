@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <title>Calendario - <span th:text="${arbitro.nombre}"></span></title>
+
+    <link rel="stylesheet" th:href="@{/css/ArbitroStyle.css}">
+
+    <link rel="stylesheet" th:href="@{/css/CalendarioStyle.css}">
+
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+
+    <style>
+        /* Estilos para la cuadrícula del calendario */
+        .calendario-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 1px;
+            background-color: #e5e7eb;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .dia-header {
+            background-color: #f3f4f6;
+            padding: 12px 8px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 0.875rem;
+            color: #374151;
+            border-bottom: 2px solid #e5e7eb;
+        }
+
+        .dia-celda {
+            background-color: white;
+            min-height: 80px;
+            padding: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+
+        .dia-celda:hover {
+            background-color: #f8fafc;
+            transform: scale(1.02);
+        }
+
+        .dia-numero {
+            font-weight: 500;
+            color: #374151;
+            margin-bottom: 4px;
+        }
+
+        .dia-otro-mes {
+            color: #9ca3af;
+            background-color: #f9fafb;
+        }
+
+        .dia-actual {
+            background-color: #3b82f6 !important;
+            color: white;
+        }
+
+        .dia-actual .dia-numero {
+            color: white;
+            font-weight: 700;
+        }
+
+        .dia-con-partido {
+            border-bottom: 4px solid #10b981;
+        }
+
+        .dia-con-partido-pasado {
+            border-bottom: 4px solid #6b7280;
+        }
+
+        .partido-info {
+            font-size: 0.75rem;
+            background-color: #10b981;
+            color: white;
+            padding: 2px 4px;
+            border-radius: 4px;
+            margin-top: 2px;
+            text-overflow: ellipsis;
+            overflow: hidden;
+            white-space: nowrap;
+        }
+
+        .partido-info.pasado {
+            background-color: #6b7280;
+        }
+    </style>
+
+</head>
+<body class="flex bg-gray-100 min-h-screen">
+
+    <div th:replace="~{fragments/ArbitroFragments/side_bar :: side_bar('calendario')}"></div>
+
+    <!-- Main content area -->
+    <div class="flex-1 flex flex-col">
+        
+        <div th:replace="~{fragments/ArbitroFragments/up_bar :: up_bar('Mi Calendario', ${arbitro.nombre})}"></div>
+
+        <!-- Calendar content -->
+        <main class="flex-1 p-6">
+            <div class="max-w-7xl mx-auto">
+                <!-- Contenedor principal del calendario -->
+                <div class="bg-white rounded-lg shadow-sm p-6">
+                    <div class="border-b border-gray-200 pb-6 mb-6">
+                        <div class="flex flex-col md:flex-row md:items-center md:justify-between">
+                            <div class="mb-4 md:mb-0">
+                                <h1 class="text-2xl font-bold text-gray-800 flex items-center">
+                                    <svg class="w-6 h-6 mr-2 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                    </svg>
+                                    Calendario de <span th:text="${arbitro.nombre}">Sebastián Medina</span>
+                                </h1>
+                                <div class="flex items-center mt-2 space-x-2">
+                                    <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                        Campo
+                                    </span>
+                                    <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                        Internacional
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="flex space-x-3">
+                                <a href="#" class="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
+                                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                                    </svg>
+                                    Perfil
+                                </a>
+                                <button onclick="window.print()" class="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
+                                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path>
+                                    </svg>
+                                    Imprimir
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Estadísticas del mes -->
+                    <div class="mb-6">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-4 text-center border border-blue-200">
+                                <div class="text-2xl font-bold text-blue-600 mb-1" th:text="${calendarioData.totalPartidos}">0</div>
+                                <div class="text-sm text-blue-700">Partidos este mes</div>
+                            </div>
+                            <div class="bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg p-4 text-center border border-green-200">
+                                <div class="text-2xl font-bold text-green-600 mb-1" id="partidosFuturos">0</div>
+                                <div class="text-sm text-green-700">Próximos</div>
+                            </div>
+                            <div class="bg-gradient-to-r from-purple-50 to-indigo-50 rounded-lg p-4 text-center border border-purple-200">
+                                <div class="text-2xl font-bold text-purple-600 mb-1" id="totalArbitrados">0</div>
+                                <div class="text-sm text-purple-700">Total Arbitrados</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Navegación del mes -->
+                    <div class="mb-6">
+                        <div class="flex justify-between items-center">
+                            <a th:href="@{/arbitro/calendario(year=${yearMonth.minusMonths(1).year}, month=${yearMonth.minusMonths(1).monthValue})}" 
+                               class="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
+                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                                </svg>
+                                Anterior
+                            </a>
+                            <h2 class="text-xl font-semibold text-gray-800" id="mesAno">
+                                <span th:text="${#temporals.format(yearMonth, 'MMMM yyyy')}"></span>
+                            </h2>
+                            <a th:href="@{/arbitro/calendario(year=${yearMonth.plusMonths(1).year}, month=${yearMonth.plusMonths(1).monthValue})}" 
+                               class="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
+                                Siguiente
+                                <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                                </svg>
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <!-- Grid del calendario -->
+                    <div class="bg-white rounded-lg border border-gray-200 p-4">
+                        <div class="calendario-grid" id="calendarioGrid">
+                            <!-- Headers de los días -->
+                            <div class="dia-header">Dom</div>
+                            <div class="dia-header">Lun</div>
+                            <div class="dia-header">Mar</div>
+                            <div class="dia-header">Mié</div>
+                            <div class="dia-header">Jue</div>
+                            <div class="dia-header">Vie</div>
+                            <div class="dia-header">Sáb</div>
+                            
+                            <!-- Los días se generarán con JavaScript -->
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Leyenda -->
+                <div class="bg-gray-50 rounded-lg p-4 mt-6">
+                    <h3 class="text-sm font-medium text-gray-700 mb-3">Leyenda</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                        <div class="flex items-center space-x-2">
+                            <div class="w-4 h-4 rounded bg-gradient-to-br from-green-400 to-green-600"></div>
+                            <span class="text-sm text-gray-600">Partido Programado</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <div class="w-4 h-4 rounded bg-gradient-to-br from-gray-400 to-gray-600"></div>
+                            <span class="text-sm text-gray-600">Partido Pasado</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <div class="w-4 h-4 rounded bg-blue-600"></div>
+                            <span class="text-sm text-gray-600">Día Actual</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <div class="w-4 h-4 border-2 border-green-500 border-b-4 bg-white rounded"></div>
+                            <span class="text-sm text-gray-600">Días con Partidos Futuros</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <div class="w-4 h-4 border-2 border-gray-500 border-b-4 bg-white rounded"></div>
+                            <span class="text-sm text-gray-600">Días con Partidos Pasados</span>
+                        </div>
+                    </div>
+                    <div class="mt-3 flex items-center text-xs text-gray-500">
+                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        Pasa el cursor por los días subrayados para ver detalles
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal para detalles del partido -->
+    <div class="modal fade" id="modalPartido" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Detalles del Partido</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- El contenido se llenará con JavaScript -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Pasar datos del servidor al JavaScript -->
+    <script th:inline="javascript">
+        console.log('🔧 Iniciando configuración del calendario...');
+        
+        // Verificar que tenemos las variables del servidor
+        const serverCalendarioData = /*[[${calendarioData}]]*/ null;
+        const serverCurrentYear = /*[[${currentYear}]]*/ null;
+        const serverCurrentMonth = /*[[${currentMonth}]]*/ null;
+        const serverArbitro = /*[[${arbitro}]]*/ null;
+        
+        console.log('📊 Variables del servidor:');
+        console.log('  - calendarioData:', serverCalendarioData);
+        console.log('  - currentYear:', serverCurrentYear);
+        console.log('  - currentMonth:', serverCurrentMonth);
+        console.log('  - arbitro:', serverArbitro);
+        
+        // Variables globales para el calendario con valores seguros
+        window.CALENDARIO_CONFIG = {
+            calendarioData: serverCalendarioData || {partidos: {}, totalPartidos: 0},
+            currentYear: serverCurrentYear || new Date().getFullYear(),
+            currentMonth: serverCurrentMonth || (new Date().getMonth() + 1),
+            arbitroId: (serverArbitro && serverArbitro.id) || 1,
+            arbitroNombre: (serverArbitro && serverArbitro.nombre) || 'Árbitro'
+        };
+        
+        console.log('✅ CALENDARIO_CONFIG creado:', window.CALENDARIO_CONFIG);
+        
+             
+        // Generar calendario cuando se carga la página
+        document.addEventListener('DOMContentLoaded', generarCalendario);
+    </script>
+    
+    <script th:src="@{/js/calendario.js}"></script>
+
+</body>
+</html>
