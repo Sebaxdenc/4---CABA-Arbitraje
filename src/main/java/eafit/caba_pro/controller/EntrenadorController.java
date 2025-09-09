@@ -22,10 +22,6 @@ public class EntrenadorController {
     @Autowired
     private PartidoService partidoService;
     
-    /**
-     * Panel principal del coach - Solo accesible para usuarios con rol COACH
-     * Ruta: /coach
-     */
     @GetMapping
     public String panelCoach(Model model, Principal principal, RedirectAttributes redirectAttributes) {
         try {
@@ -99,10 +95,6 @@ public class EntrenadorController {
         }
     }
     
-    /**
-     * Ver reseñas del coach
-     * Ruta: /coach/reseñas
-     */
     @GetMapping("/reseñas")
     public String verReseñas(Model model, Principal principal, RedirectAttributes redirectAttributes) {
         
@@ -140,10 +132,7 @@ public class EntrenadorController {
         }
     }
     
-    /**
-     * Ver perfil del coach y permitir edición básica
-     * Ruta: /coach/perfil
-     */
+
     @GetMapping("/perfil")
     public String verPerfil(Model model, Principal principal, RedirectAttributes redirectAttributes) {
         try {
@@ -166,10 +155,7 @@ public class EntrenadorController {
         }
     }
     
-    /**
-     * Actualizar perfil del coach (información limitada)
-     * Ruta: POST /coach/perfil
-     */
+
     @PostMapping("/perfil")
     public String actualizarPerfil(
             @ModelAttribute("entrenador") Entrenador entrenadorActualizado,
@@ -207,10 +193,6 @@ public class EntrenadorController {
         }
     }
     
-    /**
-     * Ver estadísticas detalladas del equipo
-     * Ruta: /coach/estadisticas
-     */
     @GetMapping("/estadisticas")
     public String verEstadisticas(Model model, Principal principal, RedirectAttributes redirectAttributes) {
         try {

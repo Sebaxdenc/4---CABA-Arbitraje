@@ -6,7 +6,6 @@ import eafit.caba_pro.model.Reseña;
 import eafit.caba_pro.repository.EntrenadorRepository;
 import eafit.caba_pro.repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import eafit.caba_pro.repository.ReseñaRepository;
@@ -24,9 +23,6 @@ public class EntrenadorService {
     
     @Autowired
     private UsuarioRepository usuarioRepository;
-    
-    //@Autowired
-    //private PasswordEncoder passwordEncoder;
 
     @Autowired
     private ReseñaRepository reseñaRepository;
