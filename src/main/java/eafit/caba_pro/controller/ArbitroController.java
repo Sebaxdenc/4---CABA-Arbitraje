@@ -65,18 +65,6 @@ public class ArbitroController {
         return "arbitro/peril";
     }
 
-    @GetMapping("/arbitro/perfil")
-    public String perfil(Model model) {
-        Optional<Arbitro> arbitro = arbitroService.findByUsername(usuarioService.getCurrentUsername());
-        
-        if (arbitro.isPresent()) {
-            model.addAttribute("arbitro", arbitro.get());
-            return "arbitro/perfil";
-        }
-        
-        return "arbitro/perfil";
-    }
-
     @GetMapping("/arbitros/{id}")
     public String show(@PathVariable Long id, Model model) {
         

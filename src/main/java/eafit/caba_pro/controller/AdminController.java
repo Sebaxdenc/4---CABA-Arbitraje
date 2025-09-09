@@ -41,16 +41,16 @@ public class AdminController {
     @GetMapping()
     public String dashboard(Model model) {
         long totalPartidos = partidoService.count();
-        long aceptados = partidoService.countByEstado(Partido.EstadoPartido.PROGRAMADO);
-        long rechazados = partidoService.countByEstado(Partido.EstadoPartido.CANCELADO);
+        long programados = partidoService.countByEstado(Partido.EstadoPartido.PROGRAMADO);
+        long finalizados = partidoService.countByEstado(Partido.EstadoPartido.FINALIZADO);
 
-        double porcentajeAceptados = totalPartidos > 0 ? (aceptados * 100.0 / totalPartidos) : 0;
-        double porcentajeRechazados = totalPartidos > 0 ? (rechazados * 100.0 / totalPartidos) : 0;
+        double porcentajeProgramados = totalPartidos > 0 ? (programados * 100.0 / totalPartidos) : 0;
+        double porcentajeFinalizados = totalPartidos > 0 ? (finalizados * 100.0 / totalPartidos) : 0;
 
         List<Arbitro> topArbitros = arbitroService.findTop5ActivosDelMes();
 
-        model.addAttribute("porcentajeAceptados", porcentajeAceptados);
-        model.addAttribute("porcentajeRechazados", porcentajeRechazados);
+        model.addAttribute("porcentajeProgramados", porcentajeProgramados);
+        model.addAttribute("porcentajeFinalizados", porcentajeFinalizados);
         model.addAttribute("topArbitros", topArbitros);
 
         return "admin/dashboard";
