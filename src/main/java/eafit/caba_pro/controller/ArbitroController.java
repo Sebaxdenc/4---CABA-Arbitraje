@@ -5,9 +5,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -22,6 +19,7 @@ import eafit.caba_pro.model.Partido;
 import eafit.caba_pro.service.ArbitroService;
 import eafit.caba_pro.service.PartidoService;
 import eafit.caba_pro.service.UsuarioService;
+import eafit.caba_pro.service.ReseñaService;
 
 
 @Controller
@@ -31,11 +29,13 @@ public class ArbitroController {
     private final ArbitroService arbitroService;
     private final PartidoService partidoService;
     private final UsuarioService usuarioService;
+    private final ReseñaService reseñaService;
 
-    public ArbitroController(ArbitroService arbitroService, PartidoService partidoService, UsuarioService usuarioService) {
+    public ArbitroController(ArbitroService arbitroService, PartidoService partidoService, UsuarioService usuarioService, ReseñaService reseñaService) {
         this.arbitroService = arbitroService;
         this.partidoService = partidoService;
         this.usuarioService = usuarioService;
+        this.reseñaService = reseñaService;
     }
 
     // ========== ENDPOINTS WEB (TEMPLATES) ==========
@@ -45,12 +45,18 @@ public class ArbitroController {
     public String dashboard(Model model){
         Optional<Arbitro> arbitro = arbitroService.findByUsername(usuarioService.getCurrentUsername());
 
-        model.addAttribute("titulo", "Dashboard");
-        model.addAttribute("nombre", arbitro.get().getNombre());
-        model.addAttribute("arbitro", arbitro.get());
-        Map<String, Object> estadisticas = partidoService.getEstadisticasArbitro(arbitro.get());
-        model.addAttribute("estadisticas", estadisticas);
-        return "arbitro/dashboard";
+        if (arbitro.isPresent()) {
+            model.addAttribute("titulo", "Dashboard");
+            model.addAttribute("nombre", arbitro.get().getNombre());
+            model.addAttribute("arbitro", arbitro.get());
+            Map<String, Object> estadisticas = partidoService.getEstadisticasArbitro(arbitro.get());
+            model.addAttribute("estadisticas", estadisticas);
+            
+            // Agregar próximos partidos
+            model.addAttribute("proximosPartidos", partidoService.findFuturePartidosByArbitro(arbitro.get()));
+        }
+        
+        return "arbitro/dashboard";        
     }
 
     @GetMapping("/arbitros")
@@ -119,13 +125,73 @@ public class ArbitroController {
         // Obtener datos del calendario
         Map<String, Object> calendarioData = partidoService.getCalendarioDataByArbitro(arbitro, yearMonth);
         
+        // NUEVO: Obtener estadísticas globales del árbitro (todos los partidos)
+        Map<String, Object> estadisticasGlobales = partidoService.getEstadisticasArbitro(arbitro);
+        
         model.addAttribute("arbitro", arbitro);
         model.addAttribute("calendarioData", calendarioData);
+        model.addAttribute("estadisticasGlobales", estadisticasGlobales);
         model.addAttribute("currentYear", yearMonth.getYear());
         model.addAttribute("currentMonth", yearMonth.getMonthValue());
         model.addAttribute("yearMonth", yearMonth);
         
         return "arbitro/calendario";
+    }
+
+    @GetMapping("/perfil")
+    public String perfil(Model model) {
+        Optional<Arbitro> arbitroOpt = arbitroService.findByUsername(usuarioService.getCurrentUsername());
+
+        if (!arbitroOpt.isPresent()) {
+            return "redirect:/arbitros";
+        }
+        
+        Arbitro arbitro = arbitroOpt.get();
+        
+        model.addAttribute("arbitro", arbitro);
+        
+        return "arbitro/perfil";
+    }
+
+    @GetMapping("/reseñas")
+    public String reseñas(Model model) {
+        Optional<Arbitro> arbitroOpt = arbitroService.findByUsername(usuarioService.getCurrentUsername());
+
+        if (!arbitroOpt.isPresent()) {
+            return "redirect:/arbitros";
+        }
+        
+        Arbitro arbitro = arbitroOpt.get();
+        
+        // Obtener todas las reseñas del árbitro
+        model.addAttribute("arbitro", arbitro);
+        model.addAttribute("reseñas", reseñaService.findReseñasByArbitro(arbitro));
+        model.addAttribute("estadisticasReseñas", reseñaService.getEstadisticasReseñas(arbitro));
+        
+        return "arbitro/reseñas";
+    }
+    
+    @GetMapping("/partidos")
+    public String partidos(Model model) {
+        Optional<Arbitro> arbitroOpt = arbitroService.findByUsername(usuarioService.getCurrentUsername());
+
+        if (!arbitroOpt.isPresent()) {
+            return "redirect:/arbitros";
+        }
+        
+        Arbitro arbitro = arbitroOpt.get();
+        
+        // Obtener partidos ordenados usando el servicio
+        List<Partido> partidosPasados = partidoService.findPartidosPasadosOrdenados(arbitro);
+        List<Partido> partidosFuturos = partidoService.findPartidosFuturosOrdenados(arbitro);
+        List<Partido> todosLosPartidos = partidoService.findByArbitro(arbitro);
+        
+        model.addAttribute("arbitro", arbitro);
+        model.addAttribute("partidosPasados", partidosPasados);
+        model.addAttribute("partidosFuturos", partidosFuturos);
+        model.addAttribute("totalPartidos", todosLosPartidos.size());
+        
+        return "arbitro/partidos";
     }
     
     // API endpoint para obtener datos del calendario (AJAX)
@@ -159,50 +225,7 @@ public class ArbitroController {
     @GetMapping("/api/arbitros/{id:[0-9]+}/photo")
     @ResponseBody
     public ResponseEntity<byte[]> getArbitroPhoto(@PathVariable Long id) {
-        try {
-            System.out.println(" Solicitando imagen para árbitro ID: " + id);
-            
-            Optional<Arbitro> arbitroOptional = arbitroService.findById(id);
-            
-            if (arbitroOptional.isPresent()) {
-                Arbitro arbitro = arbitroOptional.get();
-                
-                if (arbitro.hasPhoto()) {
-                    HttpHeaders headers = new HttpHeaders();
-                    
-                    // Establecer tipo de contenido
-                    String contentType = arbitro.getPhotoContentType();
-                    if (contentType != null) {
-                        headers.setContentType(MediaType.parseMediaType(contentType));
-                    } else {
-                        headers.setContentType(MediaType.IMAGE_JPEG); // Por defecto
-                    }
-                    
-                    // Configurar cache
-                    headers.setCacheControl("max-age=3600"); // Cache por 1 hora
-                    
-                    // Nombre del archivo para descarga (opcional)
-                    if (arbitro.getPhotoFilename() != null) {
-                        headers.setContentDispositionFormData("inline", arbitro.getPhotoFilename());
-                    }
-                    
-                    System.out.println("Sirviendo imagen: " + arbitro.getNombre() + 
-                                     " (" + arbitro.getPhotoData().length + " bytes, " + contentType + ")");
-                    
-                    return new ResponseEntity<>(arbitro.getPhotoData(), headers, HttpStatus.OK);
-                } else {
-                    System.out.println("Árbitro " + arbitro.getNombre() + " no tiene imagen");
-                    return ResponseEntity.notFound().build();
-                }
-            } else {
-                System.out.println(" Árbitro no encontrado con ID: " + id);
-                return ResponseEntity.notFound().build();
-            }
-        } catch (Exception e) {
-            System.err.println(" Error al servir imagen para árbitro ID " + id + ": " + e.getMessage());
-            e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
+        return arbitroService.buildPhotoResponse(id);
     }
 
 }

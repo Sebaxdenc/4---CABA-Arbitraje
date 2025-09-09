@@ -95,8 +95,11 @@ public class Arbitro {
     @JsonManagedReference // Manejar serialización de partidos
     private List<Partido> partidos = new ArrayList<>();
 
-    @Column(name = "unavailability_dates", columnDefinition = "TEXT")
-    private String unavailabilityDates;
+    // Relación uno a muchos con Reseña
+    @OneToMany(mappedBy = "arbitro", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonManagedReference // Manejar serialización de reseñas
+    private List<Reseña> reseñas = new ArrayList<>();
+
     
     // MÉTODO HELPER: Verificar si tiene imagen
     public boolean hasPhoto() {
@@ -133,6 +136,39 @@ public class Arbitro {
     // Verificar si tiene partidos asignados
     public boolean tienePartidos() {
         return !partidos.isEmpty();
+    }
+    
+    // MÉTODOS HELPER PARA MANEJAR LA RELACIÓN CON RESEÑAS
+    
+    // Agregar una reseña al árbitro
+    public void addReseña(Reseña reseña) {
+        reseñas.add(reseña);
+        reseña.setArbitro(this);
+    }
+    
+    // Remover una reseña del árbitro
+    public void removeReseña(Reseña reseña) {
+        reseñas.remove(reseña);
+        reseña.setArbitro(null);
+    }
+    
+    // Obtener cantidad de reseñas
+    public int getCantidadReseñas() {
+        return reseñas.size();
+    }
+    
+    // Calcular promedio de puntuación
+    public double getPromedioPuntuacion() {
+        if (reseñas.isEmpty()) {
+            return 0.0;
+        }
+        double suma = reseñas.stream().mapToInt(Reseña::getPuntuacion).sum();
+        return suma / reseñas.size();
+    }
+    
+    // Verificar si tiene reseñas
+    public boolean tieneReseñas() {
+        return !reseñas.isEmpty();
     }
  
 }

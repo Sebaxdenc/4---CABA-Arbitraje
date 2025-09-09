@@ -51,12 +51,37 @@ public class PartidoService {
         return partidoRepository.findByArbitro(arbitro);
     }
     
+    public List<Partido> findByArbitro(Arbitro arbitro) {
+        return partidoRepository.findByArbitro(arbitro);
+    }
+    
     public List<Partido> findFuturePartidosByArbitro(Arbitro arbitro) {
         return partidoRepository.findFuturePartidosByArbitro(arbitro, LocalDate.now());
     }
     
     public List<Partido> findPastPartidosByArbitro(Arbitro arbitro) {
         return partidoRepository.findPastPartidosByArbitro(arbitro, LocalDate.now());
+    }
+    
+    // Métodos para obtener partidos ordenados
+    public List<Partido> findPartidosPasadosOrdenados(Arbitro arbitro) {
+        List<Partido> todosLosPartidos = partidoRepository.findByArbitro(arbitro);
+        LocalDate hoy = LocalDate.now();
+        
+        return todosLosPartidos.stream()
+            .filter(partido -> partido.getFecha().isBefore(hoy))
+            .sorted(java.util.Comparator.comparing(Partido::getFecha).reversed()) // Más recientes primero
+            .collect(java.util.stream.Collectors.toList());
+    }
+    
+    public List<Partido> findPartidosFuturosOrdenados(Arbitro arbitro) {
+        List<Partido> todosLosPartidos = partidoRepository.findByArbitro(arbitro);
+        LocalDate hoy = LocalDate.now();
+        
+        return todosLosPartidos.stream()
+            .filter(partido -> partido.getFecha().isAfter(hoy) || partido.getFecha().isEqual(hoy))
+            .sorted(java.util.Comparator.comparing(Partido::getFecha)) // Más próximos primero
+            .collect(java.util.stream.Collectors.toList());
     }
     
     // Método para obtener datos del calendario de un árbitro
@@ -99,14 +124,27 @@ public class PartidoService {
     
     // Obtener estadísticas de un árbitro
     public Map<String, Object> getEstadisticasArbitro(Arbitro arbitro) {
+        // Una sola consulta que obtiene todos los partidos
         List<Partido> todosPartidos = findPartidosByArbitro(arbitro);
-        List<Partido> partidosFuturos = findFuturePartidosByArbitro(arbitro);
-        List<Partido> partidosPasados = findPastPartidosByArbitro(arbitro);
+        LocalDate hoy = LocalDate.now();
+        
+        // Separar en memoria en lugar de hacer más consultas a BD
+        int partidosFuturos = 0;
+        int partidosPasados = 0;
+        
+        for (Partido partido : todosPartidos) {
+            if (partido.getFecha().isAfter(hoy) || 
+                (partido.getFecha().isEqual(hoy) && partido.getHora().isAfter(java.time.LocalTime.now()))) {
+                partidosFuturos++;
+            } else {
+                partidosPasados++;
+            }
+        }
         
         Map<String, Object> estadisticas = new HashMap<>();
         estadisticas.put("totalPartidos", todosPartidos.size());
-        estadisticas.put("partidosFuturos", partidosFuturos.size());
-        estadisticas.put("partidosPasados", partidosPasados.size());
+        estadisticas.put("partidosFuturos", partidosFuturos);
+        estadisticas.put("partidosPasados", partidosPasados);
         
         // Como ahora solo hay un árbitro por partido, todos son como principal
         estadisticas.put("comoArbitroPrincipal", todosPartidos.size());
