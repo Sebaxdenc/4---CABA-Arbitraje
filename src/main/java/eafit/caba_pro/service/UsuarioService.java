@@ -15,6 +15,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import eafit.caba_pro.model.Arbitro;
 import eafit.caba_pro.model.Usuario;
 import eafit.caba_pro.repository.UsuarioRepository;
 
@@ -54,4 +55,9 @@ public class UsuarioService implements UserDetailsService{
         }
         return null;
     }
+
+    public void createUsuario(Usuario usuario){
+        usuarioRepository.save(usuario);
+    }
+
 }

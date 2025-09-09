@@ -1,10 +1,16 @@
 package eafit.caba_pro.model;
 
+import java.util.List;
+
+
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import lombok.*;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 @Entity
 @Table(name = "equipo")
@@ -29,15 +35,17 @@ public class Equipo {
     
     @Column(nullable = false)
     @Positive(message = "El año debe ser un número válido")
-    @NotNull(message = "El año de fundación es necesario")
-    private Integer anñoFundacion;
+    @NotNull(message = "El año de fundación es necesario")  
+    private Integer fundacion;
     
     @Column(nullable = false)
-    private String logoUrl;
+    private String logo;
 
-    // @OneToOne(fetch = FetchType.EAGER)
-    // @JoinColumn(name="entrenador_id")
+    @OneToMany(mappedBy = "equipoLocal",fetch = FetchType.LAZY)
+    @JsonManagedReference
+    private List<Partido> partidosLocal;
 
-    // private Entrenador entrenador;
-
+    @OneToMany(mappedBy = "equipoVisitante",fetch = FetchType.LAZY)
+    @JsonManagedReference
+    private List<Partido> partidosVisitante;
 } 

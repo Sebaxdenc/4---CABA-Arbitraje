@@ -63,10 +63,10 @@ public class PartidoService {
     public Map<String, Object> getCalendarioDataByArbitro(Arbitro arbitro, YearMonth yearMonth) {
         LocalDate startDate = yearMonth.atDay(1);
         LocalDate endDate = yearMonth.atEndOfMonth();
-        
+
         List<Partido> partidos = partidoRepository.findByArbitroAndFechaBetween(
             arbitro, startDate, endDate);
-        
+
         Map<String, Object> calendarioData = new HashMap<>();
         Map<String, List<Map<String, Object>>> partidosPorFecha = new HashMap<>();
         
@@ -75,8 +75,8 @@ public class PartidoService {
             
             Map<String, Object> partidoData = new HashMap<>();
             partidoData.put("id", partido.getId());
-            partidoData.put("equipoLocal", partido.getEquipoLocal());
-            partidoData.put("equipoVisitante", partido.getEquipoVisitante());
+            partidoData.put("equipoLocal", partido.getEquipoLocal().getNombre());
+            partidoData.put("equipoVisitante", partido.getEquipoVisitante().getNombre());
             partidoData.put("hora", partido.getHora().toString());
             partidoData.put("estado", partido.getEstado().toString());
             partidoData.put("esFuturo", partido.esPartidoFuturo());
