@@ -38,7 +38,7 @@ public class Partido {
     private EstadoPartido estado = EstadoPartido.PROGRAMADO;
     
     // Relación con el árbitro
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "arbitro_id")
     @JsonBackReference // Evitar serialización circular - lado "back"
     private Arbitro arbitro;

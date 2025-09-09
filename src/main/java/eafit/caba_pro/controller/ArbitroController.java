@@ -46,7 +46,7 @@ public class ArbitroController {
         Optional<Arbitro> arbitro = arbitroService.findByUsername(usuarioService.getCurrentUsername());
 
         model.addAttribute("titulo", "Dashboard");
-        model.addAttribute("nombre", arbitro.get().getNombre())
+        model.addAttribute("nombre", arbitro.get().getNombre());
         model.addAttribute("arbitro", arbitro.get());
         Map<String, Object> estadisticas = partidoService.getEstadisticasArbitro(arbitro.get());
         model.addAttribute("estadisticas", estadisticas);

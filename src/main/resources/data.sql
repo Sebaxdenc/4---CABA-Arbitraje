@@ -7,16 +7,16 @@ VALUES ('user2','{noop}1234','ROLE_ARBITRO');
 INSERT INTO usuario(username, password, role)
 VALUES ('user3','{noop}1234','ROLE_ENTRENADOR');
 
--- Usuario específico para Sebastian Medina
 INSERT INTO usuario(username, password, role)
 VALUES ('sebastian.medina','{noop}arbitro123','ROLE_ARBITRO');
-
 
 INSERT INTO usuario(username, password, role)
 VALUES ('paula.lp','{noop}arbitro1234','ROLE_ARBITRO');
 
-INSERT INTO arbitro (nombre, username, cedula, phone, speciality, scale, photo_data, photo_content_type, photo_filename, unavailability_dates, usuario_id) 
-VALUES ('paula lop', 'paula.lp', '34567', '3222469936', 'Campo', 'Internacional', NULL, NULL, NULL, '', 5);
+--Arbitros
+
+INSERT INTO arbitro (nombre, contraseña, username, cedula, phone, speciality, scale, photo_data, photo_content_type, photo_filename, unavailability_dates, usuario_id) 
+VALUES ('paula lop','arbitro1234' ,'paula.lp', '34567', '3222469936', 'Campo', 'Internacional', NULL, NULL, NULL, '', 5);
 
 INSERT INTO arbitro (nombre, contraseña, username, cedula, phone, speciality, scale, photo_data, photo_content_type, photo_filename, unavailability_dates, usuario_id) 
 VALUES ('Sebastian Medina', '{noop}arbitro123', 'sebastian.medina', '1058198772', '3222469936', 'Campo', 'Internacional', NULL, NULL, NULL, '', 4);
