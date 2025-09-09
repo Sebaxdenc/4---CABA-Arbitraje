@@ -28,8 +28,8 @@ public class EquipoService {
 
     @Transactional
     public void createTeam(Equipo team){
-        if(team.getLogoUrl() == null)
-            team.setLogoUrl("https://placehold.co/64x64");
+        if(team.getLogo() == null)
+            team.setLogo("https://placehold.co/64x64");
 
         equipoRepository.save(team);
     }
@@ -38,7 +38,5 @@ public class EquipoService {
     public void save(Equipo team){
         equipoRepository.save(team);
     }
-
-    
 }
 

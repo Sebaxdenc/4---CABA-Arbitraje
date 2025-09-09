@@ -15,6 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import eafit.caba_pro.model.Arbitro;
 import eafit.caba_pro.model.Partido;
+import eafit.caba_pro.model.Usuario;
 import eafit.caba_pro.repository.ArbitroRepository;
 import eafit.caba_pro.repository.PartidoRepository;
 
@@ -24,11 +25,13 @@ public class ArbitroService {
 
     private final ArbitroRepository arbitroRepository;
     private final PartidoRepository partidoRepository;
+    private final UsuarioService usuarioService;
 
     // Constructor para inyección de dependencias
-    public ArbitroService(ArbitroRepository arbitroRepository, PartidoRepository partidoRepository) {
+    public ArbitroService(ArbitroRepository arbitroRepository, PartidoRepository partidoRepository, UsuarioService usuarioService) {
         this.arbitroRepository = arbitroRepository;
         this.partidoRepository = partidoRepository;
+        this.usuarioService=usuarioService;
     }
 
     // ========== OPERACIONES DE LECTURA ==========
@@ -251,5 +254,21 @@ public class ArbitroService {
                 .header(HttpHeaders.CONTENT_TYPE, ct)
                 .header(HttpHeaders.CACHE_CONTROL, "max-age=3600")
                 .body(a.getPhotoData());
+    }
+
+    @Transactional
+    public void crearArbitro(Arbitro arbitro) {
+        // 1. Crear Usuario
+        Usuario usuario = new Usuario();
+        usuario.setUsername(arbitro.getNombre()); // o arbitro.getCedula() o lo que uses
+        usuario.setPassword(arbitro.getContraseña()); // OJO: en real usar BCryptPasswordEncoder
+        usuario.setRole("ROLE_ARBITRO");
+
+        usuarioService.createUsuario(usuario);
+
+        // 2. Asociar usuario al árbitro
+        arbitro.setUsuario(usuario);
+        arbitroRepository.save(arbitro);
+
     }
 }
