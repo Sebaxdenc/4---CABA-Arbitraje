@@ -35,6 +35,13 @@ public interface ReseñaRepository extends JpaRepository<Reseña, Long> {
     
     // Encontrar reseñas de un árbitro en un partido específico
     List<Reseña> findByArbitroAndPartido(Arbitro arbitro, Partido partido);
+
+    // En tu ReseñaRepository existente, asegúrate de tener:
+
+    List<Reseña> findByEntrenador_IdOrderByFechaCreacionDesc(Long entrenadorId);
+
+    @Query("SELECT AVG(r.puntuacion) FROM Reseña r WHERE r.entrenador.id = :entrenadorId")
+    Double findPromedioCalificacionByEntrenador(@Param("entrenadorId") Long entrenadorId);
     
     // Verificar si ya existe una reseña de un entrenador para un partido específico
     @Query("SELECT r FROM Reseña r WHERE r.arbitro = :arbitro AND r.partido = :partido AND r.entrenador.id = :entrenadorId")

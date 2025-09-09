@@ -1,10 +1,21 @@
 package eafit.caba_pro.repository;
-import org.springframework.data.jpa.repository.JpaRepository;
 
 import eafit.caba_pro.model.Usuario;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
-public interface UsuarioRepository extends JpaRepository<Usuario,Long>{
-    Usuario findByUsername(String username);
+import java.util.Optional;
+
+@Repository
+public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
+
+    Optional<Usuario> findByUsername(String username);
+    
+    Optional<Usuario> findByEmail(String email);
+    
     boolean existsByUsername(String username);
+    
+    boolean existsByEmail(String email);
+    
+    Optional<Usuario> findByUsernameAndActivoTrue(String username);
 }
- 

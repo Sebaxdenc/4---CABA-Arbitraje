@@ -1,12 +1,9 @@
 package eafit.caba_pro.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -88,5 +85,28 @@ public class Partido {
     public boolean tieneArbitro(Arbitro arbitro) {
         return (this.arbitro != null && this.arbitro.getId().equals(arbitro.getId()));
     }
+
+    @Column(name = "goles_local")
+    private Integer golesLocal;
+
+    @Column(name = "goles_visitante")  
+    private Integer golesVisitante;
+
+     // Getters y setters
+public Integer getGolesLocal() {
+    return golesLocal;
+}
+
+public void setGolesLocal(Integer golesLocal) {
+    this.golesLocal = golesLocal;
+}
+
+public Integer getGolesVisitante() {
+    return golesVisitante;
+}
+
+public void setGolesVisitante(Integer golesVisitante) {
+    this.golesVisitante = golesVisitante;
+}
     
 }
