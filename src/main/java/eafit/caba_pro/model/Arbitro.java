@@ -25,7 +25,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "arbitros")
+@Table(name = "arbitro")
 @Data // Generate getters and setters for all fields using lombok
 @AllArgsConstructor // Generate a contrustuctor with all the fields
 @NoArgsConstructor // Generates a constructor with no fields acordding to JPA
@@ -40,6 +40,11 @@ public class Arbitro {
     @NotEmpty(message = "El nombre no puede estar vacío")
     @Column(nullable = false, length = 100)
     private String nombre;
+
+    @NotNull(message = "La contraseña no puede ser nula")
+    @NotEmpty(message = "La contraseña no puede estar vacía")
+    @Column(nullable = false, length = 100)
+    private String contraseña;
 
     @NotNull(message = "El nombre de usuario no puede ser nulo")
     @NotEmpty(message = "El nombre de usuario no puede estar vacío")
@@ -86,15 +91,12 @@ public class Arbitro {
     private Usuario usuario;
 
     // Relación uno a muchos con Partido
-    @OneToMany(mappedBy = "arbitro", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "arbitro", cascade = CascadeType.ALL)
     @JsonManagedReference // Manejar serialización de partidos
     private List<Partido> partidos = new ArrayList<>();
 
-
-    
     @Column(name = "unavailability_dates", columnDefinition = "TEXT")
     private String unavailabilityDates;
-    
     
     // MÉTODO HELPER: Verificar si tiene imagen
     public boolean hasPhoto() {

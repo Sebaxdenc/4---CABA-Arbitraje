@@ -29,14 +29,30 @@ public class ArbitroService {
     private final ArbitroRepository arbitroRepository;
     private final PartidoRepository partidoRepository;
     private final UsuarioRepository usuarioRepository;
-
+    private final UsuarioService usuarioService;
 
     // Constructor para inyección de dependencias
-    public ArbitroService(ArbitroRepository arbitroRepository, PartidoRepository partidoRepository, UsuarioRepository usuarioRepository) {
+    public ArbitroService(ArbitroRepository arbitroRepository, PartidoRepository partidoRepository,UsuarioRepository usuarioRepository,UsuarioService usuarioService) {
         this.arbitroRepository = arbitroRepository;
         this.partidoRepository = partidoRepository;
         this.usuarioRepository = usuarioRepository;
+        this.usuarioService = usuarioService;
+    }
 
+    // ========== OPERACIONES DE LECTURA ==========
+
+    /**
+     * Buscar árbitro por cédula
+     */
+    public Optional<Arbitro> findByCedula(String cedula) {
+        return arbitroRepository.findByCedula(cedula);
+    }
+
+    /**
+     * Buscar árbitro por nombre de usuario
+     */
+    public Optional<Arbitro> findByUsername(String username) {
+        return arbitroRepository.findByUsername(username);
     }
 
     // ========== OPERACIONES DE LECTURA ==========
@@ -279,4 +295,19 @@ public class ArbitroService {
    public List<Arbitro> findTop5ActivosDelMes() {
     return arbitroRepository.findTop5ActivosDelMes(PageRequest.of(0, 5));
    }
+    @Transactional
+    public void crearArbitro(Arbitro arbitro) {
+        // 1. Crear Usuario
+        Usuario usuario = new Usuario();
+        usuario.setUsername(arbitro.getNombre());
+        usuario.setPassword(arbitro.getContraseña()); 
+        usuario.setRole("ROLE_ARBITRO");
+
+        usuarioService.createUsuario(usuario);
+
+        // 2. Asociar usuario al árbitro
+        arbitro.setUsuario(usuario);
+        arbitroRepository.save(arbitro);
+
+    }
 }

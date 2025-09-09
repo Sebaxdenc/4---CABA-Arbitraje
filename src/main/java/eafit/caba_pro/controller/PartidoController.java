@@ -3,6 +3,7 @@ package eafit.caba_pro.controller;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -19,7 +20,6 @@ import eafit.caba_pro.service.PartidoService;
 @Controller
 @RequestMapping("/partido")             // posiblemente toque cambiar para acceder a aqui desde arbitro
 public class PartidoController {
-
     private final PartidoService partidoService;
     private final ArbitroService arbitroService;
 

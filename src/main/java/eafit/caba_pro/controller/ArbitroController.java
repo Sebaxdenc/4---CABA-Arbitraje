@@ -1,5 +1,7 @@
 package eafit.caba_pro.controller;
 import java.time.YearMonth;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -16,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import eafit.caba_pro.model.Arbitro;
+import eafit.caba_pro.model.Partido;
 import eafit.caba_pro.service.ArbitroService;
 import eafit.caba_pro.service.PartidoService;
 import eafit.caba_pro.service.UsuarioService;
@@ -43,11 +46,11 @@ public class ArbitroController {
         Optional<Arbitro> arbitro = arbitroService.findByUsername(usuarioService.getCurrentUsername());
 
         model.addAttribute("titulo", "Dashboard");
-        model.addAttribute("nombre", arbitro.get().getNombre());
-            model.addAttribute("arbitro", arbitro.get());
-            Map<String, Object> estadisticas = partidoService.getEstadisticasArbitro(arbitro.get());
-            model.addAttribute("estadisticas", estadisticas);
-            return "arbitro/dashboard";
+        model.addAttribute("nombre", arbitro.get().getNombre())
+        model.addAttribute("arbitro", arbitro.get());
+        Map<String, Object> estadisticas = partidoService.getEstadisticasArbitro(arbitro.get());
+        model.addAttribute("estadisticas", estadisticas);
+        return "arbitro/dashboard";
     }
 
     @GetMapping("/arbitros")
@@ -85,8 +88,17 @@ public class ArbitroController {
         
         // Si no se encuentra el árbitro, redirigir a la lista
         return "redirect:/arbitros";
+  }
+    @GetMapping("/lop")
+    public ResponseEntity<Map<String, Object>> show(Model model) {
+        Map<String, Object> response = new HashMap<>();
+        Optional<Arbitro> arbitro = arbitroService.findByUsername(usuarioService.getCurrentUsername());
+        //YearMonth yearMonth = yearMonth.now();
+        Map<String, Object> arbri = new HashMap<>();
+        arbri.put("arbitro", arbitro.orElse(null));
+        return ResponseEntity.ok(arbri);
     }
-
+  
     @GetMapping("/calendario")
     public String calendario(@RequestParam(required = false) Integer year,
                              @RequestParam(required = false) Integer month,
@@ -117,8 +129,7 @@ public class ArbitroController {
     }
     
     // API endpoint para obtener datos del calendario (AJAX)
-    @GetMapping("/api/arbitros/{id}/calendario")
-    @ResponseBody
+    @GetMapping("/lop1")
     public ResponseEntity<Map<String, Object>> getCalendarioData(
             @PathVariable Long id,
             @RequestParam(required = false) Integer year,

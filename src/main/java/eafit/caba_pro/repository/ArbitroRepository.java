@@ -64,6 +64,8 @@ public interface ArbitroRepository extends JpaRepository<Arbitro, Long> {
     // Contar partidos de un árbitro
     @Query("SELECT COUNT(p) FROM Arbitro a JOIN a.partidos p WHERE a.id = :arbitroId")
     Long countPartidosByArbitroId(@Param("arbitroId") Long arbitroId);
+
+    Arbitro save(Arbitro arbitr);
     
     @Query("SELECT a FROM Arbitro a JOIN a.partidos p " +
               "WHERE MONTH(p.fecha) = MONTH(CURRENT_DATE) AND YEAR(p.fecha) = YEAR(CURRENT_DATE) " +
