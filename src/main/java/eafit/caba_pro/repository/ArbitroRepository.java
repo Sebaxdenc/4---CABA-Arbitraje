@@ -67,6 +67,14 @@ public interface ArbitroRepository extends JpaRepository<Arbitro, Long> {
 
     Arbitro save(Arbitro arbitr);
     
+    // OPTIMIZACIÓN: Buscar árbitro con partidos precargados (FETCH JOIN)
+    @Query("SELECT a FROM Arbitro a LEFT JOIN FETCH a.partidos WHERE a.username = :username")
+    Optional<Arbitro> findByUsernameWithPartidos(@Param("username") String username);
+    
+    // OPTIMIZACIÓN: Buscar árbitro con usuario precargado (FETCH JOIN)
+    @Query("SELECT a FROM Arbitro a LEFT JOIN FETCH a.usuario WHERE a.username = :username")
+    Optional<Arbitro> findByUsernameWithUsuario(@Param("username") String username);
+
     @Query("SELECT a FROM Arbitro a JOIN a.partidos p " +
               "WHERE MONTH(p.fecha) = MONTH(CURRENT_DATE) AND YEAR(p.fecha) = YEAR(CURRENT_DATE) " +
               "GROUP BY a ORDER BY COUNT(p) DESC")

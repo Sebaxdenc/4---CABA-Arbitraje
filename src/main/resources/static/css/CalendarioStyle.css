@@ -1,3 +1,84 @@
+/* Estilos para la cuadrícula del calendario */
+.calendario-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 1px;
+    background-color: #e5e7eb;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.dia-header {
+    background-color: #f3f4f6;
+    padding: 12px 8px;
+    text-align: center;
+    font-weight: 600;
+    font-size: 0.875rem;
+    color: #374151;
+    border-bottom: 2px solid #e5e7eb;
+}
+
+.dia-celda {
+    background-color: white;
+    min-height: 80px;
+    padding: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+}
+
+.dia-celda:hover {
+    background-color: #f8fafc;
+    transform: scale(1.02);
+}
+
+.dia-numero {
+    font-weight: 500;
+    color: #374151;
+    margin-bottom: 4px;
+}
+
+.dia-otro-mes {
+    color: #9ca3af;
+    background-color: #f9fafb;
+}
+
+.dia-actual {
+    background-color: #3b82f6 !important;
+    color: white;
+}
+
+.dia-actual .dia-numero {
+    color: white;
+    font-weight: 700;
+}
+
+.dia-con-partido {
+    border-bottom: 4px solid #10b981;
+}
+
+.dia-con-partido-pasado {
+    border-bottom: 4px solid #6b7280;
+}
+
+.partido-info {
+    font-size: 0.75rem;
+    background-color: #10b981;
+    color: white;
+    padding: 2px 4px;
+    border-radius: 4px;
+    margin-top: 2px;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.partido-info.pasado {
+    background-color: #6b7280;
+}
+
+
 .calendario-container {
     background: white;
     border-radius: 10px;

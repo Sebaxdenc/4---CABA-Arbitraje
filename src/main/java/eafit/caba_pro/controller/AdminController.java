@@ -1,8 +1,11 @@
 package eafit.caba_pro.controller;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -38,16 +41,24 @@ public class AdminController {
     @GetMapping()
     public String dashboard(Model model) {
         long totalPartidos = partidoService.count();
-        long aceptados = partidoService.countByEstado(Partido.EstadoPartido.PROGRAMADO);
-        long rechazados = partidoService.countByEstado(Partido.EstadoPartido.CANCELADO);
+        long programados = partidoService.countByEstado(Partido.EstadoPartido.PROGRAMADO);
+        long finalizados = partidoService.countByEstado(Partido.EstadoPartido.FINALIZADO);
+        long pendientesConfirmacion = partidoService.countByEstado(Partido.EstadoPartido.PENDIENTE_CONFIRMACION);
+        long arbitroNoDisponible = partidoService.countByEstado(Partido.EstadoPartido.ARBITRO_NO_DISPONIBLE);
 
-        double porcentajeAceptados = totalPartidos > 0 ? (aceptados * 100.0 / totalPartidos) : 0;
-        double porcentajeRechazados = totalPartidos > 0 ? (rechazados * 100.0 / totalPartidos) : 0;
+        double porcentajeProgramados = totalPartidos > 0 ? (programados * 100.0 / totalPartidos) : 0;
+        double porcentajeFinalizados = totalPartidos > 0 ? (finalizados * 100.0 / totalPartidos) : 0;
+        double porcentajePendientes = totalPartidos > 0 ? (pendientesConfirmacion * 100.0 / totalPartidos) : 0;
+        double porcentajeNoDisponible = totalPartidos > 0 ? (arbitroNoDisponible * 100.0 / totalPartidos) : 0;
 
         List<Arbitro> topArbitros = arbitroService.findTop5ActivosDelMes();
 
-        model.addAttribute("porcentajeAceptados", porcentajeAceptados);
-        model.addAttribute("porcentajeRechazados", porcentajeRechazados);
+        model.addAttribute("porcentajeProgramados", porcentajeProgramados);
+        model.addAttribute("porcentajeFinalizados", porcentajeFinalizados);
+        model.addAttribute("porcentajePendientes", porcentajePendientes);
+        model.addAttribute("porcentajeNoDisponible", porcentajeNoDisponible);
+        model.addAttribute("pendientesConfirmacion", pendientesConfirmacion);
+        model.addAttribute("arbitroNoDisponible", arbitroNoDisponible);
         model.addAttribute("topArbitros", topArbitros);
 
         return "admin/dashboard";
@@ -179,6 +190,16 @@ public class AdminController {
         return "admin/partidos";
     }
 
+    @GetMapping("/lop")
+    public ResponseEntity<Map<String, Object>> show(Model model) {
+        Map<String, Object> response = new HashMap<>();
+
+        Optional<Partido> partidos = partidoService.findById(1L);
+        Map<String, Object> arbri = new HashMap<>();
+        arbri.put("partidos", partidos.get());
+        return ResponseEntity.ok(arbri);
+    }
+
     @GetMapping("/partidos/create")
     public String mostrarFormularioCrear(Model model) {
         model.addAttribute("partido", new Partido());
@@ -202,20 +223,18 @@ public class AdminController {
 
     @GetMapping("/partidos/edit/{id}")
     public String editar(@PathVariable Long id, Model model) {
-        Partido partido = partidoService.findById(id)
-                .orElseThrow(() -> new RuntimeException("Partido no encontrado"));
+        Optional<Partido> partido = partidoService.findById(id);
         model.addAttribute("partido", partido);
         model.addAttribute("arbitros", arbitroService.findAll());
         return "admin/partido_form";
     }
-
 
     @PostMapping("/partidos/delete/{id}")
     public String deletePartido(@PathVariable Long id, RedirectAttributes ra) {
         try {
     
             Optional<Partido> opt = partidoService.findById(id);
-            String label = opt.map(p -> p.getEquipoLocal() + " vs " + p.getEquipoVisitante())
+            String label = opt.map(p -> p.getEquipoLocal().getNombre() + " vs " + p.getEquipoVisitante().getNombre())
                             .orElse("Partido #" + id);
 
             boolean deleted = partidoService.deleteById(id);

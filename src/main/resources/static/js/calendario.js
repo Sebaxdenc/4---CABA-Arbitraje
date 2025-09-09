@@ -1,26 +1,27 @@
 // Asegurar que Bootstrap esté cargado antes de continuar
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('🚀 DOM cargado, iniciando calendario...');
+    console.log(' DOM cargado, iniciando calendario...');
     
     // Función para esperar a que CALENDARIO_CONFIG esté disponible
     function esperarConfiguracion(intentos = 0) {
         if (window.CALENDARIO_CONFIG) {
-            console.log('✅ Configuración encontrada:', window.CALENDARIO_CONFIG);
+            console.log(' Configuración encontrada:', window.CALENDARIO_CONFIG);
             iniciarCalendario();
         } else if (intentos < 10) {
-            console.log(`⏳ Esperando configuración... intento ${intentos + 1}`);
+            console.log(` Esperando configuración... intento ${intentos + 1}`);
             setTimeout(() => esperarConfiguracion(intentos + 1), 100);
         } else {
-            console.error('❌ No se pudo cargar la configuración del calendario');
+            console.error(' No se pudo cargar la configuración del calendario');
             // Usar valores por defecto
             window.CALENDARIO_CONFIG = {
                 calendarioData: {partidos: {}, totalPartidos: 0},
                 currentYear: new Date().getFullYear(),
                 currentMonth: new Date().getMonth() + 1,
                 arbitroId: 1,
-                arbitroNombre: 'Árbitro'
+                arbitroNombre: 'Árbitro',
+                estadisticasGlobales: {partidosFuturos: 0, totalPartidos: 0}
             };
-            console.log('🔄 Usando configuración por defecto:', window.CALENDARIO_CONFIG);
+            console.log(' Usando configuración por defecto:', window.CALENDARIO_CONFIG);
             iniciarCalendario();
         }
     }
@@ -29,27 +30,20 @@ document.addEventListener('DOMContentLoaded', function() {
     esperarConfiguracion();
     
     function iniciarCalendario() {
-        const { calendarioData, currentYear, currentMonth, arbitroId, arbitroNombre } = window.CALENDARIO_CONFIG;
-        
-        console.log('📊 Variables del servidor:');
-        console.log('  - calendarioData:', calendarioData);
-        console.log('  - currentYear:', currentYear);
-        console.log('  - currentMonth:', currentMonth);
-        console.log('  - arbitroId:', arbitroId);
-        console.log('  - arbitroNombre:', arbitroNombre);
+        const { calendarioData, currentYear, currentMonth, arbitroId, arbitroNombre, estadisticasGlobales } = window.CALENDARIO_CONFIG;
         
         // Verificar que tenemos todo lo necesario antes de generar
         if (typeof currentYear !== 'number' || currentYear < 2000) {
-            console.error('❌ currentYear inválido:', currentYear);
+            console.error(' currentYear inválido:', currentYear);
             return;
         }
         
         if (typeof currentMonth !== 'number' || currentMonth < 1 || currentMonth > 12) {
-            console.error('❌ currentMonth inválido:', currentMonth);
+            console.error(' currentMonth inválido:', currentMonth);
             return;
         }
         
-        console.log('✅ Datos válidos, iniciando tooltips...');
+        console.log(' Datos válidos, iniciando tooltips...');
         
         // Inicializar tooltips de Bootstrap
         const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
@@ -57,26 +51,21 @@ document.addEventListener('DOMContentLoaded', function() {
             new bootstrap.Tooltip(tooltipTriggerEl);
         });
         
-        console.log('✅ Generando calendario...');
+        console.log(' Generando calendario...');
         // Generar el calendario al cargar la página
         generarCalendario();
         
         function generarCalendario() {
-        console.log('🔄 Iniciando generación del calendario...');
-        console.log('📊 currentYear:', currentYear, 'currentMonth:', currentMonth);
-        console.log('� calendarioData:', calendarioData);
         
         const grid = document.getElementById('calendarioGrid');
         if (!grid) {
-            console.error('❌ Grid del calendario no encontrado');
+            console.error(' Grid del calendario no encontrado');
             return;
         }
         
-        console.log('✅ Grid encontrado, elementos actuales:', grid.children.length);
         
         // Limpiar días anteriores (mantener headers)
         const diasExistentes = grid.querySelectorAll('.dia-celda');
-        console.log('🧹 Limpiando', diasExistentes.length, 'días existentes');
         diasExistentes.forEach(dia => dia.remove());
         
         try {
@@ -86,11 +75,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const diasEnMes = ultimoDia.getDate();
             const primerDiaSemana = primerDia.getDay();
             
-            console.log('� Primer día:', primerDia.toISOString());
-            console.log('� Último día:', ultimoDia.toISOString());
-            console.log('� Días en mes:', diasEnMes);
-            console.log('� Primer día semana:', primerDiaSemana);
-            
+
             const hoy = new Date();
             
             // Estadísticas
@@ -101,7 +86,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 const mesAnterior = new Date(currentYear, currentMonth - 1, 0);
                 const diasMesAnterior = mesAnterior.getDate();
                 
-                console.log('⬅️ Agregando', primerDiaSemana, 'días del mes anterior');
+                console.log(' Agregando', primerDiaSemana, 'días del mes anterior');
                 for (let i = primerDiaSemana - 1; i >= 0; i--) {
                     const dia = diasMesAnterior - i;
                     const celda = crearCeldaDia(dia, true, false, []);
@@ -110,7 +95,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             
             // Días del mes actual
-            console.log('📅 Agregando', diasEnMes, 'días del mes actual');
+            console.log(' Agregando', diasEnMes, 'días del mes actual');
             for (let dia = 1; dia <= diasEnMes; dia++) {
                 const fechaStr = `${currentYear}-${String(currentMonth).padStart(2, '0')}-${String(dia).padStart(2, '0')}`;
                 const partidos = (calendarioData.partidos && calendarioData.partidos[fechaStr]) ? calendarioData.partidos[fechaStr] : [];
@@ -135,20 +120,23 @@ document.addEventListener('DOMContentLoaded', function() {
             const diasSiguientes = celdasNecesarias - totalCeldas;
             
             if (diasSiguientes > 0) {
-                console.log('➡️ Agregando', diasSiguientes, 'días del mes siguiente');
+                console.log(' Agregando', diasSiguientes, 'días del mes siguiente');
                 for (let dia = 1; dia <= diasSiguientes; dia++) {
                     const celda = crearCeldaDia(dia, true, false, []);
                     grid.appendChild(celda);
                 }
             }
             
-            console.log('✅ Calendario generado - Total celdas:', grid.children.length);
+            console.log(' Calendario generado - Total celdas:', grid.children.length);
             
-            // Actualizar estadísticas
+            // Actualizar estadísticas usando las estadísticas GLOBALES del servidor
             const partidosFuturosEl = document.getElementById('partidosFuturos');
-            const totalArbitradosEl = document.getElementById('totalArbitrados');
-            if (partidosFuturosEl) partidosFuturosEl.textContent = contadorEstadisticas.futuros;
-            if (totalArbitradosEl) totalArbitradosEl.textContent = contadorEstadisticas.total;
+            if (partidosFuturosEl && estadisticasGlobales) {
+                // Solo actualizar si no tiene ya el valor del servidor (Thymeleaf ya debería haberlo puesto)
+                if (partidosFuturosEl.textContent === '0') {
+                    partidosFuturosEl.textContent = estadisticasGlobales.partidosFuturos || 0;
+                }
+            }
             
             // Reinicializar tooltips
             setTimeout(() => {
@@ -156,11 +144,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 tooltipTriggerList.forEach(tooltipTriggerEl => {
                     new bootstrap.Tooltip(tooltipTriggerEl);
                 });
-                console.log('🎯 Tooltips inicializados para', tooltipTriggerList.length, 'elementos');
+                console.log(' Tooltips inicializados para', tooltipTriggerList.length, 'elementos');
             }, 100);
             
         } catch (error) {
-            console.error('❌ Error generando calendario:', error);
+            console.error(' Error generando calendario:', error);
         }
     }
     

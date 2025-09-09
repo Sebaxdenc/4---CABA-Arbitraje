@@ -35,7 +35,7 @@
             <div class="flex justify-between items-center">
                
                 <p class="font-semibold"
-                th:text="${partido.equipoLocal + ' vs ' + partido.equipoVisitante}"></p>
+                th:text="${partido.equipoLocal.nombre + ' vs ' + partido.equipoVisitante.nombre}"></p>
                 <span class="text-sm text-gray-600" th:text="${partido.fecha}"></span>
             </div>
 

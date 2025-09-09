@@ -21,7 +21,7 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception{
         http
             .authorizeHttpRequests(authorize -> authorize
-            .requestMatchers("/","/h2-consola/**","/login").permitAll()
+            .requestMatchers("/","/h2-consola/**","/login","/css/**","/js/**","/images/**").permitAll()
             .requestMatchers("/admin/**").hasRole("ADMIN")
             .requestMatchers("/entrenador/**").hasRole("ENTRENADOR")
             .requestMatchers("/arbitro/**").hasRole("ARBITRO")
@@ -32,8 +32,20 @@ public class SecurityConfig {
                 .maxSessionsPreventsLogin(true)
             )
             .formLogin(form -> form
-            .successHandler(loginSuccesHandler)
-            .permitAll()
+                .loginPage("/login")
+                .loginProcessingUrl("/login")
+                .usernameParameter("username")
+                .passwordParameter("password")
+                .successHandler(loginSuccesHandler)
+                .failureUrl("/login?error=true")
+                .permitAll()
+            )
+            .logout(logout -> logout
+                .logoutUrl("/logout")
+                .logoutSuccessUrl("/login?logout=true")
+                .invalidateHttpSession(true)
+                .deleteCookies("JSESSIONID")
+                .permitAll()
             )
             .csrf((csrf) -> csrf.disable()) // Nota: en producción, mantener CSRF habilitado y configurar adecuadamente.
             // Permitir frames (necesario para la consola H2)
