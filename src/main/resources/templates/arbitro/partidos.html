@@ -109,8 +109,8 @@
                                             <span class="text-sm text-gray-500" th:text="'ID: ' + ${partido.id}">ID: 1</span>
                                         </div>
                                     </div>
-                                    
-                                    <h3 class="text-lg font-semibold text-gray-900 mb-2" th:text="${partido.equipoLocal} + ' vs ' + ${partido.equipoVisitante}">
+
+                                    <h3 class="text-lg font-semibold text-gray-900 mb-2" th:text="${partido.equipoLocal.nombre} + ' vs ' + ${partido.equipoVisitante.nombre}">
                                         Equipo Local vs Equipo Visitante
                                     </h3>
                                     
@@ -174,7 +174,7 @@
                                         </div>
                                     </div>
                                     
-                                    <h3 class="text-lg font-semibold text-gray-900 mb-2" th:text="${partido.equipoLocal} + ' vs ' + ${partido.equipoVisitante}">
+                                    <h3 class="text-lg font-semibold text-gray-900 mb-2" th:text="${partido.equipoLocal.nombre} + ' vs ' + ${partido.equipoVisitante.nombre}">
                                         Equipo Local vs Equipo Visitante
                                     </h3>
                                     

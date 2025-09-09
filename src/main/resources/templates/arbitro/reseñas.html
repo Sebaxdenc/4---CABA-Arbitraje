@@ -155,7 +155,7 @@
                                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-blue-700">
                                         <div>
                                             <span class="font-medium">Enfrentamiento:</span>
-                                            <div th:text="${reseña.partido.equipoLocal + ' vs ' + reseña.partido.equipoVisitante}">Equipo A vs Equipo B</div>
+                                            <div th:text="${reseña.partido.equipoLocal.nombre + ' vs ' + reseña.partido.equipoVisitante.nombre}">Equipo A vs Equipo B</div>
                                         </div>
                                         <div>
                                             <span class="font-medium">Fecha y Hora:</span>

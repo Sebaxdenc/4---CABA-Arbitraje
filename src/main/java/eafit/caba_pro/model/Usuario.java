@@ -12,10 +12,12 @@ import jakarta.persistence.Id;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.Data;
+import lombok.ToString;
 
 @Entity
 @Table(name = "usuario")
 @Data
+@ToString(exclude = {"arbitro"}) // Exclude circular references
 public class Usuario {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
