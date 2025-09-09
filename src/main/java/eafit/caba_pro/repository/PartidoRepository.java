@@ -73,4 +73,71 @@ public interface PartidoRepository extends JpaRepository<Partido, Long> {
     @Query("SELECT COUNT(p) FROM Partido p WHERE p.estado = :estado")
     long countByEstado(@Param("estado") Partido.EstadoPartido estado);
     
+// AGREGAR ESTOS MÉTODOS A TU PartidoRepository EXISTENTE
+
+    // ==================== MÉTODOS PARA ESTADÍSTICAS DE EQUIPOS ====================
+    
+    /**
+     * Contar partidos de un equipo (como local o visitante)
+     */
+    @Query("SELECT COUNT(p) FROM Partido p WHERE p.equipoLocal.nombre = :equipo OR p.equipoVisitante.nombre = :equipo")
+    int countPartidosByEquipo(@Param("equipo") String equipo);
+
+    /**
+     * Contar partidos ganados por un equipo
+     */
+    @Query("SELECT COUNT(p) FROM Partido p WHERE " +
+           "(p.equipoLocal.nombre = :equipo AND p.golesLocal > p.golesVisitante AND p.estado = 'FINALIZADO') OR " +
+           "(p.equipoVisitante.nombre = :equipo AND p.golesVisitante > p.golesLocal AND p.estado = 'FINALIZADO')")
+    int countPartidosGanadosByEquipo(@Param("equipo") String equipo);
+
+    /**
+     * Contar partidos perdidos por un equipo
+     */
+    @Query("SELECT COUNT(p) FROM Partido p WHERE " +
+           "(p.equipoLocal.nombre = :equipo AND p.golesLocal < p.golesVisitante AND p.estado = 'FINALIZADO') OR " +
+           "(p.equipoVisitante.nombre = :equipo AND p.golesVisitante < p.golesLocal AND p.estado = 'FINALIZADO')")
+    int countPartidosPerdidosByEquipo(@Param("equipo") String equipo);
+
+    /**
+     * Contar partidos empatados por un equipo
+     */
+    @Query("SELECT COUNT(p) FROM Partido p WHERE " +
+           "(p.equipoLocal.nombre = :equipo OR p.equipoVisitante.nombre = :equipo) AND " +
+           "p.golesLocal = p.golesVisitante AND p.estado = 'FINALIZADO'")
+    int countPartidosEmpatadosByEquipo(@Param("equipo") String equipo);
+
+    /**
+     * Obtener partidos programados de un equipo
+     */
+    @Query("SELECT p FROM Partido p WHERE " +
+           "(p.equipoLocal.nombre = :equipo OR p.equipoVisitante.nombre = :equipo) AND " +
+           "p.estado = 'PROGRAMADO' ORDER BY p.fecha ASC, p.hora ASC")
+    List<Partido> findPartidosProgramadosByEquipo(@Param("equipo") String equipo);
+
+    /**
+     * Obtener partidos finalizados de un equipo
+     */
+    @Query("SELECT p FROM Partido p WHERE " +
+           "(p.equipoLocal.nombre = :equipo OR p.equipoVisitante.nombre = :equipo) AND " +
+           "p.estado = 'FINALIZADO' ORDER BY p.fecha DESC, p.hora DESC")
+    List<Partido> findPartidosFinalizadosByEquipo(@Param("equipo") String equipo);
+
+    /**
+     * Obtener últimos 5 partidos finalizados de un equipo
+     */
+    @Query("SELECT p FROM Partido p WHERE " +
+           "(p.equipoLocal.nombre = :equipo OR p.equipoVisitante.nombre = :equipo) AND " +
+           "p.estado = 'FINALIZADO' AND p.fecha <= CURRENT_DATE " +
+           "ORDER BY p.fecha DESC, p.hora DESC LIMIT 5")
+    List<Partido> findUltimos5PartidosByEquipo(@Param("equipo") String equipo);
+
+    /**
+     * Obtener próximos 5 partidos programados de un equipo
+     */
+    @Query("SELECT p FROM Partido p WHERE " +
+           "(p.equipoLocal.nombre = :equipo OR p.equipoVisitante.nombre = :equipo) AND " +
+           "p.estado = 'PROGRAMADO' AND p.fecha >= CURRENT_DATE " +
+           "ORDER BY p.fecha ASC, p.hora ASC LIMIT 5")
+    List<Partido> findProximos5PartidosByEquipo(@Param("equipo") String equipo);
 }
