@@ -14,7 +14,6 @@ INSERT INTO usuario(username, password, role)
 VALUES ('paula.lp','{noop}arbitro1234','ROLE_ARBITRO');
 
 --Arbitros
-
 INSERT INTO arbitro (nombre, contraseña, username, cedula, phone, speciality, scale, photo_data, photo_content_type, photo_filename, usuario_id) 
 VALUES ('paula lop','arbitro1234' ,'paula.lp', '34567', '3222469936', 'Campo', 'Internacional', NULL, NULL, NULL, 5);
 
@@ -57,28 +56,28 @@ VALUES ('2025-11-05', '18:30', 3, 2, 'PROGRAMADO', 2);
 INSERT INTO partido (fecha, hora, equipo_local, equipo_visitante, estado, arbitro_id) 
 VALUES ('2025-09-08', '20:00', 2, 3, 'EN_CURSO', 2);
 
--- Entrenadores para las reseñas
-INSERT INTO Entrenadores (nombre, apellidos, documento, email, telefono, equipo, anos_experiencia, categoria, activo) 
+-- entrenador para las reseñas
+INSERT INTO entrenador (nombre, apellidos, documento, email, telefono, equipo, anos_experiencia, categoria, activo) 
 VALUES ('Carlos', 'Rodriguez', '12345678', 'carlos.rodriguez@email.com', '3101234567', 'Lakers', 5, 'PROFESIONAL', true);
 
-INSERT INTO Entrenadores (nombre, apellidos, documento, email, telefono, equipo, anos_experiencia, categoria, activo) 
+INSERT INTO entrenador (nombre, apellidos, documento, email, telefono, equipo, anos_experiencia, categoria, activo) 
 VALUES ('Ana', 'Martinez', '87654321', 'ana.martinez@email.com', '3207654321', 'Chicago Bulls', 8, 'PROFESIONAL', true);
 
-INSERT INTO Entrenadores (nombre, apellidos, documento, email, telefono, equipo, anos_experiencia, categoria, activo) 
+INSERT INTO entrenador (nombre, apellidos, documento, email, telefono, equipo, anos_experiencia, categoria, activo) 
 VALUES ('Luis', 'Fernandez', '11223344', 'luis.fernandez@email.com', '3156789012', 'Paisitas', 3, 'MAYOR', true);
 
 -- Reseñas para Sebastian Medina
-INSERT INTO reseñas (puntuacion, descripcion, fecha_creacion, arbitro_id, entrenador_id, partido_id) 
+INSERT INTO reseña (puntuacion, descripcion, fecha_creacion, arbitro_id, entrenador_id, partido_id) 
 VALUES (5, 'Excelente arbitraje, muy profesional y justo en todas sus decisiones. Mantuvo el control del partido en todo momento.', '2025-08-15 18:00:00', 2, 1, 3);
 
-INSERT INTO reseñas (puntuacion, descripcion, fecha_creacion, arbitro_id, entrenador_id, partido_id) 
+INSERT INTO reseña (puntuacion, descripcion, fecha_creacion, arbitro_id, entrenador_id, partido_id) 
 VALUES (4, 'Buen trabajo en general, aunque algunas decisiones fueron cuestionables. En general, un arbitraje sólido.', '2025-08-20 21:00:00', 2, 2, 4);
 
-INSERT INTO reseñas (puntuacion, descripcion, fecha_creacion, arbitro_id, entrenador_id, partido_id) 
+INSERT INTO reseña (puntuacion, descripcion, fecha_creacion, arbitro_id, entrenador_id, partido_id) 
 VALUES (5, 'Arbitraje impecable. Sebastian demostró gran conocimiento del reglamento y excelente manejo de situaciones difíciles.', '2025-09-02 19:30:00', 2, 3, 5);
 
-INSERT INTO reseñas (puntuacion, descripcion, fecha_creacion, arbitro_id, entrenador_id, partido_id) 
+INSERT INTO reseña (puntuacion, descripcion, fecha_creacion, arbitro_id, entrenador_id, partido_id) 
 VALUES (4, 'Muy profesional, puntual y con buen criterio. Recomendamos ampliamente sus servicios de arbitraje.', '2025-08-16 10:00:00', 2, 1, NULL);
 
-INSERT INTO reseñas (puntuacion, descripcion, fecha_creacion, arbitro_id, entrenador_id, partido_id) 
+INSERT INTO reseña (puntuacion, descripcion, fecha_creacion, arbitro_id, entrenador_id, partido_id) 
 VALUES (3, 'Arbitraje correcto pero podría mejorar en la comunicación con los jugadores. Decisiones técnicas acertadas.', '2025-08-22 14:30:00', 2, 2, NULL);
