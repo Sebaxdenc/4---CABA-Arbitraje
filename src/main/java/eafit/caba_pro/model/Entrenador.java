@@ -3,7 +3,6 @@ package eafit.caba_pro.model;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import java.time.LocalDate;
-//import java.util.List;
 
 @Entity
 @Table(name = "entrenador")
