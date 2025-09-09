@@ -14,7 +14,6 @@ INSERT INTO usuario(username, password, role)
 VALUES ('paula.lp','{noop}arbitro1234','ROLE_ARBITRO');
 
 --Arbitros
-
 INSERT INTO arbitro (nombre, contraseña, username, cedula, phone, speciality, scale, photo_data, photo_content_type, photo_filename, usuario_id) 
 VALUES ('paula lop','arbitro1234' ,'paula.lp', '34567', '3222469936', 'Campo', 'Internacional', NULL, NULL, NULL, 5);
 
@@ -58,6 +57,7 @@ INSERT INTO partido (fecha, hora, equipo_local, equipo_visitante, estado, arbitr
 VALUES ('2025-09-08', '20:00', 2, 3, 'FINALIZADO', 2);
 
 -- Entrenadores para las reseñas
+
 INSERT INTO entrenador (nombre, apellidos, documento, email, telefono, equipo, anos_experiencia, categoria, activo) 
 VALUES ('Carlos', 'Rodriguez', '12345678', 'carlos.rodriguez@email.com', '3101234567', 'Lakers', 5, 'PROFESIONAL', true);
 
