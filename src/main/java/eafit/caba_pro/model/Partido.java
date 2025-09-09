@@ -1,5 +1,7 @@
 package eafit.caba_pro.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -45,6 +47,7 @@ public class Partido {
     // Relación con el árbitro
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "arbitro_id")
+    @JsonBackReference // Evitar serialización circular - lado "back"
     private Arbitro arbitro;
     
     // Enums

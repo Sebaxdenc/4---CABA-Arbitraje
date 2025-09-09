@@ -197,4 +197,24 @@ public class PartidoService {
     public Long contarPartidosDeArbitro(Arbitro arbitro) {
         return partidoRepository.countByArbitro(arbitro);
     }
+
+    public long count() {
+    return partidoRepository.count();
+    }
+
+    public long countByEstado(Partido.EstadoPartido estado) {
+        return partidoRepository.countByEstado(estado);
+    }
+    // Porcentaje partidos aceptados/rechazados
+    public Map<String, Double> getPorcentajeAceptadosRechazados() {
+        long total = partidoRepository.count();
+        long aceptados = partidoRepository.countByEstado(Partido.EstadoPartido.PROGRAMADO);
+        long rechazados = partidoRepository.countByEstado(Partido.EstadoPartido.CANCELADO);
+
+        Map<String, Double> porcentajes = new HashMap<>();
+        porcentajes.put("aceptados", total > 0 ? (aceptados * 100.0 / total) : 0);
+        porcentajes.put("rechazados", total > 0 ? (rechazados * 100.0 / total) : 0);
+        return porcentajes;
+    }
+
 }

@@ -3,6 +3,9 @@ package eafit.caba_pro.model;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -37,6 +40,11 @@ public class Arbitro {
     @NotEmpty(message = "El nombre no puede estar vacío")
     @Column(nullable = false, length = 100)
     private String nombre;
+
+    @NotNull(message = "El nombre de usuario no puede ser nulo")
+    @NotEmpty(message = "El nombre de usuario no puede estar vacío")
+    @Column(nullable = false, length = 100, unique = true)
+    private String username;
     
     @NotNull(message = "La cédula no puede ser nula")
     @NotEmpty(message = "La cédula no puede estar vacía")
@@ -74,10 +82,12 @@ public class Arbitro {
     // Relación uno a uno con Usuario
     @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "usuario_id", unique = true, nullable = true)
+    @JsonIgnore // Evitar serialización circular
     private Usuario usuario;
 
     // Relación uno a muchos con Partido
     @OneToMany(mappedBy = "arbitro", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonManagedReference // Manejar serialización de partidos
     private List<Partido> partidos = new ArrayList<>();
 
 
