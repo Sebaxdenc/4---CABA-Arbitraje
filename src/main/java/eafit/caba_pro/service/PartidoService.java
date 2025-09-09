@@ -88,10 +88,10 @@ public class PartidoService {
     public Map<String, Object> getCalendarioDataByArbitro(Arbitro arbitro, YearMonth yearMonth) {
         LocalDate startDate = yearMonth.atDay(1);
         LocalDate endDate = yearMonth.atEndOfMonth();
-        
+
         List<Partido> partidos = partidoRepository.findByArbitroAndFechaBetween(
             arbitro, startDate, endDate);
-        
+
         Map<String, Object> calendarioData = new HashMap<>();
         Map<String, List<Map<String, Object>>> partidosPorFecha = new HashMap<>();
         
@@ -100,8 +100,8 @@ public class PartidoService {
             
             Map<String, Object> partidoData = new HashMap<>();
             partidoData.put("id", partido.getId());
-            partidoData.put("equipoLocal", partido.getEquipoLocal());
-            partidoData.put("equipoVisitante", partido.getEquipoVisitante());
+            partidoData.put("equipoLocal", partido.getEquipoLocal().getNombre());
+            partidoData.put("equipoVisitante", partido.getEquipoVisitante().getNombre());
             partidoData.put("hora", partido.getHora().toString());
             partidoData.put("estado", partido.getEstado().toString());
             partidoData.put("esFuturo", partido.esPartidoFuturo());
@@ -235,4 +235,24 @@ public class PartidoService {
     public Long contarPartidosDeArbitro(Arbitro arbitro) {
         return partidoRepository.countByArbitro(arbitro);
     }
+
+    public long count() {
+    return partidoRepository.count();
+    }
+
+    public long countByEstado(Partido.EstadoPartido estado) {
+        return partidoRepository.countByEstado(estado);
+    }
+    // Porcentaje partidos aceptados/rechazados
+    public Map<String, Double> getPorcentajeAceptadosRechazados() {
+        long total = partidoRepository.count();
+        long aceptados = partidoRepository.countByEstado(Partido.EstadoPartido.PROGRAMADO);
+        long rechazados = partidoRepository.countByEstado(Partido.EstadoPartido.CANCELADO);
+
+        Map<String, Double> porcentajes = new HashMap<>();
+        porcentajes.put("aceptados", total > 0 ? (aceptados * 100.0 / total) : 0);
+        porcentajes.put("rechazados", total > 0 ? (rechazados * 100.0 / total) : 0);
+        return porcentajes;
+    }
+
 }

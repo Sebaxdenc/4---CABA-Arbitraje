@@ -1,15 +1,18 @@
 package eafit.caba_pro.repository;
 
-import eafit.caba_pro.model.Arbitro;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.List;
+import java.util.Optional;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.util.List;
-import java.util.Optional;
+import org.springframework.data.domain.Pageable;
+
+import eafit.caba_pro.model.Arbitro;
 
 @Repository
 public interface ArbitroRepository extends JpaRepository<Arbitro, Long> {
@@ -24,6 +27,7 @@ public interface ArbitroRepository extends JpaRepository<Arbitro, Long> {
     // Verificación de existencia (para validaciones)
     boolean existsByCedula(String cedula);
     boolean existsByPhone(String phone);
+    boolean existsByUsuarioUsername(String username);
     
     // Ordenar por nombre (usado en findAllOrderByNombre)
     List<Arbitro> findAllByOrderByNombreAsc();
@@ -60,6 +64,8 @@ public interface ArbitroRepository extends JpaRepository<Arbitro, Long> {
     // Contar partidos de un árbitro
     @Query("SELECT COUNT(p) FROM Arbitro a JOIN a.partidos p WHERE a.id = :arbitroId")
     Long countPartidosByArbitroId(@Param("arbitroId") Long arbitroId);
+
+    Arbitro save(Arbitro arbitr);
     
     // OPTIMIZACIÓN: Buscar árbitro con partidos precargados (FETCH JOIN)
     @Query("SELECT a FROM Arbitro a LEFT JOIN FETCH a.partidos WHERE a.username = :username")
@@ -68,5 +74,10 @@ public interface ArbitroRepository extends JpaRepository<Arbitro, Long> {
     // OPTIMIZACIÓN: Buscar árbitro con usuario precargado (FETCH JOIN)
     @Query("SELECT a FROM Arbitro a LEFT JOIN FETCH a.usuario WHERE a.username = :username")
     Optional<Arbitro> findByUsernameWithUsuario(@Param("username") String username);
+
+    @Query("SELECT a FROM Arbitro a JOIN a.partidos p " +
+              "WHERE MONTH(p.fecha) = MONTH(CURRENT_DATE) AND YEAR(p.fecha) = YEAR(CURRENT_DATE) " +
+              "GROUP BY a ORDER BY COUNT(p) DESC")
+     List<Arbitro> findTop5ActivosDelMes(Pageable pageable);
 
 }

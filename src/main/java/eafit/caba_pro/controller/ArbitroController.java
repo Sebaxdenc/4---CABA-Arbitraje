@@ -1,5 +1,6 @@
 package eafit.caba_pro.controller;
 import java.time.YearMonth;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -61,7 +62,19 @@ public class ArbitroController {
     @GetMapping("/arbitros")
     public String index(Model model) {
         model.addAttribute("arbitros", arbitroService.findAll());
-        return "arbitro/index";
+        return "arbitro/peril";
+    }
+
+    @GetMapping("/arbitro/perfil")
+    public String perfil(Model model) {
+        Optional<Arbitro> arbitro = arbitroService.findByUsername(usuarioService.getCurrentUsername());
+        
+        if (arbitro.isPresent()) {
+            model.addAttribute("arbitro", arbitro.get());
+            return "arbitro/perfil";
+        }
+        
+        return "arbitro/perfil";
     }
 
     @GetMapping("/arbitros/{id}")
@@ -81,8 +94,17 @@ public class ArbitroController {
         
         // Si no se encuentra el árbitro, redirigir a la lista
         return "redirect:/arbitros";
+  }
+    @GetMapping("/lop")
+    public ResponseEntity<Map<String, Object>> show(Model model) {
+        Map<String, Object> response = new HashMap<>();
+        Optional<Arbitro> arbitro = arbitroService.findByUsername(usuarioService.getCurrentUsername());
+        //YearMonth yearMonth = yearMonth.now();
+        Map<String, Object> arbri = new HashMap<>();
+        arbri.put("arbitro", arbitro.orElse(null));
+        return ResponseEntity.ok(arbri);
     }
-
+  
     @GetMapping("/calendario")
     public String calendario(@RequestParam(required = false) Integer year,
                              @RequestParam(required = false) Integer month,
@@ -173,8 +195,7 @@ public class ArbitroController {
     }
     
     // API endpoint para obtener datos del calendario (AJAX)
-    @GetMapping("/api/arbitros/{id}/calendario")
-    @ResponseBody
+    @GetMapping("/lop1")
     public ResponseEntity<Map<String, Object>> getCalendarioData(
             @PathVariable Long id,
             @RequestParam(required = false) Integer year,

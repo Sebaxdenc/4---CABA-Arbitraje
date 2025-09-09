@@ -1,6 +1,8 @@
 package eafit.caba_pro.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import jakarta.persistence.*;
@@ -14,7 +16,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "partidos")
+@Table(name = "partido")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -32,22 +34,12 @@ public class Partido {
     @Column(nullable = false)
     private LocalTime hora;
     
-    @NotNull(message = "El equipo local no puede ser nulo")
-    @NotEmpty(message = "El equipo local no puede estar vacío")
-    @Column(nullable = false, length = 100)
-    private String equipoLocal;
-    
-    @NotNull(message = "El equipo visitante no puede ser nulo")
-    @NotEmpty(message = "El equipo visitante no puede estar vacío")
-    @Column(nullable = false, length = 100)
-    private String equipoVisitante;
-    
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private EstadoPartido estado = EstadoPartido.PROGRAMADO;
-
+    
     // Relación con el árbitro
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "arbitro_id")
     @JsonBackReference // Evitar serialización circular - lado "back"
     private Arbitro arbitro;
@@ -56,6 +48,22 @@ public class Partido {
     @OneToMany(mappedBy = "partido", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonManagedReference
     private List<Reseña> reseñas;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "equipo_visitante")
+    //@JsonIgnore
+    @JsonBackReference
+    //@JsonIgnoreProperties({"partidosLocal", "partidosVisitante"})
+    @NotNull(message = "El equipo visitante no puede ser nulo")
+    private Equipo equipoVisitante;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "equipo_local")
+    //@JsonIgnore
+    @JsonBackReference
+    //@JsonIgnoreProperties({"partidosLocal", "partidosVisitante"})
+    @NotNull(message = "El equipo local no puede ser nulo")
+    private Equipo equipoLocal;
     
     // Enums
     public enum EstadoPartido {
@@ -72,11 +80,11 @@ public class Partido {
         return fecha.isBefore(LocalDate.now()) || 
                (fecha.equals(LocalDate.now()) && hora.isBefore(LocalTime.now()));
     }
-    
+    /*
     public String getPartidoCompleto() {
         return equipoLocal + " vs " + equipoVisitante;
     }
-    
+    */
     public boolean tieneArbitro(Arbitro arbitro) {
         return (this.arbitro != null && this.arbitro.getId().equals(arbitro.getId()));
     }

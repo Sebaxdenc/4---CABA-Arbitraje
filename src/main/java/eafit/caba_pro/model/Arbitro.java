@@ -25,7 +25,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "arbitros")
+@Table(name = "arbitro")
 @Data // Generate getters and setters for all fields using lombok
 @AllArgsConstructor // Generate a contrustuctor with all the fields
 @NoArgsConstructor // Generates a constructor with no fields acordding to JPA
@@ -91,7 +91,7 @@ public class Arbitro {
     private Usuario usuario;
 
     // Relación uno a muchos con Partido
-    @OneToMany(mappedBy = "arbitro", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "arbitro", cascade = CascadeType.ALL)
     @JsonManagedReference // Manejar serialización de partidos
     private List<Partido> partidos = new ArrayList<>();
 
