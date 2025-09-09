@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mis Partidos - CABA Pro</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
+
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+
+
+</head>
+<body class="bg-gray-50">
+    
+    <!-- Sidebar -->
+    <div th:replace="~{fragments/ArbitroFragments/side_bar :: side_bar('partidos')}"></div>
+    
+    <!-- Main Content -->
+    <div class="ml-0 md:ml-64 min-h-screen">
+        
+        <!-- Header -->
+        <div th:replace="~{fragments/ArbitroFragments/up_bar :: up_bar('Mis Partidos', ${arbitro.nombre})}"></div>
+        
+        <!-- Page Content -->
+        <main class="p-6">
+            
+            <!-- Page Header -->
+            <div class="mb-8">
+                <h1 class="text-3xl font-bold text-gray-900 mb-2">Mis Partidos</h1>
+                <p class="text-gray-600">Gestiona y revisa todos tus partidos asignados</p>
+                
+                <!-- Stats Summary -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
+                    <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+                        <div class="flex items-center">
+                            <div class="p-3 rounded-full bg-blue-100">
+                                <svg class="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                                </svg>
+                            </div>
+                            <div class="ml-4">
+                                <p class="text-sm font-medium text-gray-500">Total de Partidos</p>
+                                <p class="text-2xl font-semibold text-gray-900" th:text="${totalPartidos}">0</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+                        <div class="flex items-center">
+                            <div class="p-3 rounded-full bg-green-100">
+                                <svg class="h-6 w-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                            </div>
+                            <div class="ml-4">
+                                <p class="text-sm font-medium text-gray-500">Partidos Futuros</p>
+                                <p class="text-2xl font-semibold text-gray-900" th:text="${#lists.size(partidosFuturos)}">0</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+                        <div class="flex items-center">
+                            <div class="p-3 rounded-full bg-gray-100">
+                                <svg class="h-6 w-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                            </div>
+                            <div class="ml-4">
+                                <p class="text-sm font-medium text-gray-500">Partidos Completados</p>
+                                <p class="text-2xl font-semibold text-gray-900" th:text="${#lists.size(partidosPasados)}">0</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Partidos Content -->
+            <div class="space-y-8">
+                
+                <!-- Partidos Futuros -->
+                <div th:if="${!#lists.isEmpty(partidosFuturos)}">
+                    <div class="flex items-center mb-6">
+                        <h2 class="text-xl font-bold text-gray-900">Próximos Partidos</h2>
+                        <span class="ml-3 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800" 
+                              th:text="${#lists.size(partidosFuturos)} + ' partidos'">0 partidos</span>
+                    </div>
+                    
+                    <div class="space-y-4">
+                        <div th:each="partido : ${partidosFuturos}" 
+                             class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow duration-200">
+                            <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between">
+                                <div class="flex-1">
+                                    <div class="flex items-center space-x-4 mb-3">
+                                        <div class="flex items-center space-x-2">
+                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                                Próximo
+                                            </span>
+                                            <span class="text-sm text-gray-500" th:text="'ID: ' + ${partido.id}">ID: 1</span>
+                                        </div>
+                                    </div>
+                                    
+                                    <h3 class="text-lg font-semibold text-gray-900 mb-2" th:text="${partido.equipoLocal} + ' vs ' + ${partido.equipoVisitante}">
+                                        Equipo Local vs Equipo Visitante
+                                    </h3>
+                                    
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                                        <div class="flex items-center text-gray-600">
+                                            <svg class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                            </svg>
+                                            <span th:text="${partido.fecha}">01/01/2024</span>
+                                        </div>
+                                        
+                                        <div class="flex items-center text-gray-600">
+                                            <svg class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                            </svg>
+                                            <span th:text="${partido.hora}">15:00</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="mt-4 lg:mt-0 lg:ml-6 flex flex-col lg:items-end space-y-2">
+                                    <div class="text-right">
+                                        <p class="text-sm text-gray-500">Estado</p>
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800"
+                                              th:text="${partido.estado}">Programado</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Empty state para partidos futuros -->
+                <div th:if="${#lists.isEmpty(partidosFuturos)}" class="text-center py-12">
+                    <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <h3 class="mt-2 text-sm font-medium text-gray-900">No hay partidos próximos</h3>
+                    <p class="mt-1 text-sm text-gray-500">No tienes partidos programados para las próximas fechas.</p>
+                </div>
+                
+                <!-- Partidos Pasados -->
+                <div th:if="${!#lists.isEmpty(partidosPasados)}">
+                    <div class="flex items-center mb-6">
+                        <h2 class="text-xl font-bold text-gray-900">Historial de Partidos</h2>
+                        <span class="ml-3 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800" 
+                              th:text="${#lists.size(partidosPasados)} + ' partidos'">0 partidos</span>
+                    </div>
+                    
+                    <div class="space-y-4">
+                        <div th:each="partido : ${partidosPasados}" 
+                             class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow duration-200">
+                            <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between">
+                                <div class="flex-1">
+                                    <div class="flex items-center space-x-4 mb-3">
+                                        <div class="flex items-center space-x-2">
+                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                                                Completado
+                                            </span>
+                                            <span class="text-sm text-gray-500" th:text="'ID: ' + ${partido.id}">ID: 1</span>
+                                        </div>
+                                    </div>
+                                    
+                                    <h3 class="text-lg font-semibold text-gray-900 mb-2" th:text="${partido.equipoLocal} + ' vs ' + ${partido.equipoVisitante}">
+                                        Equipo Local vs Equipo Visitante
+                                    </h3>
+                                    
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                                        <div class="flex items-center text-gray-600">
+                                            <svg class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                            </svg>
+                                            <span th:text="${partido.fecha}">01/01/2024</span>
+                                        </div>
+                                        
+                                        <div class="flex items-center text-gray-600">
+                                            <svg class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                            </svg>
+                                            <span th:text="${partido.hora}">15:00</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="mt-4 lg:mt-0 lg:ml-6 flex flex-col lg:items-end space-y-2">
+                                    <div class="text-right">
+                                        <p class="text-sm text-gray-500">Estado</p>
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800"
+                                              th:text="${partido.estado}">Finalizado</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Empty state para partidos pasados -->
+                <div th:if="${#lists.isEmpty(partidosPasados)}" class="text-center py-12">
+                    <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <h3 class="mt-2 text-sm font-medium text-gray-900">No hay historial de partidos</h3>
+                    <p class="mt-1 text-sm text-gray-500">Aún no has arbitrado ningún partido.</p>
+                </div>
+                
+                <!-- Empty state general -->
+                <div th:if="${#lists.isEmpty(partidosFuturos) && #lists.isEmpty(partidosPasados)}" class="text-center py-16">
+                    <svg class="mx-auto h-16 w-16 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <h3 class="mt-4 text-lg font-medium text-gray-900">No tienes partidos asignados</h3>
+                    <p class="mt-2 text-sm text-gray-500">Cuando tengas partidos asignados, aparecerán aquí organizados por fechas.</p>
+                </div>
+                
+            </div>
+            
+        </main>
+    </div>
+    
+    <!-- Mobile menu toggle script -->
+    <script>
+        // Mobile menu toggle
+        const menuToggle = document.getElementById('menu-toggle');
+        const menuClose = document.getElementById('menu-close');
+        const sidebar = document.getElementById('sidebar');
+        
+        if (menuToggle) {
+            menuToggle.addEventListener('click', () => {
+                sidebar.classList.remove('-translate-x-full');
+            });
+        }
+        
+        if (menuClose) {
+            menuClose.addEventListener('click', () => {
+                sidebar.classList.add('-translate-x-full');
+            });
+        }
+        
+        // Close sidebar when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!sidebar.contains(e.target) && !menuToggle?.contains(e.target)) {
+                sidebar.classList.add('-translate-x-full');
+            }
+        });
+    </script>
+</body>
+</html>

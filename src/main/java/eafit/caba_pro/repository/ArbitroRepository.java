@@ -61,4 +61,12 @@ public interface ArbitroRepository extends JpaRepository<Arbitro, Long> {
     @Query("SELECT COUNT(p) FROM Arbitro a JOIN a.partidos p WHERE a.id = :arbitroId")
     Long countPartidosByArbitroId(@Param("arbitroId") Long arbitroId);
     
+    // OPTIMIZACIÓN: Buscar árbitro con partidos precargados (FETCH JOIN)
+    @Query("SELECT a FROM Arbitro a LEFT JOIN FETCH a.partidos WHERE a.username = :username")
+    Optional<Arbitro> findByUsernameWithPartidos(@Param("username") String username);
+    
+    // OPTIMIZACIÓN: Buscar árbitro con usuario precargado (FETCH JOIN)
+    @Query("SELECT a FROM Arbitro a LEFT JOIN FETCH a.usuario WHERE a.username = :username")
+    Optional<Arbitro> findByUsernameWithUsuario(@Param("username") String username);
+
 }

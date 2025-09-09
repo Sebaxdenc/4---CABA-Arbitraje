@@ -1,12 +1,14 @@
 package eafit.caba_pro.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -50,9 +52,14 @@ public class Partido {
     @JsonBackReference // Evitar serialización circular - lado "back"
     private Arbitro arbitro;
     
+    // Relación con reseñas (un partido puede tener múltiples reseñas)
+    @OneToMany(mappedBy = "partido", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonManagedReference
+    private List<Reseña> reseñas;
+    
     // Enums
     public enum EstadoPartido {
-        PROGRAMADO, EN_CURSO, FINALIZADO, SUSPENDIDO, CANCELADO
+        PROGRAMADO, EN_CURSO, FINALIZADO, PENDIENTE_CONFIRMACION
     }
     
     // Métodos helper
