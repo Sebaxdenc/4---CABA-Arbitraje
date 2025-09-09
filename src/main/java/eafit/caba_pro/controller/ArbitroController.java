@@ -46,7 +46,6 @@ public class ArbitroController {
     @GetMapping
     public String dashboard(Model model){
         Optional<Arbitro> arbitro = arbitroService.findByUsername(usuarioService.getCurrentUsername());
-
         if (arbitro.isPresent()) {
             model.addAttribute("titulo", "Dashboard");
             model.addAttribute("nombre", arbitro.get().getNombre());
