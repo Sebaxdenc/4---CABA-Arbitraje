@@ -67,7 +67,7 @@ public class Partido {
     
     // Enums
     public enum EstadoPartido {
-        PROGRAMADO, EN_CURSO, FINALIZADO, PENDIENTE_CONFIRMACION
+        PROGRAMADO, EN_CURSO, FINALIZADO, PENDIENTE_CONFIRMACION, ARBITRO_NO_DISPONIBLE
     }
     
     // Métodos helper

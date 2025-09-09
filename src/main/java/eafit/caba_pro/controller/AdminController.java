@@ -43,14 +43,22 @@ public class AdminController {
         long totalPartidos = partidoService.count();
         long programados = partidoService.countByEstado(Partido.EstadoPartido.PROGRAMADO);
         long finalizados = partidoService.countByEstado(Partido.EstadoPartido.FINALIZADO);
+        long pendientesConfirmacion = partidoService.countByEstado(Partido.EstadoPartido.PENDIENTE_CONFIRMACION);
+        long arbitroNoDisponible = partidoService.countByEstado(Partido.EstadoPartido.ARBITRO_NO_DISPONIBLE);
 
         double porcentajeProgramados = totalPartidos > 0 ? (programados * 100.0 / totalPartidos) : 0;
         double porcentajeFinalizados = totalPartidos > 0 ? (finalizados * 100.0 / totalPartidos) : 0;
+        double porcentajePendientes = totalPartidos > 0 ? (pendientesConfirmacion * 100.0 / totalPartidos) : 0;
+        double porcentajeNoDisponible = totalPartidos > 0 ? (arbitroNoDisponible * 100.0 / totalPartidos) : 0;
 
         List<Arbitro> topArbitros = arbitroService.findTop5ActivosDelMes();
 
         model.addAttribute("porcentajeProgramados", porcentajeProgramados);
         model.addAttribute("porcentajeFinalizados", porcentajeFinalizados);
+        model.addAttribute("porcentajePendientes", porcentajePendientes);
+        model.addAttribute("porcentajeNoDisponible", porcentajeNoDisponible);
+        model.addAttribute("pendientesConfirmacion", pendientesConfirmacion);
+        model.addAttribute("arbitroNoDisponible", arbitroNoDisponible);
         model.addAttribute("topArbitros", topArbitros);
 
         return "admin/dashboard";

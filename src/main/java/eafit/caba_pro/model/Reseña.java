@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 
 @Entity
-@Table(name = "reseñas")
+@Table(name = "reseña")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

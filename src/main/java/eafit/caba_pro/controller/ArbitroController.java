@@ -1,18 +1,20 @@
 package eafit.caba_pro.controller;
 import java.time.YearMonth;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import eafit.caba_pro.model.Arbitro;
 import eafit.caba_pro.model.Partido;
@@ -83,15 +85,6 @@ public class ArbitroController {
         // Si no se encuentra el árbitro, redirigir a la lista
         return "redirect:/arbitros";
   }
-    @GetMapping("/lop")
-    public ResponseEntity<Map<String, Object>> show(Model model) {
-        Map<String, Object> response = new HashMap<>();
-        Optional<Arbitro> arbitro = arbitroService.findByUsername(usuarioService.getCurrentUsername());
-        //YearMonth yearMonth = yearMonth.now();
-        Map<String, Object> arbri = new HashMap<>();
-        arbri.put("arbitro", arbitro.orElse(null));
-        return ResponseEntity.ok(arbri);
-    }
   
     @GetMapping("/calendario")
     public String calendario(@RequestParam(required = false) Integer year,
@@ -181,29 +174,84 @@ public class ArbitroController {
         
         return "arbitro/partidos";
     }
-    
-    // API endpoint para obtener datos del calendario (AJAX)
-    @GetMapping("/lop1")
-    public ResponseEntity<Map<String, Object>> getCalendarioData(
-            @PathVariable Long id,
-            @RequestParam(required = false) Integer year,
-            @RequestParam(required = false) Integer month) {
+
+    // ========== ENDPOINTS DE DISPONIBILIDAD ==========
+
+    @GetMapping("/disponibilidad")
+    public String mostrarDisponibilidad(Model model, Authentication authentication) {
+        // Obtener el árbitro autenticado
+        String username = authentication.getName();
+        Optional<Arbitro> arbitroOpt = arbitroService.findByUsername(username);
         
-        Optional<Arbitro> arbitroOpt = arbitroService.findById(id);
-        
-        if (!arbitroOpt.isPresent()) {
-            return ResponseEntity.notFound().build();
+        if (arbitroOpt.isEmpty()) {
+            model.addAttribute("errorMessage", "No se encontró el árbitro autenticado");
+            return "redirect:/login";
         }
-        
-        YearMonth yearMonth = (year != null && month != null) 
-            ? YearMonth.of(year, month) 
-            : YearMonth.now();
-        
-        Map<String, Object> calendarioData = partidoService.getCalendarioDataByArbitro(arbitroOpt.get(), yearMonth);
-        
-        return ResponseEntity.ok(calendarioData);
+
+        Arbitro arbitro = arbitroOpt.get();
+
+        // Obtener partidos pendientes de confirmación para este árbitro
+        List<Partido> partidosPendientes = partidoService.findByArbitroAndEstado(
+            arbitro, Partido.EstadoPartido.PENDIENTE_CONFIRMACION);
+
+        // Obtener todos los árbitros disponibles (excepto el actual) para reasignación
+        List<Arbitro> arbitrosDisponibles = arbitroService.findAllExcept(arbitro.getId());
+
+        model.addAttribute("arbitro", arbitro);
+        model.addAttribute("partidosPendientes", partidosPendientes);
+        model.addAttribute("arbitrosDisponibles", arbitrosDisponibles);
+
+        return "arbitro/disponibilidad";
     }
 
+    @PostMapping("/disponibilidad/confirmar")
+    public String confirmarDisponibilidad(@RequestParam("partidoId") Long partidoId,
+                                        Authentication authentication,
+                                        RedirectAttributes redirectAttributes) {
+        String username = authentication.getName();
+        String resultado = arbitroService.confirmarDisponibilidad(partidoId, username);
+        
+        if (resultado.startsWith("SUCCESS:")) {
+            redirectAttributes.addFlashAttribute("successMessage", resultado.substring(8));
+        } else {
+            redirectAttributes.addFlashAttribute("errorMessage", resultado);
+        }
+
+        return "redirect:/arbitro/disponibilidad";
+    }
+
+    @PostMapping("/disponibilidad/rechazar")
+    public String rechazarYReasignar(@RequestParam("partidoId") Long partidoId,
+                                   @RequestParam("nuevoArbitroId") Long nuevoArbitroId,
+                                   Authentication authentication,
+                                   RedirectAttributes redirectAttributes) {
+        String username = authentication.getName();
+        String resultado = arbitroService.reasignarPartido(partidoId, nuevoArbitroId, username);
+        
+        if (resultado.startsWith("SUCCESS:")) {
+            redirectAttributes.addFlashAttribute("successMessage", resultado.substring(8));
+        } else {
+            redirectAttributes.addFlashAttribute("errorMessage", resultado);
+        }
+
+        return "redirect:/arbitro/disponibilidad";
+    }
+
+    @PostMapping("/disponibilidad/no-disponible")
+    public String marcarNoDisponible(@RequestParam("partidoId") Long partidoId,
+                                   Authentication authentication,
+                                   RedirectAttributes redirectAttributes) {
+        String username = authentication.getName();
+        String resultado = arbitroService.marcarNoDisponible(partidoId, username);
+        
+        if (resultado.startsWith("SUCCESS:")) {
+            redirectAttributes.addFlashAttribute("successMessage", resultado.substring(8));
+        } else {
+            redirectAttributes.addFlashAttribute("errorMessage", resultado);
+        }
+
+        return "redirect:/arbitro/disponibilidad";
+    }
 
     // ========== ENDPOINTS REST API (JSON/BLOB) ==========
 
