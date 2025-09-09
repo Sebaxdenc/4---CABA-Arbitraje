@@ -46,7 +46,7 @@ public class ArbitroController {
         Optional<Arbitro> arbitro = arbitroService.findByUsername(usuarioService.getCurrentUsername());
 
         model.addAttribute("titulo", "Dashboard");
-        model.addAttribute("nombre", arbitro.get().getNombre());
+        model.addAttribute("nombre", arbitro.get().getNombre())
         model.addAttribute("arbitro", arbitro.get());
         Map<String, Object> estadisticas = partidoService.getEstadisticasArbitro(arbitro.get());
         model.addAttribute("estadisticas", estadisticas);
@@ -56,9 +56,39 @@ public class ArbitroController {
     @GetMapping("/arbitros")
     public String index(Model model) {
         model.addAttribute("arbitros", arbitroService.findAll());
-        return "arbitro/index";
+        return "arbitro/peril";
     }
 
+    @GetMapping("/arbitro/perfil")
+    public String perfil(Model model) {
+        Optional<Arbitro> arbitro = arbitroService.findByUsername(usuarioService.getCurrentUsername());
+        
+        if (arbitro.isPresent()) {
+            model.addAttribute("arbitro", arbitro.get());
+            return "arbitro/perfil";
+        }
+        
+        return "arbitro/perfil";
+    }
+
+    @GetMapping("/arbitros/{id}")
+    public String show(@PathVariable Long id, Model model) {
+        
+        Optional<Arbitro> arbitro = arbitroService.findByUsername(usuarioService.getCurrentUsername());
+        
+        if (arbitro.isPresent()) {
+            model.addAttribute("arbitro", arbitro.get());
+            
+            // Agregar estadísticas del árbitro
+            Map<String, Object> estadisticas = partidoService.getEstadisticasArbitro(arbitro.get());
+            model.addAttribute("estadisticas", estadisticas);
+            
+            return "arbitro/show";
+        }
+        
+        // Si no se encuentra el árbitro, redirigir a la lista
+        return "redirect:/arbitros";
+  }
     @GetMapping("/lop")
     public ResponseEntity<Map<String, Object>> show(Model model) {
         Map<String, Object> response = new HashMap<>();
@@ -68,7 +98,7 @@ public class ArbitroController {
         arbri.put("arbitro", arbitro.orElse(null));
         return ResponseEntity.ok(arbri);
     }
-
+  
     @GetMapping("/calendario")
     public String calendario(@RequestParam(required = false) Integer year,
                              @RequestParam(required = false) Integer month,

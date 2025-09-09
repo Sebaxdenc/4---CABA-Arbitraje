@@ -6,6 +6,7 @@ import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +19,8 @@ import eafit.caba_pro.model.Partido;
 import eafit.caba_pro.model.Usuario;
 import eafit.caba_pro.repository.ArbitroRepository;
 import eafit.caba_pro.repository.PartidoRepository;
+import eafit.caba_pro.repository.UsuarioRepository;
+
 
 @Service
 @Transactional(readOnly = true)
@@ -25,13 +28,15 @@ public class ArbitroService {
 
     private final ArbitroRepository arbitroRepository;
     private final PartidoRepository partidoRepository;
+    private final UsuarioRepository usuarioRepository;
     private final UsuarioService usuarioService;
 
     // Constructor para inyección de dependencias
-    public ArbitroService(ArbitroRepository arbitroRepository, PartidoRepository partidoRepository, UsuarioService usuarioService) {
+    public ArbitroService(ArbitroRepository arbitroRepository, PartidoRepository partidoRepository,UsuarioRepository usuarioRepository,UsuarioService usuarioService) {
         this.arbitroRepository = arbitroRepository;
         this.partidoRepository = partidoRepository;
-        this.usuarioService=usuarioService;
+        this.usuarioRepository = usuarioRepository;
+        this.usuarioService = usuarioService;
     }
 
     // ========== OPERACIONES DE LECTURA ==========
@@ -49,6 +54,23 @@ public class ArbitroService {
     public Optional<Arbitro> findByUsername(String username) {
         return arbitroRepository.findByUsername(username);
     }
+
+    // ========== OPERACIONES DE LECTURA ==========
+
+    /**
+     * Buscar árbitro por cédula
+     */
+    public Optional<Arbitro> findByCedula(String cedula) {
+        return arbitroRepository.findByCedula(cedula);
+    }
+
+    /**
+     * Buscar árbitro por nombre de usuario
+     */
+    public Optional<Arbitro> findByUsername(String username) {
+        return arbitroRepository.findByUsername(username);
+    }
+
 
     /**
      * Obtener todos los árbitros
@@ -83,9 +105,11 @@ public class ArbitroService {
     /**
      * Crear árbitro con archivo de foto (guarda BLOB en BD)
      */
+
     @Transactional
     public Arbitro createArbitroWithPhoto(Arbitro arbitro, MultipartFile photoFile) throws IOException {
         // Validaciones de duplicados
+
         if (arbitro.getCedula() != null && arbitroRepository.existsByCedula(arbitro.getCedula())) {
             throw new RuntimeException("Esta cédula ya está registrada: " + arbitro.getCedula());
         }
@@ -93,6 +117,18 @@ public class ArbitroService {
         if (arbitro.getPhone() != null && arbitroRepository.existsByPhone(arbitro.getPhone())) {
             throw new RuntimeException("Este teléfono ya está registrado: " + arbitro.getPhone());
         }
+        
+        
+        Usuario usuario = arbitro.getUsuario();
+            if (usuario == null) {
+                throw new RuntimeException("Debes asociar un usuario al árbitro");
+         }
+
+        arbitro.setUsername(usuario.getUsername());
+
+        usuario.setRole("ROLE_ARBITRO");
+
+        usuarioRepository.save(usuario);
 
         // Procesar imagen si se proporciona
         if (photoFile != null && !photoFile.isEmpty()) {
@@ -256,12 +292,15 @@ public class ArbitroService {
                 .body(a.getPhotoData());
     }
 
+   public List<Arbitro> findTop5ActivosDelMes() {
+    return arbitroRepository.findTop5ActivosDelMes(PageRequest.of(0, 5));
+   }
     @Transactional
     public void crearArbitro(Arbitro arbitro) {
         // 1. Crear Usuario
         Usuario usuario = new Usuario();
-        usuario.setUsername(arbitro.getNombre()); // o arbitro.getCedula() o lo que uses
-        usuario.setPassword(arbitro.getContraseña()); // OJO: en real usar BCryptPasswordEncoder
+        usuario.setUsername(arbitro.getNombre());
+        usuario.setPassword(arbitro.getContraseña()); 
         usuario.setRole("ROLE_ARBITRO");
 
         usuarioService.createUsuario(usuario);

@@ -69,5 +69,8 @@ public interface PartidoRepository extends JpaRepository<Partido, Long> {
     // Contar partidos por árbitro
     @Query("SELECT COUNT(p) FROM Partido p WHERE p.arbitro = :arbitro")
     Long countByArbitro(@Param("arbitro") Arbitro arbitro);
+
+    @Query("SELECT COUNT(p) FROM Partido p WHERE p.estado = :estado")
+    long countByEstado(@Param("estado") Partido.EstadoPartido estado);
     
 }

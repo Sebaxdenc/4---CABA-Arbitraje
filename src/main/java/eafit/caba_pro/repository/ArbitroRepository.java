@@ -1,15 +1,18 @@
 package eafit.caba_pro.repository;
 
-import eafit.caba_pro.model.Arbitro;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.List;
+import java.util.Optional;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.util.List;
-import java.util.Optional;
+import org.springframework.data.domain.Pageable;
+
+import eafit.caba_pro.model.Arbitro;
 
 @Repository
 public interface ArbitroRepository extends JpaRepository<Arbitro, Long> {
@@ -24,6 +27,7 @@ public interface ArbitroRepository extends JpaRepository<Arbitro, Long> {
     // Verificación de existencia (para validaciones)
     boolean existsByCedula(String cedula);
     boolean existsByPhone(String phone);
+    boolean existsByUsuarioUsername(String username);
     
     // Ordenar por nombre (usado en findAllOrderByNombre)
     List<Arbitro> findAllByOrderByNombreAsc();
@@ -63,4 +67,9 @@ public interface ArbitroRepository extends JpaRepository<Arbitro, Long> {
 
     Arbitro save(Arbitro arbitr);
     
+    @Query("SELECT a FROM Arbitro a JOIN a.partidos p " +
+              "WHERE MONTH(p.fecha) = MONTH(CURRENT_DATE) AND YEAR(p.fecha) = YEAR(CURRENT_DATE) " +
+              "GROUP BY a ORDER BY COUNT(p) DESC")
+     List<Arbitro> findTop5ActivosDelMes(Pageable pageable);
+
 }

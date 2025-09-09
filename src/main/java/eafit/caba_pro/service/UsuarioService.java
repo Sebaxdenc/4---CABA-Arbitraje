@@ -54,8 +54,7 @@ public class UsuarioService implements UserDetailsService{
             }
         }
         return null;
-    }
-
+    }    
     public void createUsuario(Usuario usuario){
         usuarioRepository.save(usuario);
     }
