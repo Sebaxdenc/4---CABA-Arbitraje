@@ -253,4 +253,17 @@ public class PartidoService {
         return porcentajes;
     }
 
+    // ========== MÉTODOS ADICIONALES PARA DISPONIBILIDAD ==========
+
+    /**
+     * Buscar partidos por árbitro y estado
+     */
+    public List<Partido> findByArbitroAndEstado(Arbitro arbitro, Partido.EstadoPartido estado) {
+        return partidoRepository.findAll().stream()
+                .filter(partido -> partido.getArbitro() != null && 
+                                 partido.getArbitro().getId().equals(arbitro.getId()) && 
+                                 partido.getEstado() == estado)
+                .toList();
+    }
+
 }

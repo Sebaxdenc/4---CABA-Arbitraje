@@ -87,6 +87,10 @@
                                           class="px-3 py-1 bg-yellow-200 text-yellow-800 text-xs font-semibold rounded-full">
                                         Pendiente Confirmación
                                     </span>
+                                    <span th:if="${partido.estado.name() == 'ARBITRO_NO_DISPONIBLE'}" 
+                                          class="px-3 py-1 bg-red-200 text-red-800 text-xs font-semibold rounded-full">
+                                        Cancelaste
+                                    </span>
                                 </div>
                             </div>
                         </li>

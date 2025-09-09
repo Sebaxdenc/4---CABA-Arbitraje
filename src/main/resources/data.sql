@@ -54,9 +54,10 @@ INSERT INTO partido (fecha, hora, equipo_local, equipo_visitante, estado, arbitr
 VALUES ('2025-11-05', '18:30', 3, 2, 'PROGRAMADO', 2);
 
 INSERT INTO partido (fecha, hora, equipo_local, equipo_visitante, estado, arbitro_id) 
-VALUES ('2025-09-08', '20:00', 2, 3, 'EN_CURSO', 2);
+VALUES ('2025-09-08', '20:00', 2, 3, 'FINALIZADO', 2);
 
--- entrenador para las reseñas
+-- Entrenadores para las reseñas
+
 INSERT INTO entrenador (nombre, apellidos, documento, email, telefono, equipo, anos_experiencia, categoria, activo) 
 VALUES ('Carlos', 'Rodriguez', '12345678', 'carlos.rodriguez@email.com', '3101234567', 'Lakers', 5, 'PROFESIONAL', true);
 
@@ -81,3 +82,20 @@ VALUES (4, 'Muy profesional, puntual y con buen criterio. Recomendamos ampliamen
 
 INSERT INTO reseña (puntuacion, descripcion, fecha_creacion, arbitro_id, entrenador_id, partido_id) 
 VALUES (3, 'Arbitraje correcto pero podría mejorar en la comunicación con los jugadores. Decisiones técnicas acertadas.', '2025-08-22 14:30:00', 2, 2, NULL);
+
+-- Partidos pendientes de confirmación para Sebastian Medina
+INSERT INTO partido (fecha, hora, equipo_local, equipo_visitante, estado, arbitro_id) 
+VALUES ('2025-12-15', '16:00', 1, 2, 'PENDIENTE_CONFIRMACION', 2);
+
+INSERT INTO partido (fecha, hora, equipo_local, equipo_visitante, estado, arbitro_id) 
+VALUES ('2025-12-20', '18:30', 2, 3, 'PENDIENTE_CONFIRMACION', 2);
+
+INSERT INTO partido (fecha, hora, equipo_local, equipo_visitante, estado, arbitro_id) 
+VALUES ('2025-12-25', '15:00', 3, 1, 'PENDIENTE_CONFIRMACION', 2);
+
+-- Partidos pendientes de confirmación para Paula López
+INSERT INTO partido (fecha, hora, equipo_local, equipo_visitante, estado, arbitro_id) 
+VALUES ('2025-12-18', '17:00', 1, 3, 'PENDIENTE_CONFIRMACION', 1);
+
+INSERT INTO partido (fecha, hora, equipo_local, equipo_visitante, estado, arbitro_id) 
+VALUES ('2025-12-22', '19:00', 2, 1, 'PENDIENTE_CONFIRMACION', 1);
