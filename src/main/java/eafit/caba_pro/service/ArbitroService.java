@@ -475,6 +475,15 @@ public class ArbitroService {
                 return "No tienes permiso para modificar este partido";
             }
 
+            notificacionService.notificarArbitro("Disponibilidad rechazada: El árbitro " + arbitro.getNombre() + " ha rechazado su disponibilidad para el partido " +
+                                           partido.getEquipoLocal().getNombre() + " vs " + partido.getEquipoVisitante().getNombre() +
+                                           " programado para el " + partido.getFecha() + " a las " + partido.getHora() + ".", arbitro);
+                        
+
+            notificacionService.notificarAdmin("Disponibilidad rechazada: El árbitro " + arbitro.getNombre() + " ha rechazado su disponibilidad para el partido " +
+                                           partido.getEquipoLocal().getNombre() + " vs " + partido.getEquipoVisitante().getNombre() +
+                                           " programado para el " + partido.getFecha() + " a las " + partido.getHora() + ".");
+
             // Cambiar estado a ARBITRO_NO_DISPONIBLE
             partido.setEstado(Partido.EstadoPartido.ARBITRO_NO_DISPONIBLE);
             partidoRepository.save(partido);

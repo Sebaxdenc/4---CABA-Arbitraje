@@ -27,6 +27,7 @@ import eafit.caba_pro.model.Arbitro;
 import eafit.caba_pro.model.Escalafon;
 import eafit.caba_pro.repository.EscalafonRepository;
 import eafit.caba_pro.service.LiquidacionService;
+import eafit.caba_pro.service.NotificacionService;
 import eafit.caba_pro.model.Liquidacion;
 import eafit.caba_pro.model.Equipo;
 import eafit.caba_pro.model.Partido;
@@ -50,8 +51,9 @@ public class AdminController {
     private final EquipoService equipoService;
     private final EntrenadorService entrenadorService;
     private final EscalafonRepository escalafonRepository;
+    private final NotificacionService notificacionService;
 
-    public AdminController(EntrenadorService entrenadorService, EquipoService equipoService, PdfService pdfService ,LiquidacionService liquidacionService, ArbitroService arbitroService, PartidoService partidoService, EscalafonRepository escalafonRepository) {
+    public AdminController(NotificacionService notificacionService,EntrenadorService entrenadorService, EquipoService equipoService, PdfService pdfService ,LiquidacionService liquidacionService, ArbitroService arbitroService, PartidoService partidoService, EscalafonRepository escalafonRepository) {
         this.arbitroService = arbitroService;
         this.partidoService = partidoService;
         this.liquidacionService = liquidacionService;
@@ -59,6 +61,7 @@ public class AdminController {
         this.equipoService = equipoService;
         this.entrenadorService = entrenadorService;
         this.escalafonRepository = escalafonRepository;
+        this.notificacionService = notificacionService;
     }
 
     
@@ -270,8 +273,9 @@ public class AdminController {
     @PostMapping("/arbitros/delete/{id}")
     public String delete(@PathVariable Long id, RedirectAttributes redirectAttributes) {
         try {
-            Optional<Arbitro> arbitro = arbitroService.findById(id);
-            String nombre = arbitro.map(Arbitro::getNombre).orElse(null);
+            Optional<Arbitro> arbitroOpt = arbitroService.findById(id);
+            Arbitro arbitro = arbitroOpt.get();
+            String nombre = arbitro.getNombre();
             
             boolean deleted = arbitroService.deleteById(id);
             if (deleted) {
@@ -587,7 +591,6 @@ public class AdminController {
 
         return "admin/partido_form";
     }
-
     @PostMapping("/partidos/save")
     public String guardar(@ModelAttribute Partido partido, Model model, RedirectAttributes redirectAttributes) {
         try {
@@ -621,7 +624,20 @@ public class AdminController {
             model.addAttribute("estados", Partido.EstadoPartido.values());
             return "admin/partido_form";
         }
+
     }
+
+    if (partido.getArbitro() != null && partido.getArbitro().getId() != null) {
+        arbitroService.findById(partido.getArbitro().getId())
+                      .ifPresent(partido::setArbitro);
+    } else {
+        partido.setArbitro(null);
+    }
+
+    partidoService.crearPartido(partido);
+    return "redirect:/admin/partidos";
+}
+
 
     @GetMapping("/partidos/edit/{id}")
     public String editar(@PathVariable Long id, Model model) {
@@ -702,6 +718,10 @@ public class AdminController {
             model.addAttribute("estados", Partido.EstadoPartido.values());
             return "admin/partido_form";
         }
+    @GetMapping("/notificaciones")
+    public String notificaciones(Model model){
+        model.addAttribute("notificaciones", notificacionService.obtenerNotificacionesAdmin());
+        return "admin/notificaciones";
     }
 
 }

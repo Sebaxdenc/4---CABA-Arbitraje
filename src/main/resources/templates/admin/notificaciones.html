@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Liquidaciones</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body class="bg-gray-100 min-h-screen flex">
+  <aside th:replace="~{admin/sidebar :: sidebar('notificaciones')}"></aside>
+
+  <div class="flex-1 flex flex-col overflow-x-hidden overflow-y-auto">
+    <header th:replace="~{admin/header :: header('Notificaciones')}"></header>
+    <main class="p-6 space-y-6">
+            <div id="content-container" class="flex-1 p-6 space-y-6">
+      <h3 class="text-2xl font-semibold text-gray-800 mb-6">Notificaciones</h3>
+
+      <div class="bg-white p-6 rounded-lg shadow-md">
+        <ul class="divide-y divide-gray-200">
+
+          <!-- Iterar notificaciones -->
+          <li th:each="notif : ${notificaciones}" class="py-4">
+            <div class="flex items-center">
+
+              <!-- Ícono dinámico según tipo -->
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3"
+                   th:classappend="${notif.tipoDestinatario.name() == 'ARBITRO'} ? 'text-indigo-500' : 'text-green-500'"
+                   fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+
+              <div>
+                <p class="font-semibold text-gray-800" th:text="${notif.mensaje}">Título de notificación</p>
+                <p class="text-sm text-gray-600">
+                  <span th:text="${notif.tipoDestinatario == 'ADMIN' ? 'Notificación para administradores' : 'Notificación para árbitro'}"></span>
+                </p>
+                <p class="text-xs text-gray-400 mt-1"
+                   th:text="${#temporals.format(notif.fecha, 'dd/MM/yyyy HH:mm')}">Hace 5 minutos</p>
+              </div>
+            </div>
+          </li>
+
+          <!-- Si no hay notificaciones -->
+          <li th:if="${#lists.isEmpty(notificaciones)}" class="py-6 text-center text-gray-500">
+            No tienes notificaciones nuevas.
+          </li>
+        </ul>
+      </div>
+    </div>
+    </main>
+  </div>
+</body>
+</html>

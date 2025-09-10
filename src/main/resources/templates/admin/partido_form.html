@@ -70,6 +70,7 @@
                 <option value="">Seleccione un equipo</option>
                 <option th:each="equipoLocal : ${equipos}"
                         th:value="${equipoLocal.id}" th:text="${equipoLocal.nombre}"></option>
+
               </select>
               <p class="mt-1 text-sm text-red-600" th:if="${#fields.hasErrors('equipoLocal')}" th:errors="*{equipoLocal}"></p>
             </div>
@@ -112,6 +113,7 @@
                     class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition duration-200">
               <span th:text="${partido.id != null ? 'Actualizar' : 'Crear'}">Crear</span>
             </button>
+
           </div>
         </form>
 
