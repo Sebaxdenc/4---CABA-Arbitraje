@@ -28,22 +28,22 @@
                 <!-- Resumen General -->
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
                     <div class="bg-white p-6 rounded-lg shadow-md text-center">
-                        <div class="text-3xl font-bold text-blue-600 mb-2" th:text="${estadisticas.partidosJugados}">0</div>
+                        <div class="text-3xl font-bold text-blue-600 mb-2" th:text="${estadisticas['partidosJugados']}">0</div>
                         <div class="text-gray-600 text-sm font-medium">Partidos Jugados</div>
                     </div>
                     
                     <div class="bg-white p-6 rounded-lg shadow-md text-center">
-                        <div class="text-3xl font-bold text-green-600 mb-2" th:text="${estadisticas.partidosGanados}">0</div>
+                        <div class="text-3xl font-bold text-green-600 mb-2" th:text="${estadisticas['partidosGanados']}">0</div>
                         <div class="text-gray-600 text-sm font-medium">Victorias</div>
                     </div>
                     
                     <div class="bg-white p-6 rounded-lg shadow-md text-center">
-                        <div class="text-3xl font-bold text-red-600 mb-2" th:text="${estadisticas.partidosPerdidos}">0</div>
+                        <div class="text-3xl font-bold text-red-600 mb-2" th:text="${estadisticas['partidosPerdidos']}">0</div>
                         <div class="text-gray-600 text-sm font-medium">Derrotas</div>
                     </div>
                     
                     <div class="bg-white p-6 rounded-lg shadow-md text-center">
-                        <div class="text-3xl font-bold text-yellow-600 mb-2" th:text="${estadisticas.partidosEmpatados ?: 0}">0</div>
+                        <div class="text-3xl font-bold text-yellow-600 mb-2" th:text="${estadisticas['partidosEmpatados ?: 0']}">0</div>
                         <div class="text-gray-600 text-sm font-medium">Empates</div>
                     </div>
                 </div>

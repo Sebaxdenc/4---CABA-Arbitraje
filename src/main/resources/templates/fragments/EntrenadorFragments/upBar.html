@@ -21,7 +21,7 @@
             <!-- Información del usuario y botón de cerrar sesión -->
             <div class="flex items-center space-x-4">
                 <p class="text-sm text-gray-600 hidden md:block" 
-                   th:text="'¡Bienvenido, ' + (${userName != null ? userName : 'Coach'}) + '!'">¡Bienvenido, Coach!</p>
+                   th:text="'¡Bienvenido, ' + (${userName != null ? userName : 'Coach'}) + '!'">¡Bienvenid@, Coach!</p>
                 
                 <!-- Botón de cerrar sesión -->
                 <form th:action="@{/logout}" method="post" class="inline">

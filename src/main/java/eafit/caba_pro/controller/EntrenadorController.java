@@ -39,7 +39,7 @@ public class EntrenadorController {
     private ReseñaService reseñaService;
     
     @GetMapping
-    public String panelCoach(Model model, Principal principal, RedirectAttributes redirectAttributes) {
+    public String panelCoach(Model model, Principal principal) {
         try {
             // Obtener el usuario autenticado
             String username = principal.getName();
@@ -48,7 +48,6 @@ public class EntrenadorController {
             Optional<Entrenador> entrenadorOpt = entrenadorService.findByUsuarioUsername(username);
             
             if (entrenadorOpt.isEmpty()) {
-                redirectAttributes.addFlashAttribute("error", "No se encontró información del entrenador para este usuario");
                 return "redirect:/login";
             }
             
@@ -73,7 +72,6 @@ public class EntrenadorController {
             return "coach/panel";
             
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("error", "Error al cargar el panel del entrenador");
             return "redirect:/login";
         }
     }
