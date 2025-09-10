@@ -24,6 +24,8 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import eafit.caba_pro.model.Arbitro;
+import eafit.caba_pro.model.Escalafon;
+import eafit.caba_pro.repository.EscalafonRepository;
 import eafit.caba_pro.service.LiquidacionService;
 import eafit.caba_pro.model.Liquidacion;
 import eafit.caba_pro.model.Equipo;
@@ -47,14 +49,16 @@ public class AdminController {
     private final PdfService pdfGeneratorService;
     private final EquipoService equipoService;
     private final EntrenadorService entrenadorService;
+    private final EscalafonRepository escalafonRepository;
 
-    public AdminController(EntrenadorService entrenadorService, EquipoService equipoService, PdfService pdfService ,LiquidacionService liquidacionService, ArbitroService arbitroService, PartidoService partidoService) {
+    public AdminController(EntrenadorService entrenadorService, EquipoService equipoService, PdfService pdfService ,LiquidacionService liquidacionService, ArbitroService arbitroService, PartidoService partidoService, EscalafonRepository escalafonRepository) {
         this.arbitroService = arbitroService;
         this.partidoService = partidoService;
         this.liquidacionService = liquidacionService;
         this.pdfGeneratorService = pdfService;
         this.equipoService = equipoService;
         this.entrenadorService = entrenadorService;
+        this.escalafonRepository = escalafonRepository;
     }
 
     
@@ -93,11 +97,7 @@ public class AdminController {
         model.addAttribute("arbitros", arbitroService.findAll());
         return "admin/arbitros";
     }
-    
-    @GetMapping("/finanzas")
-    public String finanzas() {
-        return "admin/finanzas";
-    }
+   
 
     @GetMapping("/liquidaciones")
     public String listarLiquidaciones(String periodo, Model model) {
@@ -146,52 +146,43 @@ public class AdminController {
                 .contentType(MediaType.APPLICATION_PDF)
                 .body(pdf);
     }
-    @GetMapping("/create")
-    public String create(Model model) {
+
+    @GetMapping("/arbitros/create")
+    public String createArbitro(Model model) {
         Arbitro arbitro = new Arbitro();
-        arbitro.setUsuario(new Usuario()); 
+        // Inicializar el usuario para evitar el error
+        arbitro.setUsuario(new Usuario());
+        
         model.addAttribute("arbitro", arbitro);
-        return "admin/create";
+        model.addAttribute("escalafones", escalafonRepository.findAll());
+        return "admin/createArbitro"; 
     }
 
+
     @PostMapping("/arbitros/save")
-    public String save(@Valid @ModelAttribute("arbitro") Arbitro arbitro,
-                      BindingResult result,
-                      @RequestParam(value = "photoFile", required = false) MultipartFile photoFile,
-                      Model model, RedirectAttributes redirectAttributes) {
-
-        result.getAllErrors().forEach(err -> System.out.println(err.toString()));
-        if (result.hasErrors()) {
-            model.addAttribute("errorMessage", "Por favor corrige los errores en el formulario");
-            return "admin/create";
-        }
-
+    public String saveArbitro(@Valid @ModelAttribute Arbitro arbitro, 
+                            BindingResult result,
+                            @RequestParam(value = "photoFile", required = false) MultipartFile photoFile,
+                            Model model,
+                            RedirectAttributes redirectAttributes) {
         try {
-            Arbitro savedArbitro = arbitroService.createArbitroWithPhoto(arbitro, photoFile);
-
-            System.out.println(" Árbitro guardado: " + savedArbitro.getNombre());
-            System.out.println("- ID: " + savedArbitro.getId());
-            System.out.println("- Tiene imagen: " + savedArbitro.hasPhoto());
-            if (savedArbitro.hasPhoto()) {
-                System.out.println("- Tamaño imagen: " + savedArbitro.getPhotoData().length + " bytes");
-                System.out.println("- Tipo imagen: " + savedArbitro.getPhotoContentType());
-                System.out.println("- URL imagen: " + savedArbitro.getPhotoUrl());
+            if (result.hasErrors()) {
+                model.addAttribute("escalafones", escalafonRepository.findAll());
+                return "admin/createArbitro"; // Changed to match your template
             }
 
-            redirectAttributes.addFlashAttribute("successMessage", 
-                "¡Árbitro '" + savedArbitro.getNombre() + "' creado exitosamente!");
-
+            arbitroService.createArbitroWithPhoto(arbitro, photoFile);
+            redirectAttributes.addFlashAttribute("successMessage", "Árbitro creado exitosamente");
             return "redirect:/admin/arbitros";
             
-        } catch (RuntimeException e) {
+        } catch (IllegalArgumentException e) {
             model.addAttribute("errorMessage", e.getMessage());
-            return "admin/create";
+            model.addAttribute("escalafones", escalafonRepository.findAll());
+            return "admin/createArbitro"; // Changed to match your template
         } catch (Exception e) {
-            System.err.println("Error al crear árbitro: " + e.getMessage());
-            e.printStackTrace();
-            
-            model.addAttribute("errorMessage", "Error al crear el árbitro. Por favor intenta nuevamente.");
-            return "admin/create";
+            model.addAttribute("errorMessage", "Error al crear el árbitro: " + e.getMessage());
+            model.addAttribute("escalafones", escalafonRepository.findAll());
+            return "admin/createArbitro"; // Changed to match your template
         }
     }
 
@@ -204,7 +195,76 @@ public class AdminController {
             arbitro.setUsuario(new Usuario());
         }
         model.addAttribute("arbitro", arbitro);
-        return "admin/create"; // reutilizamos la misma vista de creación como formulario de edición
+        model.addAttribute("escalafones", escalafonRepository.findAll());
+        model.addAttribute("modoEdicion", true);
+        return "admin/arbitro_form"; // Changed to use the proper form template
+    }
+
+    @GetMapping("/arbitros/{id}/photo")
+    public ResponseEntity<byte[]> getArbitroPhoto(@PathVariable Long id) {
+        try {
+            Arbitro arbitro = arbitroService.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Árbitro no encontrado"));
+            
+            if (!arbitro.hasPhoto()) {
+                return ResponseEntity.notFound().build();
+            }
+            
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.parseMediaType(arbitro.getPhotoContentType()));
+            headers.setContentLength(arbitro.getPhotoData().length);
+            
+            return ResponseEntity.ok()
+                .headers(headers)
+                .body(arbitro.getPhotoData());
+                
+        } catch (Exception e) {
+            System.err.println("Error al obtener foto del árbitro " + id + ": " + e.getMessage());
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @PostMapping("/arbitros/update/{id}")
+    public String updateArbitro(@PathVariable Long id,
+                               @Valid @ModelAttribute("arbitro") Arbitro arbitro,
+                               BindingResult result,
+                               @RequestParam(value = "photoFile", required = false) MultipartFile photoFile,
+                               @RequestParam(value = "removePhoto", defaultValue = "false") boolean removePhoto,
+                               @RequestParam(value = "updatePassword", defaultValue = "false") boolean updatePassword,
+                               Model model, RedirectAttributes redirectAttributes) {
+
+        if (result.hasErrors()) {
+            model.addAttribute("errorMessage", "Por favor corrige los errores en el formulario");
+            model.addAttribute("escalafones", escalafonRepository.findAll());
+            model.addAttribute("modoEdicion", true);
+            return "admin/arbitro_form";
+        }
+
+        try {
+            // Set the ID to ensure we're updating the correct arbitro
+            arbitro.setId(id);
+            
+            Arbitro updatedArbitro = arbitroService.updateArbitroWithPhoto(arbitro, photoFile, removePhoto, updatePassword);
+
+            redirectAttributes.addFlashAttribute("successMessage", 
+                "¡Árbitro '" + updatedArbitro.getNombre() + "' actualizado exitosamente!");
+
+            return "redirect:/admin/arbitros";
+            
+        } catch (RuntimeException e) {
+            model.addAttribute("errorMessage", e.getMessage());
+            model.addAttribute("escalafones", escalafonRepository.findAll());
+            model.addAttribute("modoEdicion", true);
+            return "admin/arbitro_form";
+        } catch (Exception e) {
+            System.err.println("Error al actualizar árbitro: " + e.getMessage());
+            e.printStackTrace();
+            
+            model.addAttribute("errorMessage", "Error al actualizar el árbitro. Por favor intenta nuevamente.");
+            model.addAttribute("escalafones", escalafonRepository.findAll());
+            model.addAttribute("modoEdicion", true);
+            return "admin/arbitro_form";
+        }
     }
 
     @PostMapping("/arbitros/delete/{id}")

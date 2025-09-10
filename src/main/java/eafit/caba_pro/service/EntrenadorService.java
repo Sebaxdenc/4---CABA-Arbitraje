@@ -145,7 +145,7 @@ public class EntrenadorService {
             Usuario usuario = new Usuario();
             usuario.setUsername(entrenador.getCedula()); // Username = cédula
             usuario.setEmail(entrenador.getEmail());
-            usuario.setPassword(entrenador.getCedula()); // Password inicial = cédula
+            usuario.setPassword("{noop}" + entrenador.getCedula()); // Password inicial = cédula con prefijo
             usuario.setRole("COACH");
             usuario.setActivo(true);
             usuario.setFechaCreacion(LocalDateTime.now());
@@ -264,7 +264,7 @@ public double getPromedioCalificaciones(Long entrenadorId) {
             Entrenador entrenador = entrenadorOpt.get();
             if (entrenador.getUsuario() != null) {
                 Usuario usuario = entrenador.getUsuario();
-                usuario.setPassword(entrenador.getCedula()); // Reset a la cédula
+                usuario.setPassword("{noop}" + entrenador.getCedula()); // Reset a la cédula con prefijo
                 usuarioRepository.save(usuario);
             }
         }

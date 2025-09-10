@@ -62,10 +62,10 @@ INSERT INTO partido (fecha, hora, equipo_local, equipo_visitante, estado, arbitr
 VALUES ('2025-09-02', '17:30', 1, 3, 'FINALIZADO', 2);
 
 INSERT INTO partido (fecha, hora, equipo_local, equipo_visitante, estado, arbitro_id) 
-VALUES ('2025-10-20', '14:00', 2, 1, 'PROGRAMADO', 2);
+VALUES ('2025-10-20', '14:00', 2, 1, 'PENDIENTE_CONFIRMACION', 2);
 
 INSERT INTO partido (fecha, hora, equipo_local, equipo_visitante, estado, arbitro_id) 
-VALUES ('2025-11-05', '18:30', 3, 2, 'PROGRAMADO', 2);
+VALUES ('2025-11-05', '18:30', 3, 2, 'PENDIENTE_CONFIRMACION', 2);
 
 INSERT INTO partido (fecha, hora, equipo_local, equipo_visitante, estado, arbitro_id) 
 VALUES ('2025-09-08', '20:00', 2, 3, 'FINALIZADO', 2);

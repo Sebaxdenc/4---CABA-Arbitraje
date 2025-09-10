@@ -183,7 +183,7 @@
                                 <option value="">Selecciona un árbitro...</option>
                                 <option th:each="arbitro : ${arbitrosDisponibles}" 
                                         th:value="${arbitro.id}" 
-                                        th:text="${arbitro.nombre + ' - ' + arbitro.speciality + ' (' + arbitro.scale + ')'}">
+                                        th:text="${arbitro.nombre + ' - ' + arbitro.speciality + ' (' + arbitro.escalafon.nombre + ')'}">
                                     Árbitro Ejemplo
                                 </option>
                             </select>
