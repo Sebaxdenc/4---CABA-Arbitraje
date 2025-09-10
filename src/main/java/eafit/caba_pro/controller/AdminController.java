@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -19,9 +20,11 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import eafit.caba_pro.model.Arbitro;
+import eafit.caba_pro.model.Equipo;
 import eafit.caba_pro.model.Partido;
 import eafit.caba_pro.model.Usuario;
 import eafit.caba_pro.service.ArbitroService;
+import eafit.caba_pro.service.EquipoService;
 import eafit.caba_pro.service.PartidoService;
 import jakarta.validation.Valid;
 
@@ -31,11 +34,13 @@ public class AdminController {
 
     private final ArbitroService arbitroService;
     private final PartidoService partidoService;
+    private final EquipoService equipoService;
 
 
-    public AdminController(ArbitroService arbitroService, PartidoService partidoService) {
+    public AdminController(ArbitroService arbitroService, PartidoService partidoService, EquipoService equipoService) {
         this.arbitroService = arbitroService;
         this.partidoService = partidoService;
+        this.equipoService = equipoService;
     }
     
     @GetMapping()
@@ -99,6 +104,8 @@ public class AdminController {
         return "admin/reportes"; 
     }
 
+
+
     @GetMapping("/create")
     public String create(Model model) {
         Arbitro arbitro = new Arbitro();
@@ -153,32 +160,50 @@ public class AdminController {
         }
     }
 
+    @GetMapping("/arbitros/edit/{id}")
+    public String editArbitro(@PathVariable Long id, Model model) {
+        Arbitro arbitro = arbitroService.findById(id)
+            .orElseThrow(() -> new IllegalArgumentException("Árbitro no encontrado"));
+        // Asegura objeto usuario para el form, si lo usas ahí
+        if (arbitro.getUsuario() == null) {
+            arbitro.setUsuario(new Usuario());
+        }
+        model.addAttribute("arbitro", arbitro);
+        return "admin/create"; // reutilizamos la misma vista de creación como formulario de edición
+    }
+
     @PostMapping("/arbitros/delete/{id}")
     public String delete(@PathVariable Long id, RedirectAttributes redirectAttributes) {
         try {
-            // Buscar el árbitro para obtener su nombre antes de eliminar
-            Optional<Arbitro> arbitro = arbitroService.findById(id);
-            String arbitroName = arbitro.map(Arbitro::getNombre).orElse(null);
-            
+            String nombre = arbitroService.findById(id).map(Arbitro::getNombre).orElse("Árbitro #" + id);
             boolean deleted = arbitroService.deleteById(id);
-            
             if (deleted) {
-                redirectAttributes.addFlashAttribute("successMessage", 
-                    "¡Árbitro" + (arbitroName != null ? " '" + arbitroName + "'" : "") + " eliminado exitosamente!");
+                redirectAttributes.addFlashAttribute("successMessage",
+                    "¡Árbitro '" + nombre + "' eliminado exitosamente!");
             } else {
-                redirectAttributes.addFlashAttribute("errorMessage", 
+                redirectAttributes.addFlashAttribute("errorMessage",
                     "No se pudo encontrar el árbitro a eliminar.");
             }
+        } catch (DataIntegrityViolationException e) {
+            redirectAttributes.addFlashAttribute("errorMessage",
+                "No se puede eliminar porque tiene partidos asociados. " +
+                "Desasigna o elimina sus partidos primero.");
         } catch (RuntimeException e) {
-            // Errores de negocio (como integridad referencial)
             redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("errorMessage", 
+            redirectAttributes.addFlashAttribute("errorMessage",
                 "Error interno al eliminar el árbitro. Por favor intenta nuevamente.");
             System.err.println("Error al eliminar árbitro con ID " + id + ": " + e.getMessage());
         }
-        
         return "redirect:/admin/arbitros";
+    }
+
+    @GetMapping("/arbitros/{id}")
+    public String viewArbitro(@PathVariable Long id, Model model) {
+        Arbitro arbitro = arbitroService.findById(id)
+            .orElseThrow(() -> new IllegalArgumentException("Árbitro no encontrado"));
+        model.addAttribute("arbitro", arbitro);
+        return "admin/arbitro_view"; // ver plantilla en el punto 4
     }
 
     // -------------------- PARTIDOS --------------------
@@ -202,30 +227,31 @@ public class AdminController {
 
     @GetMapping("/partidos/create")
     public String mostrarFormularioCrear(Model model) {
-        model.addAttribute("partido", new Partido());
+        Partido p = new Partido();
+        // Evita null al evaluar *{arbitro.id} y *{equipo*.id} en la vista
+        p.setArbitro(new Arbitro());
+        p.setEquipoLocal(new Equipo());
+        p.setEquipoVisitante(new Equipo());
+
+        model.addAttribute("partido", p);
+        // Si no usas @ModelAttribute (ver abajo), entonces añade estas 3 líneas:
         model.addAttribute("arbitros", arbitroService.findAll());
+        model.addAttribute("equipos",  equipoService.findAll());
+        model.addAttribute("estados",  Partido.EstadoPartido.values());
+
         return "admin/partido_form";
     }
 
 
-    @PostMapping("/partidos/save")
-    public String guardar(@ModelAttribute Partido partido) {
-        if (partido.getArbitro() != null && partido.getArbitro().getId() != null) {
-            arbitroService.findById(partido.getArbitro().getId())
-                        .ifPresent(partido::setArbitro);
-        } else {
-            partido.setArbitro(null);
-        }
-        partidoService.crearPartido(partido);
-        return "redirect:/admin/partidos";
-    }
 
-
-    @GetMapping("/partidos/edit/{id}")
+    @GetMapping("/partidos/edit/{id:[0-9]+}")
     public String editar(@PathVariable Long id, Model model) {
-        Optional<Partido> partido = partidoService.findById(id);
+        Partido partido = partidoService.findById(id)
+            .orElseThrow(() -> new IllegalArgumentException("Partido no encontrado"));
         model.addAttribute("partido", partido);
         model.addAttribute("arbitros", arbitroService.findAll());
+        model.addAttribute("equipos", equipoService.findAll());       // <-- necesario
+        model.addAttribute("estados", Partido.EstadoPartido.values());
         return "admin/partido_form";
     }
 

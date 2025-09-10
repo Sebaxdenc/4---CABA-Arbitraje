@@ -11,11 +11,10 @@
 <body class="flex bg-gray-100 min-h-screen">
   <aside th:replace="~{admin/sidebar :: sidebar('partidos')}"></aside>
 
-  <div class="flex-1 overflow-x-hidden overflow-y-auto">
+  <div class="flex-1 overflow-x-hidden overflow-y-hidden">
     <header th:replace="~{admin/header :: header('Programación de Partidos')}"></header>
 
     <main class="p-6 space-y-6">
-
       <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-2">
         <h3 class="text-2xl font-semibold text-gray-800">Partidos</h3>
         <a th:href="@{/admin/partidos/create}"
@@ -24,61 +23,53 @@
         </a>
       </div>
 
-        <div class="bg-white p-6 rounded-lg shadow">
-        <input type="text" placeholder="Buscar partido..."
-                class="w-full mb-4 px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+      <!-- ✅ Card con alto fijo y contenido scrollable -->
+      <div class="bg-white p-6 rounded-lg shadow flex flex-col h-[75vh]">
+        <!-- Encabezado “sticky” dentro de la card -->
+        <div class="sticky top-0 bg-white z-10 pb-3">
+          <input type="text" placeholder="Buscar partido..."
+                 class="w-full mb-4 px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+          <h4 class="text-lg font-semibold text-gray-800">Todos los partidos</h4>
+        </div>
 
-        <h4 class="text-lg font-semibold text-gray-800 mb-4">Todos los partidos</h4>
-
-        <ul class="space-y-4">
+        <!-- Área que scrollea -->
+        <div class="mt-2 flex-1 overflow-y-auto pr-2">
+          <ul class="space-y-4">
             <li th:each="partido : ${partidos}" class="bg-gray-50 p-4 rounded-lg">
-            <div class="flex justify-between items-center">
-               
+              <div class="flex justify-between items-center">
                 <p class="font-semibold"
-                th:text="${partido.equipoLocal.nombre + ' vs ' + partido.equipoVisitante.nombre}"></p>
+                   th:text="${partido.equipoLocal.nombre + ' vs ' + partido.equipoVisitante.nombre}"></p>
                 <span class="text-sm text-gray-600" th:text="${partido.fecha}"></span>
-            </div>
+              </div>
 
-            <div class="mt-2 text-sm text-gray-500">
-                <p>
-                <strong>Hora:</strong>
-                <span th:text="${partido.hora}"></span>
+              <div class="mt-2 text-sm text-gray-500">
+                <p><strong>Hora:</strong> <span th:text="${partido.hora}"></span></p>
+                <p><strong>Estado:</strong> <span th:text="${partido.estado}"></span></p>
+                <p><strong>Árbitro:</strong>
+                  <span th:text="${partido.arbitro != null ? partido.arbitro.nombre : 'Sin asignar'}"></span>
                 </p>
-                <p>
-                <strong>Estado:</strong>
-                <span th:text="${partido.estado}"></span>
-                </p>
-                <p>
-                <strong>Árbitro:</strong>
-                <span th:text="${partido.arbitro != null ? partido.arbitro.nombre : 'Sin asignar'}"></span>
-                </p>
-            </div>
+              </div>
 
-            <div class="mt-3 flex gap-2">
+              <div class="mt-3 flex gap-2">
                 <a th:href="@{'/admin/partidos/edit/' + ${partido.id}}"
-                class="px-3 py-1 bg-yellow-500 text-white rounded hover:bg-yellow-600">
-                Editar
-                </a>
+                   class="px-3 py-1 bg-yellow-500 text-white rounded hover:bg-yellow-600">Editar</a>
 
-             
                 <form th:action="@{'/admin/partidos/delete/' + ${partido.id}}" method="post" class="inline">
-             
-                <input type="hidden" th:if="${_csrf != null}"
-                        th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
-                <button type="submit"
-                        class="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700"
-                        onclick="return confirm('¿Eliminar este partido?');">
-                    Eliminar
-                </button>
+                  <input type="hidden" th:if="${_csrf != null}"
+                         th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                  <button type="submit"
+                          class="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700"
+                          onclick="return confirm('¿Eliminar este partido?');">Eliminar</button>
                 </form>
-            </div>
+              </div>
             </li>
 
             <li th:if="${#lists.isEmpty(partidos)}" class="text-gray-500">
-            No hay partidos registrados.
+              No hay partidos registrados.
             </li>
-        </ul>
+          </ul>
         </div>
+      </div>
     </main>
   </div>
 </body>

@@ -2,100 +2,153 @@
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8" />
-  <title th:text="${partido.id} != null ? 'Editar Partido' : 'Agendar Partido'">Partido</title>
+  <title th:text="${partido.id != null ? 'Editar Partido' : 'Agendar Partido'}">Partido</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
-<body class="bg-gray-100 min-h-screen flex">
+<body class="flex bg-gray-100 min-h-screen">
+
   <aside th:replace="~{admin/sidebar :: sidebar('partidos')}"></aside>
 
   <div class="flex-1 flex flex-col overflow-x-hidden overflow-y-auto">
-    <header th:replace="~{admin/header :: header(${partido.id} != null ? 'Editar Partido' : 'Agendar Partido')}"></header>
+    <header th:replace="~{admin/header :: header(${partido.id != null ? 'Editar Partido' : 'Agendar Partido'})}"></header>
 
     <main class="p-6 flex-1">
       <div class="bg-white p-6 rounded-lg shadow max-w-2xl mx-auto">
         <h3 class="text-2xl font-semibold text-gray-800 mb-4"
-            th:text="${partido.id} != null ? 'Editar Partido' : 'Agendar Partido'">
-          Agendar Partido
-        </h3>
+            th:text="${partido.id != null ? 'Editar Partido' : 'Agendar Partido'}">Agendar Partido</h3>
 
         <div th:if="${errorMessage}" class="mb-4 rounded-md bg-red-50 p-4 text-red-700" th:text="${errorMessage}"></div>
 
-        <form th:action="@{/admin/partidos/save}"
-              th:object="${partido}"
-              method="post"
-              class="space-y-4">
-
-          <!-- CSRF -->
-          <input type="hidden" th:if="${_csrf != null}"
-                 th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
-
-          <!-- Para edición -->
+        <!-- ===== FORM EDITAR ===== -->
+        <form th:if="${partido.id != null}"
+              th:action="@{/admin/partidos/update/{id}(id=${partido.id})}"
+              th:object="${partido}" method="post" class="space-y-4">
+          <input type="hidden" th:if="${_csrf != null}" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
           <input type="hidden" th:field="*{id}"/>
 
-         <!-- Fecha -->
+          <!-- Fecha -->
           <div>
-            <label for="fecha" class="block text-sm font-medium text-gray-700">Fecha *</label>
-            <input type="date" id="fecha" th:field="*{fecha}" required autocomplete="off"
-                   class="mt-1 block w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"/>
+            <label class="block text-sm font-medium">Fecha *</label>
+            <input type="date" th:field="*{fecha}" required class="mt-1 block w-full border rounded px-3 py-2"/>
             <p class="mt-1 text-sm text-red-600" th:if="${#fields.hasErrors('fecha')}" th:errors="*{fecha}"></p>
           </div>
 
           <!-- Hora -->
           <div>
-            <label for="hora" class="block text-sm font-medium text-gray-700">Hora *</label>
-            <input type="time" id="hora" th:field="*{hora}" required autocomplete="off"
-                   class="mt-1 block w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"/>
+            <label class="block text-sm font-medium">Hora *</label>
+            <input type="time" th:field="*{hora}" required class="mt-1 block w-full border rounded px-3 py-2"/>
             <p class="mt-1 text-sm text-red-600" th:if="${#fields.hasErrors('hora')}" th:errors="*{hora}"></p>
-          </div>
-
-          <!-- Equipo Local -->
-          <div>
-            <label for="equipoLocal" class="block text-sm font-medium text-gray-700">Equipo Local *</label>
-            <input id="equipoLocal" th:field="*{equipoLocal}" placeholder="Equipo A" required autocomplete="off"
-                   class="mt-1 block w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"/>
-            <p class="mt-1 text-sm text-red-600" th:if="${#fields.hasErrors('equipoLocal')}" th:errors="*{equipoLocal}"></p>
-          </div>
-
-          <!-- Equipo Visitante -->
-          <div>
-            <label for="equipoVisitante" class="block text-sm font-medium text-gray-700">Equipo Visitante *</label>
-            <input id="equipoVisitante" th:field="*{equipoVisitante}" placeholder="Equipo B" required autocomplete="off"
-                   class="mt-1 block w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"/>
-            <p class="mt-1 text-sm text-red-600" th:if="${#fields.hasErrors('equipoVisitante')}" th:errors="*{equipoVisitante}"></p>
           </div>
 
           <!-- Estado -->
           <div>
-            <label for="estado" class="block text-sm font-medium text-gray-700">Estado *</label>
-            <select id="estado" th:field="*{estado}" required
-                    class="mt-1 block w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            <label class="block text-sm font-medium">Estado *</label>
+            <select th:field="*{estado}" required class="mt-1 block w-full border rounded px-3 py-2">
               <option th:each="e : ${T(eafit.caba_pro.model.Partido.EstadoPartido).values()}"
                       th:value="${e}" th:text="${e}"></option>
             </select>
-            <p class="mt-1 text-sm text-red-600" th:if="${#fields.hasErrors('estado')}" th:errors="*{estado}"></p>
           </div>
 
           <!-- Árbitro (opcional) -->
           <div>
-            <label for="arbitro" class="block text-sm font-medium text-gray-700">Árbitro (opcional)</label>
-            <select id="arbitro" th:field="*{arbitro.id}"
-                    class="mt-1 block w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            <label class="block text-sm font-medium">Árbitro (opcional)</label>
+            <select th:field="*{arbitro.id}" class="mt-1 block w-full border rounded px-3 py-2">
               <option value="">Sin asignar</option>
-              <option th:each="a : ${arbitros}"
-                      th:value="${a.id}"
-                      th:text="${a.nombre}"></option>
+              <option th:each="a : ${arbitros != null ? arbitros : {}}"
+                      th:value="${a.id}" th:text="${a.nombre}"></option>
             </select>
-            <p class="mt-1 text-sm text-red-600" th:if="${#fields.hasErrors('arbitro.id')}" th:errors="*{arbitro.id}"></p>
+          </div>
+
+          <!-- Equipos -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium">Equipo Local *</label>
+              <select th:field="*{equipoLocal.id}" required class="mt-1 block w-full border rounded px-3 py-2">
+                <option value="" disabled>Selecciona...</option>
+                <option th:each="eq : ${equipos != null ? equipos : {}}"
+                        th:value="${eq.id}" th:text="${eq.nombre}"></option>
+              </select>
+              <p class="mt-1 text-sm text-red-600" th:if="${#fields.hasErrors('equipoLocal')}" th:errors="*{equipoLocal}"></p>
+            </div>
+            <div>
+              <label class="block text-sm font-medium">Equipo Visitante *</label>
+              <select th:field="*{equipoVisitante.id}" required class="mt-1 block w-full border rounded px-3 py-2">
+                <option value="" disabled>Selecciona...</option>
+                <option th:each="eq : ${equipos != null ? equipos : {}}"
+                        th:value="${eq.id}" th:text="${eq.nombre}"></option>
+              </select>
+              <p class="mt-1 text-sm text-red-600" th:if="${#fields.hasErrors('equipoVisitante')}" th:errors="*{equipoVisitante}"></p>
+            </div>
           </div>
 
           <div class="flex justify-end space-x-3 pt-2">
             <a th:href="@{/admin/partidos}" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300">Cancelar</a>
-            <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">
-              Guardar
-            </button>
+            <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">Guardar</button>
           </div>
         </form>
+
+        <!-- ===== FORM CREAR ===== -->
+        <form th:unless="${partido.id != null}"
+              th:action="@{/admin/partidos/save}"
+              th:object="${partido}" method="post" class="space-y-4">
+          <input type="hidden" th:if="${_csrf != null}" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+
+          <!-- (los mismos campos que arriba) -->
+          <div>
+            <label class="block text-sm font-medium">Fecha *</label>
+            <input type="date" th:field="*{fecha}" required class="mt-1 block w-full border rounded px-3 py-2"/>
+            <p class="mt-1 text-sm text-red-600" th:if="${#fields.hasErrors('fecha')}" th:errors="*{fecha}"></p>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium">Hora *</label>
+            <input type="time" th:field="*{hora}" required class="mt-1 block w-full border rounded px-3 py-2"/>
+            <p class="mt-1 text-sm text-red-600" th:if="${#fields.hasErrors('hora')}" th:errors="*{hora}"></p>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium">Estado *</label>
+            <select th:field="*{estado}" required class="mt-1 block w-full border rounded px-3 py-2">
+              <option th:each="e : ${T(eafit.caba_pro.model.Partido$EstadoPartido).values()}"
+                      th:value="${e}" th:text="${e}"></option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium">Árbitro (opcional)</label>
+            <select th:field="*{arbitro.id}" class="mt-1 block w-full border rounded px-3 py-2">
+              <option value="">Sin asignar</option>
+              <option th:each="a : ${arbitros != null ? arbitros : {}}"
+                      th:value="${a.id}" th:text="${a.nombre}"></option>
+            </select>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium">Equipo Local *</label>
+              <select th:field="*{equipoLocal.id}" required class="mt-1 block w-full border rounded px-3 py-2">
+                <option value="" disabled selected>Selecciona...</option>
+                <option th:each="eq : ${equipos != null ? equipos : {}}"
+                        th:value="${eq.id}" th:text="${eq.nombre}"></option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-sm font-medium">Equipo Visitante *</label>
+              <select th:field="*{equipoVisitante.id}" required class="mt-1 block w-full border rounded px-3 py-2">
+                <option value="" disabled selected>Selecciona...</option>
+                <option th:each="eq : ${equipos != null ? equipos : {}}"
+                        th:value="${eq.id}" th:text="${eq.nombre}"></option>
+              </select>
+            </div>
+          </div>
+
+          <div class="flex justify-end space-x-3 pt-2">
+            <a th:href="@{/admin/partidos}" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300">Cancelar</a>
+            <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">Guardar</button>
+          </div>
+        </form>
+
       </div>
     </main>
   </div>

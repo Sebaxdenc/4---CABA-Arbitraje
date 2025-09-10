@@ -1,17 +1,28 @@
 package eafit.caba_pro.repository;
 
-import eafit.caba_pro.model.Partido;
-import eafit.caba_pro.model.Arbitro;
+import java.time.LocalDate;
+import java.util.List;
+
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.time.LocalDate;
-import java.util.List;
+import eafit.caba_pro.model.Arbitro;
+import eafit.caba_pro.model.Partido;
+import jakarta.transaction.Transactional;
 
 @Repository
 public interface PartidoRepository extends JpaRepository<Partido, Long> {
+
+    List<Partido> findByTorneoIsNull();           
+    boolean existsByArbitroId(Long arbitroId);
+    List<Partido> findByTorneo_Id(Long torneoId);
+    List<Partido> findByTorneoIsNullAndEstado(Partido.EstadoPartido estado);
+    boolean existsByTorneo_Id(Long torneoId);
+    long countByTorneo_Id(Long torneoId);
+
     
     // Encontrar partidos por árbitro
     @Query("SELECT p FROM Partido p WHERE p.arbitro = :arbitro")
@@ -72,5 +83,11 @@ public interface PartidoRepository extends JpaRepository<Partido, Long> {
 
     @Query("SELECT COUNT(p) FROM Partido p WHERE p.estado = :estado")
     long countByEstado(@Param("estado") Partido.EstadoPartido estado);
+    
+    @Transactional
+    @Modifying
+    @Query("update Partido p set p.torneo = null where p.torneo.id = :torneoId")
+    int unassignByTorneoId(Long torneoId);
+    
     
 }

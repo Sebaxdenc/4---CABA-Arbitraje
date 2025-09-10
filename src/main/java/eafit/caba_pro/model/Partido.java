@@ -1,16 +1,26 @@
 package eafit.caba_pro.model;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
-
-import jakarta.persistence.*;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -64,6 +74,14 @@ public class Partido {
     //@JsonIgnoreProperties({"partidosLocal", "partidosVisitante"})
     @NotNull(message = "El equipo local no puede ser nulo")
     private Equipo equipoLocal;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "torneo_id", nullable = true)
+    private Torneo torneo;
+
+    public Torneo getTorneo() { return torneo; }
+    public void setTorneo(Torneo torneo) { this.torneo = torneo; }
+
     
     // Enums
     public enum EstadoPartido {
