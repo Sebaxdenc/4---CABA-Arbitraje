@@ -15,7 +15,7 @@
         <!-- Main Content -->
         <div class="flex-1 md:ml-64">
             <!-- Top bar -->
-            <div th:replace="~{fragments/EntrenadorFragments/upBar :: upBar('Crear Reseña', ${entrenador.nombre})}"></div>
+            <div th:replace="~{fragments/EntrenadorFragments/upBar :: upBar('Crear Reseña', ${entrenador.nombreCompleto})}"></div>
             
             <!-- Content -->
             <div class="p-6">
@@ -51,7 +51,7 @@
                                 <option value="">-- Selecciona un árbitro --</option>
                                 <option th:each="arbitro : ${arbitros}" 
                                         th:value="${arbitro.id}" 
-                                        th:text="${arbitro.nombre + ' ' + arbitro.apellido + ' (' + arbitro.cedula + ')'}">
+                                        th:text="${arbitro.nombre + ' (' + arbitro.cedula + ')'}">
                                     Árbitro Nombre
                                 </option>
                             </select>
@@ -64,15 +64,10 @@
                             </label>
                             <select name="partidoId" id="partidoId"
                                     class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
-                                <option value="">-- Ningún partido específico --</option>
-                                <option th:each="partido : ${partidosFinalizados}" 
-                                        th:value="${partido.id}" 
-                                        th:text="${partido.equipoLocal + ' vs ' + partido.equipoVisitante + ' - ' + partido.fecha}">
-                                    Partido Info
-                                </option>
+                                <option value="">-- Selecciona primero un árbitro --</option>
                             </select>
                             <p class="text-sm text-gray-500 mt-1">
-                                Puedes asociar esta reseña a un partido específico donde arbitró
+                                Primero selecciona un árbitro para ver sus partidos finalizados disponibles
                             </p>
                         </div>
 
@@ -140,12 +135,14 @@
         </div>
     </div>
 
-    <!-- JavaScript para manejo de estrellas -->
+    <!-- JavaScript para manejo de estrellas y partidos dinámicos -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const starButtons = document.querySelectorAll('.star-btn');
             const ratingInput = document.getElementById('puntuacion');
             const ratingText = document.getElementById('rating-text');
+            const arbitroSelect = document.getElementById('arbitroId');
+            const partidoSelect = document.getElementById('partidoId');
             
             const ratingTexts = {
                 1: '1 Balón - Muy Malo',
@@ -155,6 +152,69 @@
                 5: '5 Balones - Excelente'
             };
             
+            // Función para cargar partidos dinámicamente
+            function cargarPartidosPorArbitro(arbitroId) {
+                if (!arbitroId) {
+                    // Si no hay árbitro seleccionado, limpiar la lista de partidos
+                    partidoSelect.innerHTML = '<option value="">-- Selecciona primero un árbitro --</option>';
+                    partidoSelect.disabled = true;
+                    return;
+                }
+                
+                // Mostrar loading
+                partidoSelect.innerHTML = '<option value="">Cargando partidos...</option>';
+                partidoSelect.disabled = true;
+                
+                // Hacer petición AJAX
+                fetch(`/coach/api/arbitro/${arbitroId}/partidos-finalizados`)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Error al cargar los partidos');
+                        }
+                        return response.json();
+                    })
+                    .then(partidos => {
+                        // Limpiar las opciones
+                        partidoSelect.innerHTML = '<option value="">-- Ningún partido específico --</option>';
+                        
+                        // Agregar los partidos finalizados
+                        partidos.forEach(partido => {
+                            const option = document.createElement('option');
+                            option.value = partido.id;
+                            option.textContent = `${partido.equipoLocal.nombre} vs ${partido.equipoVisitante.nombre} - ${partido.fecha}`;
+                            partidoSelect.appendChild(option);
+                        });
+                        
+                        // Habilitar el select
+                        partidoSelect.disabled = false;
+                        
+                        // Si no hay partidos, mostrar mensaje
+                        if (partidos.length === 0) {
+                            const option = document.createElement('option');
+                            option.value = '';
+                            option.textContent = 'Este árbitro no tiene partidos finalizados';
+                            option.disabled = true;
+                            partidoSelect.appendChild(option);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        partidoSelect.innerHTML = '<option value="">Error al cargar partidos</option>';
+                        partidoSelect.disabled = true;
+                    });
+            }
+            
+            // Evento cuando cambia la selección de árbitro
+            arbitroSelect.addEventListener('change', function() {
+                const arbitroId = this.value;
+                cargarPartidosPorArbitro(arbitroId);
+            });
+            
+            // Inicializar - deshabilitar partidos al cargar la página
+            partidoSelect.disabled = true;
+            partidoSelect.innerHTML = '<option value="">-- Selecciona primero un árbitro --</option>';
+            
+            // Manejo de estrellas (código existente)
             starButtons.forEach((button, index) => {
                 button.addEventListener('click', function(e) {
                     e.preventDefault();

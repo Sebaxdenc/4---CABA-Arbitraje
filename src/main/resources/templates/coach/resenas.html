@@ -15,7 +15,7 @@
         <!-- Main Content -->
         <div class="flex-1 md:ml-64">
             <!-- Top bar -->
-            <div th:replace="~{fragments/EntrenadorFragments/upBar :: upBar('Mis Reseñas', ${entrenador.nombre})}"></div>
+            <div th:replace="~{fragments/EntrenadorFragments/upBar :: upBar('Mis Reseñas', ${entrenador.nombreCompleto})}"></div>
             
             <!-- Content -->
             <div class="p-6">
@@ -78,7 +78,7 @@
                                     <div class="flex items-center space-x-3 mb-2">
                                         <h3 class="text-lg font-semibold text-gray-900">
                                             <i class="fas fa-user-tie mr-2 text-blue-600"></i>
-                                            <span th:text="${resena.arbitro.nombreCompleto}">Nombre del Árbitro</span>
+                                            <span th:text="${resena.arbitro.nombre}">Nombre del Árbitro</span>
                                         </h3>
                                         
                                         <!-- Calificación con estrellas -->
@@ -99,7 +99,7 @@
                                         <p class="text-sm text-blue-800">
                                             <i class="fas fa-basketball-ball mr-2"></i>
                                             <strong>Partido:</strong> 
-                                            <span th:text="${resena.partido.equipoLocal + ' vs ' + resena.partido.equipoVisitante}">
+                                            <span th:text="${resena.partido.equipoLocal.nombre + ' vs ' + resena.partido.equipoVisitante.nombre}">
                                                 Equipo vs Equipo
                                             </span>
                                             <span class="ml-2" th:text="'(' + ${#temporals.format(resena.partido.fecha, 'dd/MM/yyyy')} + ')'">
