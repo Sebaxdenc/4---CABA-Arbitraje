@@ -1,17 +1,20 @@
-INSERT INTO usuarios(username, password, role, email, activo) 
+INSERT INTO usuario(username, password, role, email, activo) 
 VALUES ('user1', '{noop}1234', 'ROLE_ADMIN', 'admin@test.com', true);
 
-INSERT INTO usuarios(username, password, role, email, activo) 
+INSERT INTO usuario(username, password, role, email, activo) 
 VALUES ('user2', '{noop}1234', 'ROLE_ARBITRO', 'arbitro@test.com', true);
 
-INSERT INTO usuarios(username, password, role, email, activo) 
+INSERT INTO usuario(username, password, role, email, activo) 
 VALUES ('user3', '{noop}1234', 'ROLE_ENTRENADOR', 'entrenador@test.com', true);
 
-INSERT INTO usuarios(username, password, role, email, activo) 
+INSERT INTO usuario(username, password, role, email, activo) 
 VALUES ('sebastian.medina', '{noop}arbitro123', 'ROLE_ARBITRO', 'sebas@test.com', true);
 
-INSERT INTO usuarios(username, password, role, email, activo) 
+INSERT INTO usuario(username, password, role, email, activo) 
 VALUES ('paula.lp', '{noop}arbitro1234', 'ROLE_ARBITRO', 'pau@test.com', true);
+
+INSERT INTO usuario(username, password, role, email, activo) 
+VALUES ('sara', '{noop}12345', 'ROLE_ENTRENADOR', 'sara@test.com', true);
 
 -- Escalafones disponibles
 INSERT INTO escalafon (nombre, honorario_base) 
@@ -29,6 +32,8 @@ VALUES ('Paula Lop', '{noop}arbitro1234', 'paula.lp', '34567', '3222469936', 'Ca
 
 INSERT INTO arbitro (nombre, contraseña, username, cedula, phone, speciality, photo_data, photo_content_type, photo_filename, usuario_id, escalafon_id) 
 VALUES ('Sebastian Medina', '{noop}arbitro123', 'sebastian.medina', '1058198772', '3222469936', 'Campo', NULL, NULL, NULL, 4, 1);
+
+
 
 -- Equipos
 INSERT INTO equipo(nombre, estado, ciudad, fundacion, logo)

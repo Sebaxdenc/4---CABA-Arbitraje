@@ -6,8 +6,6 @@ import java.util.Optional;
 import org.springframework.transaction.annotation.Transactional;
 
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import eafit.caba_pro.model.Equipo;
 import eafit.caba_pro.repository.EquipoRepository;
 
@@ -19,9 +17,6 @@ public class EquipoService {
     public EquipoService(EquipoRepository equipoRepository){
         this.equipoRepository = equipoRepository;
     }
-
-    private final EquipoRepository repo;
-    public EquipoService(EquipoRepository repo) { this.repo = repo; }
 
     @Transactional(readOnly = true)
     public List <Equipo> findAll(){

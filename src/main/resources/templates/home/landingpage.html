@@ -1,131 +1,618 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CABA Pro - Sistema de Gestión Integral de Arbitraje</title>
-    <!-- Tailwind CSS CDN -->
+    <title>CABA Pro - Sistema de Arbitraje Profesional</title>
+    
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .hero-gradient {
+            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 50%, #06b6d4 100%);
+        }
+        
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+        
+        .bounce-animation {
+            animation: bounce 2s infinite;
+        }
+        
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {
+                transform: translateY(0);
+            }
+            40% {
+                transform: translateY(-10px);
+            }
+            60% {
+                transform: translateY(-5px);
+            }
+        }
+        
+        .fade-in {
+            animation: fadeIn 1s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
 
-    <link rel="stylesheet" th:href="@{/css/style.css}">
-
-<body class="bg-gray-50 text-gray-800">
-
-    <!-- Sección del Hero -->
-    <header class="hero text-white py-24 md:py-32 flex flex-col justify-center items-center text-center rounded-b-3xl shadow-xl">
-        <div class="container mx-auto px-4">
-            <h1 class="text-4xl sm:text-5xl md:text-6xl font-extrabold leading-tight tracking-tight mb-4">
-                CABA Pro: El Futuro del Arbitraje de Baloncesto
-            </h1>
-            <p class="text-lg sm:text-xl md:text-2xl font-medium mb-8">
-                Automatiza, centraliza y eleva la gestión de arbitraje.
-            </p>
-            <a href="#" class="inline-block bg-indigo-600 text-white font-bold py-3 px-8 rounded-full shadow-lg hover:bg-indigo-700 transition duration-300 transform hover:scale-105">
-                Descubre Más
-            </a>
-        </div>
-    </header>
-
-    <!-- Sección de Introducción/Problema -->
-    <section class="py-16 md:py-24">
-        <div class="container mx-auto px-4 text-center max-w-4xl">
-            <h2 class="text-3xl sm:text-4xl font-bold mb-4">
-                De lo Manual a lo Magistral
-            </h2>
-            <p class="text-lg text-gray-600 leading-relaxed">
-                Reemplaza las hojas de cálculo, los grupos de WhatsApp y las llamadas dispersas con una plataforma web integral. CABA Pro es el sistema nervioso central que tu institución de arbitraje necesita para gestionar cada operación, de principio a fin, de manera eficiente y transparente.
-            </p>
-        </div>
-    </section>
-
-    <!-- Sección de Características Clave -->
-    <section class="bg-gray-100 py-16 md:py-24">
-        <div class="container mx-auto px-4">
-            <h2 class="text-3xl sm:text-4xl font-bold text-center mb-12">
-                Funcionalidades Clave
-            </h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-
-                <!-- Característica 1: Gestión de Personal -->
-                <div class="bg-white p-8 rounded-2xl shadow-lg text-center transform hover:scale-105 transition duration-300">
-                    <div class="mx-auto bg-indigo-500 w-16 h-16 flex items-center justify-center rounded-full mb-6">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                        </svg>
-                    </div>
-                    <h3 class="text-xl font-semibold mb-2">Gestión de Personal</h3>
-                    <p class="text-gray-600">
-                        Crea y gestiona perfiles detallados de árbitros con sus datos, especialidad y escalafón.
-                    </p>
-                </div>
-
-                <!-- Característica 2: Programación de Partidos -->
-                <div class="bg-white p-8 rounded-2xl shadow-lg text-center transform hover:scale-105 transition duration-300">
-                    <div class="mx-auto bg-indigo-500 w-16 h-16 flex items-center justify-center rounded-full mb-6">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h8m-8 4h8m-8 4h8M4 14v-2c0-1.1.9-2 2-2h12a2 2 0 012 2v2M6 10h12a2 2 0 012 2v8a2 2 0 01-2 2H6a2 2 0 01-2-2v-8z" />
-                        </svg>
-                    </div>
-                    <h3 class="text-xl font-semibold mb-2">Programación de Partidos</h3>
-                    <p class="text-gray-600">
-                        Agenda partidos y asigna roles específicos a los árbitros disponibles según sus perfiles.
-                    </p>
-                </div>
-
-                <!-- Característica 3: Ciclo de Vida del Agendamiento -->
-                <div class="bg-white p-8 rounded-2xl shadow-lg text-center transform hover:scale-105 transition duration-300">
-                    <div class="mx-auto bg-indigo-500 w-16 h-16 flex items-center justify-center rounded-full mb-6">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.955a11.955 11.955 0 01-8.618 3.029m-1.157 1.055a12.042 12.042 0 000 8.822m-1.157 1.055a12.042 12.042 0 000 8.822m1.157-1.055a12.042 12.042 0 000-8.822" />
-                        </svg>
-                    </div>
-                    <h3 class="text-xl font-semibold mb-2">Ciclo de Agendamiento</h3>
-                    <p class="text-gray-600">
-                        Notifica a los árbitros de sus asignaciones y centraliza el estado de cada una.
-                    </p>
+    <!-- Navigation Bar -->
+        <!-- Navigation Bar -->
+    <nav class="bg-white shadow-lg fixed w-full z-50 top-0">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <!-- Logo y marca -->
+                <div class="flex items-center flex-shrink-0">
+                    <a href="#inicio" class="flex items-center">
+                        <img th:src="@{/images/logo.png}" alt="CABA Pro Logo" class="h-10 w-10 mr-3">
+                        <span class="text-2xl font-bold text-blue-600">CABA Pro</span>
+                    </a>
                 </div>
                 
-                <!-- Característica 4: Gestión Financiera -->
-                <div class="bg-white p-8 rounded-2xl shadow-lg text-center transform hover:scale-105 transition duration-300">
-                    <div class="mx-auto bg-indigo-500 w-16 h-16 flex items-center justify-center rounded-full mb-6">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.105 0-2 .895-2 2s.895 2 2 2 2-.895 2-2-.895-2-2-2zM12 14c-1.105 0-2 .895-2 2s.895 2 2 2 2-.895 2-2-.895-2-2-2zM12 20c-1.105 0-2 .895-2 2s.895 2 2 2 2-.895 2-2-.895-2-2-2z" />
-                        </svg>
-                    </div>
-                    <h3 class="text-xl font-semibold mb-2">Gestión Financiera</h3>
-                    <p class="text-gray-600">
-                        Define tarifas por escalafón y genera reportes de liquidación para pagos precisos.
-                    </p>
+                <!-- Menú de navegación (desktop) -->
+                <div class="hidden md:flex items-center space-x-6">
+                    <a href="#inicio" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">Inicio</a>
+                    <a href="#servicios" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">Servicios</a>
+                    <a href="#caracteristicas" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">Características</a>
+                    <a href="#contacto" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">Contacto</a>
                 </div>
                 
+                <!-- Botón de login (desktop) -->
+                <div class="hidden md:flex items-center">
+                    <a th:href="@{/login}" class="bg-blue-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-blue-700 transition-colors duration-200 shadow-md hover:shadow-lg">
+                        <i class="fas fa-sign-in-alt mr-2"></i>Iniciar Sesión
+                    </a>
+                </div>
+                
+                <!-- Botón de menú móvil -->
+                <div class="md:hidden flex items-center">
+                    <button id="mobile-menu-button" class="text-gray-700 hover:text-blue-600 focus:outline-none focus:text-blue-600 p-2">
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Menú móvil -->
+        <div id="mobile-menu" class="md:hidden hidden bg-white border-t shadow-lg">
+            <div class="px-4 pt-2 pb-3 space-y-2">
+                <a href="#inicio" class="block px-3 py-2 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors duration-200">Inicio</a>
+                <a href="#servicios" class="block px-3 py-2 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors duration-200">Servicios</a>
+                <a href="#caracteristicas" class="block px-3 py-2 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors duration-200">Características</a>
+                <a href="#contacto" class="block px-3 py-2 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors duration-200">Contacto</a>
+                <div class="pt-2">
+                    <a th:href="@{/login}" class="block w-full text-center bg-blue-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-blue-700 transition-colors duration-200">
+                        <i class="fas fa-sign-in-alt mr-2"></i>Iniciar Sesión
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="inicio" class="hero-gradient text-white py-20 pt-24">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col lg:flex-row items-center min-h-[80vh]">
+                <div class="lg:w-1/2 fade-in">
+                    <h1 class="text-4xl lg:text-6xl font-bold mb-6 leading-tight">
+                        El Futuro del
+                        <span class="text-yellow-300">Arbitraje Deportivo</span>
+                    </h1>
+                    <p class="text-xl lg:text-2xl mb-8 text-blue-100 leading-relaxed">
+                        Conectamos árbitros profesionales con entrenadores y equipos. 
+                        Gestión inteligente, reseñas verificadas y excelencia en cada partido.
+                    </p>
+                    <div class="flex flex-col sm:flex-row gap-4">
+                        <a th:href="@{/login}" class="bg-yellow-400 text-blue-900 px-8 py-3 rounded-lg font-semibold text-lg hover:bg-yellow-300 transition-all duration-200 inline-flex items-center justify-center shadow-lg hover:shadow-xl transform hover:-translate-y-1">
+                            <i class="fas fa-play mr-2"></i>
+                            Comenzar Ahora
+                        </a>
+                        <a href="#servicios" class="border-2 border-white text-white px-8 py-3 rounded-lg font-semibold text-lg hover:bg-white hover:text-blue-900 transition-all duration-200 inline-flex items-center justify-center">
+                            <i class="fas fa-info-circle mr-2"></i>
+                            Conocer Más
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="lg:w-1/2 mt-12 lg:mt-0 flex justify-center">
+                    <div class="relative">
+                        <div class="bounce-animation">
+                            <i class="fas fa-basketball-ball text-9xl text-yellow-300"></i>
+                        </div>
+                        <div class="absolute -top-4 -right-4">
+                            <i class="fas fa-whistle text-4xl text-white opacity-80"></i>
+                        </div>
+                        <div class="absolute -bottom-4 -left-4">
+                            <i class="fas fa-medal text-4xl text-yellow-400 opacity-80"></i>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </section>
 
-    <!-- Sección de Call to Action -->
-    <section class="bg-indigo-600 text-white py-16 md:py-24">
-        <div class="container mx-auto px-4 text-center max-w-3xl">
-            <h2 class="text-3xl sm:text-4xl font-bold mb-4">
-                Listo para transformar tu gestión?
-            </h2>
-            <p class="text-lg mb-8 leading-relaxed">
-                Contacta a nuestro equipo para descubrir cómo CABA Pro puede llevar tu institución de arbitraje al siguiente nivel de eficiencia y transparencia.
+    <!-- Servicios Section -->
+    <section id="servicios" class="py-20 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-bold text-gray-900 mb-4">Nuestros Servicios</h2>
+                <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+                    Ofrecemos una plataforma completa para la gestión de arbitraje deportivo con herramientas profesionales
+                </p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Servicio 1: Para Árbitros -->
+                <div class="card-hover bg-gradient-to-br from-blue-50 to-blue-100 p-8 rounded-2xl text-center">
+                    <div class="bg-blue-600 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <i class="fas fa-user-tie text-2xl text-white"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-900 mb-4">Para Árbitros</h3>
+                    <p class="text-gray-600 mb-6">
+                        Gestiona tu calendario, recibe asignaciones automáticas y mantén tu perfil profesional actualizado.
+                    </p>
+                    <ul class="text-left text-gray-600 space-y-2">
+                        <li><i class="fas fa-check text-green-500 mr-2"></i>Calendario inteligente</li>
+                        <li><i class="fas fa-check text-green-500 mr-2"></i>Gestión de disponibilidad</li>
+                        <li><i class="fas fa-check text-green-500 mr-2"></i>Historial de partidos</li>
+                        <li><i class="fas fa-check text-green-500 mr-2"></i>Sistema de reseñas</li>
+                    </ul>
+                </div>
+                
+                <!-- Servicio 2: Para Entrenadores -->
+                <div class="card-hover bg-gradient-to-br from-green-50 to-green-100 p-8 rounded-2xl text-center">
+                    <div class="bg-green-600 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <i class="fas fa-clipboard-user text-2xl text-white"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-900 mb-4">Para Entrenadores</h3>
+                    <p class="text-gray-600 mb-6">
+                        Solicita árbitros verificados, gestiona tus equipos y proporciona retroalimentación valiosa.
+                    </p>
+                    <ul class="text-left text-gray-600 space-y-2">
+                        <li><i class="fas fa-check text-green-500 mr-2"></i>Búsqueda de árbitros</li>
+                        <li><i class="fas fa-check text-green-500 mr-2"></i>Gestión de equipos</li>
+                        <li><i class="fas fa-check text-green-500 mr-2"></i>Sistema de reseñas</li>
+                        <li><i class="fas fa-check text-green-500 mr-2"></i>Estadísticas detalladas</li>
+                    </ul>
+                </div>
+                
+                <!-- Servicio 3: Administración -->
+                <div class="card-hover bg-gradient-to-br from-purple-50 to-purple-100 p-8 rounded-2xl text-center">
+                    <div class="bg-purple-600 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <i class="fas fa-cogs text-2xl text-white"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-900 mb-4">Administración</h3>
+                    <p class="text-gray-600 mb-6">
+                        Panel de control completo para gestionar toda la plataforma y usuarios del sistema.
+                    </p>
+                    <ul class="text-left text-gray-600 space-y-2">
+                        <li><i class="fas fa-check text-green-500 mr-2"></i>Panel de administración</li>
+                        <li><i class="fas fa-check text-green-500 mr-2"></i>Gestión de usuarios</li>
+                        <li><i class="fas fa-check text-green-500 mr-2"></i>Reportes y analytics</li>
+                        <li><i class="fas fa-check text-green-500 mr-2"></i>Configuración del sistema</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Características Section -->
+    <section id="caracteristicas" class="py-20 bg-gray-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-bold text-gray-900 mb-4">¿Por qué elegir CABA Pro?</h2>
+                <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+                    Tecnología avanzada, seguridad garantizada y la mejor experiencia de usuario
+                </p>
+            </div>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                <div class="space-y-8">
+                    <div class="flex items-start space-x-4">
+                        <div class="bg-blue-600 w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0">
+                            <i class="fas fa-shield-alt text-white"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-bold text-gray-900 mb-2">Seguridad Garantizada</h3>
+                            <p class="text-gray-600">Sistema de autenticación robusto y protección de datos de nivel empresarial.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-start space-x-4">
+                        <div class="bg-green-600 w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0">
+                            <i class="fas fa-clock text-white"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-bold text-gray-900 mb-2">Disponibilidad 24/7</h3>
+                            <p class="text-gray-600">Acceso completo a la plataforma en cualquier momento y desde cualquier dispositivo.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-start space-x-4">
+                        <div class="bg-purple-600 w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0">
+                            <i class="fas fa-star text-white"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-bold text-gray-900 mb-2">Sistema de Calificaciones</h3>
+                            <p class="text-gray-600">Reseñas y calificaciones transparentes para mantener la calidad del servicio.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-start space-x-4">
+                        <div class="bg-yellow-600 w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0">
+                            <i class="fas fa-mobile-alt text-white"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-bold text-gray-900 mb-2">Diseño Responsivo</h3>
+                            <p class="text-gray-600">Interfaz optimizada para todos los dispositivos: móvil, tablet y escritorio.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="flex justify-center">
+                    <div class="relative">
+                        <div class="bg-gradient-to-br from-blue-400 to-purple-600 w-80 h-80 rounded-full flex items-center justify-center">
+                            <i class="fas fa-trophy text-8xl text-white"></i>
+                        </div>
+                        <div class="absolute -top-4 -right-4 bg-yellow-400 w-16 h-16 rounded-full flex items-center justify-center">
+                            <i class="fas fa-medal text-2xl text-yellow-800"></i>
+                        </div>
+                        <div class="absolute -bottom-4 -left-4 bg-green-400 w-12 h-12 rounded-full flex items-center justify-center">
+                            <i class="fas fa-check text-xl text-green-800"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonios Section -->
+    <section class="py-20 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-bold text-gray-900 mb-4">Lo que dicen nuestros usuarios</h2>
+                <p class="text-xl text-gray-600">Testimonios reales de árbitros y entrenadores que confían en CABA Pro</p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="bg-gray-50 p-8 rounded-2xl">
+                    <div class="text-yellow-400 mb-4">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <p class="text-gray-600 mb-6 italic">
+                        "CABA Pro ha revolucionado la forma en que gestiono mis asignaciones de arbitraje. 
+                        La plataforma es intuitiva y me ahorra horas de trabajo administrativo."
+                    </p>
+                    <div class="flex items-center">
+                        <div class="bg-blue-600 w-12 h-12 rounded-full flex items-center justify-center mr-4">
+                            <i class="fas fa-user text-white"></i>
+                        </div>
+                        <div>
+                            <p class="font-semibold text-gray-900">Sebastian Medina</p>
+                            <p class="text-gray-600">Árbitro Internacional</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-gray-50 p-8 rounded-2xl">
+                    <div class="text-yellow-400 mb-4">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <p class="text-gray-600 mb-6 italic">
+                        "Como entrenador, puedo encontrar árbitros calificados rápidamente y gestionar 
+                        todo desde una sola plataforma. El sistema de reseñas es excelente."
+                    </p>
+                    <div class="flex items-center">
+                        <div class="bg-green-600 w-12 h-12 rounded-full flex items-center justify-center mr-4">
+                            <i class="fas fa-user text-white"></i>
+                        </div>
+                        <div>
+                            <p class="font-semibold text-gray-900">Sara López</p>
+                            <p class="text-gray-600">Entrenadora Chicago Bulls</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-gray-50 p-8 rounded-2xl">
+                    <div class="text-yellow-400 mb-4">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <p class="text-gray-600 mb-6 italic">
+                        "La interfaz es moderna y fácil de usar. He mejorado significativamente 
+                        la organización de mis partidos gracias a CABA Pro."
+                    </p>
+                    <div class="flex items-center">
+                        <div class="bg-purple-600 w-12 h-12 rounded-full flex items-center justify-center mr-4">
+                            <i class="fas fa-user text-white"></i>
+                        </div>
+                        <div>
+                            <p class="font-semibold text-gray-900">Paula López</p>
+                            <p class="text-gray-600">Árbitro Profesional</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="gradient-bg text-white py-20">
+        <div class="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
+            <h2 class="text-4xl font-bold mb-6">¿Listo para comenzar?</h2>
+            <p class="text-xl mb-8 text-gray-200">
+                Únete a cientos de árbitros y entrenadores que ya confían en CABA Pro 
+                para gestionar sus actividades deportivas profesionalmente.
             </p>
-            <a href="#" class="inline-block bg-white text-indigo-600 font-bold py-3 px-8 rounded-full shadow-lg hover:bg-gray-100 transition duration-300 transform hover:scale-105">
-                Contáctanos Ahora
-            </a>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <a th:href="@{/login}" class="bg-white text-purple-600 px-8 py-3 rounded-lg font-semibold text-lg hover:bg-gray-100 transition inline-flex items-center justify-center">
+                    <i class="fas fa-rocket mr-2"></i>
+                    Comenzar Gratis
+                </a>
+                <a href="#contacto" class="border-2 border-white text-white px-8 py-3 rounded-lg font-semibold text-lg hover:bg-white hover:text-purple-600 transition inline-flex items-center justify-center">
+                    <i class="fas fa-envelope mr-2"></i>
+                    Contactar Ventas
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contacto Section -->
+    <section id="contacto" class="py-20 bg-gray-100">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-bold text-gray-900 mb-4">Contáctanos</h2>
+                <p class="text-xl text-gray-600">¿Tienes preguntas? Estamos aquí para ayudarte</p>
+            </div>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+                <div class="space-y-8">
+                    <div class="flex items-center space-x-4">
+                        <div class="bg-blue-600 w-12 h-12 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-envelope text-white"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-semibold text-gray-900">Email</h3>
+                            <p class="text-gray-600">contacto@cabapro.com</p>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-center space-x-4">
+                        <div class="bg-green-600 w-12 h-12 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-phone text-white"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-semibold text-gray-900">Teléfono</h3>
+                            <p class="text-gray-600">+57 (4) 123-4567</p>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-center space-x-4">
+                        <div class="bg-purple-600 w-12 h-12 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-map-marker-alt text-white"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-semibold text-gray-900">Ubicación</h3>
+                            <p class="text-gray-600">Medellín, Colombia</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-white p-8 rounded-2xl shadow-lg">
+                    <form class="space-y-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Nombre</label>
+                            <input type="text" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                            <input type="email" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Mensaje</label>
+                            <textarea rows="4" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"></textarea>
+                        </div>
+                        <button type="submit" class="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition">
+                            <i class="fas fa-paper-plane mr-2"></i>
+                            Enviar Mensaje
+                        </button>
+                    </form>
+                </div>
+            </div>
         </div>
     </section>
 
     <!-- Footer -->
-    <footer class="bg-gray-800 text-white py-8">
-        <div class="container mx-auto px-4 text-center text-sm">
-            <p>&copy; 2025 CABA Pro. Todos los derechos reservados.</p>
+    <footer class="bg-gray-900 text-white py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div class="col-span-1 md:col-span-2">
+                    <div class="flex items-center mb-4">
+                        <img th:src="@{/images/logo.png}" alt="CABA Pro Logo" class="h-8 w-auto mr-3">
+                        <span class="text-2xl font-bold">CABA Pro</span>
+                    </div>
+                    <p class="text-gray-400 mb-4">
+                        La plataforma líder en gestión de arbitraje deportivo. 
+                        Conectamos profesionales del deporte con tecnología avanzada.
+                    </p>
+                    <div class="flex space-x-4">
+                        <a href="#" class="text-gray-400 hover:text-white transition">
+                            <i class="fab fa-facebook-f text-xl"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white transition">
+                            <i class="fab fa-twitter text-xl"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white transition">
+                            <i class="fab fa-instagram text-xl"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white transition">
+                            <i class="fab fa-linkedin-in text-xl"></i>
+                        </a>
+                    </div>
+                </div>
+                
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">Enlaces</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#inicio" class="text-gray-400 hover:text-white transition">Inicio</a></li>
+                        <li><a href="#servicios" class="text-gray-400 hover:text-white transition">Servicios</a></li>
+                        <li><a href="#caracteristicas" class="text-gray-400 hover:text-white transition">Características</a></li>
+                        <li><a th:href="@{/login}" class="text-gray-400 hover:text-white transition">Iniciar Sesión</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">Soporte</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-400 hover:text-white transition">Centro de Ayuda</a></li>
+                        <li><a href="#contacto" class="text-gray-400 hover:text-white transition">Contacto</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition">Términos de Servicio</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition">Política de Privacidad</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-800 mt-8 pt-8 text-center">
+                <p class="text-gray-400">
+                    &copy; 2025 CABA Pro. Todos los derechos reservados. Desarrollado con ❤️ en Colombia.
+                </p>
+            </div>
         </div>
     </footer>
+
+    <!-- JavaScript -->
+    <script>
+        // Mobile menu toggle
+        document.addEventListener('DOMContentLoaded', function() {
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+            
+            if (mobileMenuButton && mobileMenu) {
+                mobileMenuButton.addEventListener('click', function() {
+                    mobileMenu.classList.toggle('hidden');
+                    
+                    // Cambiar icono del botón
+                    const icon = this.querySelector('i');
+                    if (mobileMenu.classList.contains('hidden')) {
+                        icon.className = 'fas fa-bars text-xl';
+                    } else {
+                        icon.className = 'fas fa-times text-xl';
+                    }
+                });
+                
+                // Cerrar menú al hacer click en un enlace
+                const mobileLinks = mobileMenu.querySelectorAll('a[href^="#"]');
+                mobileLinks.forEach(link => {
+                    link.addEventListener('click', function() {
+                        mobileMenu.classList.add('hidden');
+                        mobileMenuButton.querySelector('i').className = 'fas fa-bars text-xl';
+                    });
+                });
+            }
+        });
+
+        // Smooth scrolling para todos los enlaces internos
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const targetId = this.getAttribute('href');
+                const target = document.querySelector(targetId);
+                
+                if (target) {
+                    const navbarHeight = 64; // Altura del navbar fijo
+                    const targetPosition = target.offsetTop - navbarHeight;
+                    
+                    window.scrollTo({
+                        top: targetPosition,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+
+        // Navbar background y shadow en scroll
+        window.addEventListener('scroll', function() {
+            const navbar = document.querySelector('nav');
+            if (window.scrollY > 10) {
+                navbar.classList.add('bg-white/95', 'backdrop-blur-sm');
+                navbar.classList.remove('bg-white');
+            } else {
+                navbar.classList.add('bg-white');
+                navbar.classList.remove('bg-white/95', 'backdrop-blur-sm');
+            }
+        });
+
+        // Resaltar enlace activo en navbar
+        window.addEventListener('scroll', function() {
+            const sections = document.querySelectorAll('section[id]');
+            const navLinks = document.querySelectorAll('nav a[href^="#"]');
+            
+            let currentSection = '';
+            
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop - 100;
+                const sectionHeight = section.clientHeight;
+                
+                if (window.scrollY >= sectionTop && window.scrollY < sectionTop + sectionHeight) {
+                    currentSection = section.getAttribute('id');
+                }
+            });
+            
+            navLinks.forEach(link => {
+                link.classList.remove('text-blue-600', 'bg-blue-50');
+                link.classList.add('text-gray-700');
+                
+                if (link.getAttribute('href') === `#${currentSection}`) {
+                    link.classList.remove('text-gray-700');
+                    link.classList.add('text-blue-600');
+                    if (!link.closest('#mobile-menu')) {
+                        link.classList.add('bg-blue-50');
+                    }
+                }
+            });
+        });
+    </script>
 
 </body>
 </html>
