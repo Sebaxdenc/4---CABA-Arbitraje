@@ -46,7 +46,7 @@
           <tr th:each="arbitro : ${topArbitros}">
             <td class="px-4 py-2 text-gray-800" th:text="${arbitro.nombre}"></td>
             <td class="px-4 py-2 text-gray-600" th:text="${arbitro.speciality}"></td>
-            <td class="px-4 py-2 text-gray-600" th:text="${arbitro.scale}"></td>
+            <td class="px-4 py-2 text-gray-600" th:text="${arbitro.escalafon.nombre}"></td>
           </tr>
         </tbody>
       </table>

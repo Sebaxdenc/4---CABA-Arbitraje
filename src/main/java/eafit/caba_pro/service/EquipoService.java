@@ -3,7 +3,8 @@ package eafit.caba_pro.service;
 import java.util.List;
 import java.util.Optional;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -13,8 +14,11 @@ import eafit.caba_pro.repository.EquipoRepository;
 @Service
 public class EquipoService {
 
-    @Autowired
-    EquipoRepository equipoRepository;    
+    private final EquipoRepository equipoRepository;   
+    
+    public EquipoService(EquipoRepository equipoRepository){
+        this.equipoRepository = equipoRepository;
+    }
 
     private final EquipoRepository repo;
     public EquipoService(EquipoRepository repo) { this.repo = repo; }

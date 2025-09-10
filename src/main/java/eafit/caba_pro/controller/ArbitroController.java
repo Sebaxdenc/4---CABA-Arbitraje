@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
@@ -17,9 +19,13 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import eafit.caba_pro.model.Arbitro;
+import eafit.caba_pro.model.Liquidacion;
 import eafit.caba_pro.model.Partido;
 import eafit.caba_pro.service.ArbitroService;
+import eafit.caba_pro.service.LiquidacionService;
+import eafit.caba_pro.service.NotificacionService;
 import eafit.caba_pro.service.PartidoService;
+import eafit.caba_pro.service.PdfService;
 import eafit.caba_pro.service.UsuarioService;
 import eafit.caba_pro.service.ReseñaService;
 
@@ -32,12 +38,18 @@ public class ArbitroController {
     private final PartidoService partidoService;
     private final UsuarioService usuarioService;
     private final ReseñaService reseñaService;
+    private final LiquidacionService liquidacionService;
+    private final PdfService pdfGeneratorService;
+    private final NotificacionService notificacionService;
 
-    public ArbitroController(ArbitroService arbitroService, PartidoService partidoService, UsuarioService usuarioService, ReseñaService reseñaService) {
+    public ArbitroController(NotificacionService notificacionService,PdfService pdfGeneratorService, LiquidacionService liquidacionService, ArbitroService arbitroService, PartidoService partidoService, UsuarioService usuarioService, ReseñaService reseñaService) {
+        this.notificacionService = notificacionService;
+        this.pdfGeneratorService = pdfGeneratorService;
         this.arbitroService = arbitroService;
         this.partidoService = partidoService;
         this.usuarioService = usuarioService;
         this.reseñaService = reseñaService;
+        this.liquidacionService = liquidacionService;
     }
 
     // ========== ENDPOINTS WEB (TEMPLATES) ==========
@@ -83,7 +95,8 @@ public class ArbitroController {
         
         // Si no se encuentra el árbitro, redirigir a la lista
         return "redirect:/arbitros";
-  }
+    }
+
   
     @GetMapping("/calendario")
     public String calendario(@RequestParam(required = false) Integer year,
@@ -174,6 +187,12 @@ public class ArbitroController {
         return "arbitro/partidos";
     }
 
+  @GetMapping("/liquidaciones")
+    public String liquidaciones(Model model) {
+        Optional<Arbitro> arbitroOpt = arbitroService.findByUsername(usuarioService.getCurrentUsername());
+
+        if (!arbitroOpt.isPresent()) {
+            return "redirect:/arbitros";
     // ========== ENDPOINTS DE DISPONIBILIDAD ==========
 
     @GetMapping("/disponibilidad")
@@ -209,7 +228,6 @@ public class ArbitroController {
                                         RedirectAttributes redirectAttributes) {
         String username = authentication.getName();
         String resultado = arbitroService.confirmarDisponibilidad(partidoId, username);
-        
         if (resultado.startsWith("SUCCESS:")) {
             redirectAttributes.addFlashAttribute("successMessage", resultado.substring(8));
         } else {
@@ -218,6 +236,20 @@ public class ArbitroController {
 
         return "redirect:/arbitro/disponibilidad";
     }
+        
+
+    @GetMapping("/liquidaciones/{id}")
+    public ResponseEntity<byte[]> generarPdf(@PathVariable Long id) {
+        Liquidacion liq = liquidacionService.obtenerPorId(id);
+        byte[] pdf = pdfGeneratorService.generarPdfDesdeLiquidacion(liq);
+        Arbitro arbitro = arbitroOpt.get();
+
+        List<Liquidacion> liquidaciones = liquidacionService.obtenerLiquidacionesPorArbitro(arbitro.getId());
+        model.addAttribute("arbitro", arbitro);
+        model.addAttribute("liquidaciones", liquidaciones);
+        return "arbitro/liquidaciones";
+    }
+
 
     @PostMapping("/disponibilidad/rechazar")
     public String rechazarYReasignar(@RequestParam("partidoId") Long partidoId,
@@ -252,15 +284,24 @@ public class ArbitroController {
         return "redirect:/arbitro/disponibilidad";
     }
 
-    // ========== ENDPOINTS REST API (JSON/BLOB) ==========
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=liquidacion-" + id + ".pdf")
+                .contentType(MediaType.APPLICATION_PDF)
+                .body(pdf);
+    }
 
-    /**
-     *  ENDPOINT ESENCIAL: Servir imágenes BLOB desde la base de datos
-     */
-    @GetMapping("/api/arbitros/{id:[0-9]+}/photo")
-    @ResponseBody
-    public ResponseEntity<byte[]> getArbitroPhoto(@PathVariable Long id) {
-        return arbitroService.buildPhotoResponse(id);
+    @GetMapping("/notificaciones")
+    public String notificaciones(Model model){
+        Optional<Arbitro> arbitroOpt = arbitroService.findByUsername(usuarioService.getCurrentUsername());
+
+        if (!arbitroOpt.isPresent()) {
+            return "redirect:/arbitros";
+        }
+
+        Arbitro arbitro = arbitroOpt.get();
+        model.addAttribute("arbitro", arbitro);
+        model.addAttribute("notificaciones", notificacionService.obtenerNotificacionesArbitro(arbitro.getId()));
+        return "arbitro/notificaciones";
     }
 
 }

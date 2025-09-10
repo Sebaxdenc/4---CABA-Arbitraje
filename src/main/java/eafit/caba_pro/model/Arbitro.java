@@ -3,6 +3,7 @@ package eafit.caba_pro.model;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
@@ -15,6 +16,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Lob;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
@@ -66,14 +68,8 @@ public class Arbitro {
     @NotEmpty(message = "El teléfono no puede estar vacío")
     @Column(nullable = false, length = 100)
     private String speciality;
-
-    @NotNull(message = "La escala no puede ser nula")
-    @NotEmpty(message = "La escala no puede estar vacía")
-    @Column(nullable = false, length = 50)
-    private String scale;
     
     // Pa guardar fotos como blob
-
     @Lob
     @Column(name = "photo_data", columnDefinition = "LONGBLOB")
     private byte[] photoData;
@@ -100,7 +96,16 @@ public class Arbitro {
     @JsonManagedReference // Manejar serialización de reseñas
     private List<Reseña> reseñas = new ArrayList<>();
 
-    
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "escalafon_id", nullable = false)
+    @JsonBackReference
+    private Escalafon escalafon;        
+
+    // Relación uno a muchos con Notificación
+    @OneToMany(mappedBy = "destinatario", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
+    private List<Notificacion> notificacionesRecibidas = new ArrayList<>();
+
     // MÉTODO HELPER: Verificar si tiene imagen
     public boolean hasPhoto() {
         return photoData != null && photoData.length > 0;

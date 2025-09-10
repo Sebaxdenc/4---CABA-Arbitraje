@@ -17,9 +17,12 @@ import java.util.Optional;
 @Service
 @Transactional
 public class EntrenadorService {
+    
+    private final EntrenadorRepository entrenadorRepository;
 
-    @Autowired
-    private EntrenadorRepository entrenadorRepository;
+    public EntrenadorService(EntrenadorRepository entrenadorRepository){
+        this.entrenadorRepository=entrenadorRepository;
+    }
     
     @Autowired
     private UsuarioRepository usuarioRepository;

@@ -83,6 +83,8 @@ public interface PartidoRepository extends JpaRepository<Partido, Long> {
 
     @Query("SELECT COUNT(p) FROM Partido p WHERE p.estado = :estado")
     long countByEstado(@Param("estado") Partido.EstadoPartido estado);
+
+    List<Partido> findByArbitroAndFechaBetweenAndLiquidacionIsNull(Arbitro arbitro,LocalDate fechaInicio,LocalDate fechaFin);
     
     @Transactional
     @Modifying

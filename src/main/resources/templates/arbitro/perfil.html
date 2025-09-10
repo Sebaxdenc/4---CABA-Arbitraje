@@ -49,7 +49,7 @@
                     </div>
                     <div>
                         <h4 class="text-xl font-semibold text-gray-800" th:text="${arbitro.nombre}">Nombre del Árbitro</h4>
-                        <p class="text-gray-600" th:text="${arbitro.scale}">Escalafón</p>
+                        <p class="text-gray-600" th:text="${arbitro.escalafon.nombre}">Escalafón</p>
                     </div>
                 </div>
 
@@ -108,16 +108,7 @@
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">Escalafón</label>
                                 <input type="text" 
-                                       th:value="${arbitro.scale}"
-                                       class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-gray-50" 
-                                       readonly>
-                            </div>
-                            
-                            <!-- Especialidad -->
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Especialidad</label>
-                                <input type="text" 
-                                       th:value="${arbitro.speciality}"
+                                       th:value="${arbitro.escalafon.nombre}"
                                        class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-gray-50" 
                                        readonly>
                             </div>
@@ -172,7 +163,7 @@
                                     </svg>
                                     <div>
                                         <p class="text-sm font-medium text-purple-600">Escalafón</p>
-                                        <p class="text-lg font-bold text-purple-900" th:text="${arbitro.scale}">Nivel</p>
+                                        <p class="text-lg font-bold text-purple-900" th:text="${arbitro.escalafon.nombre}">Nivel</p>
                                     </div>
                                 </div>
                             </div>

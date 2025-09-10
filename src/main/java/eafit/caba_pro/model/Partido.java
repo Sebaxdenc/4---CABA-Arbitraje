@@ -62,19 +62,20 @@ public class Partido {
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "equipo_visitante")
-    //@JsonIgnore
-    @JsonBackReference
-    //@JsonIgnoreProperties({"partidosLocal", "partidosVisitante"})
+    @JsonBackReference("visitante")
     @NotNull(message = "El equipo visitante no puede ser nulo")
     private Equipo equipoVisitante;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "equipo_local")
-    //@JsonIgnore
-    @JsonBackReference
-    //@JsonIgnoreProperties({"partidosLocal", "partidosVisitante"})
+    @JsonBackReference("local")
     @NotNull(message = "El equipo local no puede ser nulo")
     private Equipo equipoLocal;
+
+    @ManyToOne
+    @JoinColumn(name = "liquidacion_id")
+    @JsonBackReference
+    private Liquidacion liquidacion;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "torneo_id", nullable = true)

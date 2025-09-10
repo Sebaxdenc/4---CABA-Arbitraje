@@ -1,10 +1,14 @@
 package eafit.caba_pro.controller;
 
+import java.nio.charset.StandardCharsets;
+import java.time.YearMonth;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import org.springframework.http.HttpHeaders;
 
+import org.springframework.http.MediaType;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -20,6 +24,8 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import eafit.caba_pro.model.Arbitro;
+import eafit.caba_pro.service.LiquidacionService;
+import eafit.caba_pro.model.Liquidacion;
 import eafit.caba_pro.model.Equipo;
 import eafit.caba_pro.model.Partido;
 import eafit.caba_pro.model.Usuario;
@@ -28,6 +34,7 @@ import eafit.caba_pro.service.EquipoService;
 import eafit.caba_pro.service.EntrenadorService;
 import eafit.caba_pro.model.Entrenador;
 import eafit.caba_pro.service.PartidoService;
+import eafit.caba_pro.service.PdfService;
 import jakarta.validation.Valid;
 
 @Controller
@@ -36,15 +43,20 @@ public class AdminController {
 
     private final ArbitroService arbitroService;
     private final PartidoService partidoService;
+    private final LiquidacionService liquidacionService;
+    private final PdfService pdfGeneratorService;
     private final EquipoService equipoService;
     private final EntrenadorService entrenadorService;
 
-    public AdminController(ArbitroService arbitroService, PartidoService partidoService, EquipoService equipoService, EntrenadorService entrenadorService) {
+    public AdminController(EntrenadorService entrenadorService, EquipoService equipoService, PdfService pdfService ,LiquidacionService liquidacionService, ArbitroService arbitroService, PartidoService partidoService) {
         this.arbitroService = arbitroService;
         this.partidoService = partidoService;
+        this.liquidacionService = liquidacionService;
+        this.pdfGeneratorService = pdfService;
         this.equipoService = equipoService;
         this.entrenadorService = entrenadorService;
-      
+    }
+
     
     @GetMapping()
     public String dashboard(Model model) {
@@ -81,9 +93,59 @@ public class AdminController {
         model.addAttribute("arbitros", arbitroService.findAll());
         return "admin/arbitros";
     }
+    
+    @GetMapping("/finanzas")
+    public String finanzas() {
+        return "admin/finanzas";
+    }
 
+    @GetMapping("/liquidaciones")
+    public String listarLiquidaciones(String periodo, Model model) {
 
+        // Periodo por defecto = mes actual
+        YearMonth periodoSeleccionado;
+        if (periodo != null) {
+            periodoSeleccionado = YearMonth.parse(periodo); // formato "2025-09"
+        } else {
+            periodoSeleccionado = YearMonth.now();
+        }
+        
+        // Liquidaciones de ese periodo
+        List<Liquidacion> liquidaciones = liquidacionService.obtenerLiquidacionesPorPeriodo(periodoSeleccionado);
 
+        // Pasar al modelo
+        model.addAttribute("liquidaciones", liquidaciones);
+        model.addAttribute("periodoSeleccionado", periodoSeleccionado);
+
+        return "admin/liquidaciones";
+    }
+
+    @PostMapping("/liquidaciones/generar")
+    public String generarLiquidaciones(@RequestParam String periodo) {
+        YearMonth ym = YearMonth.parse(periodo); // formato "YYYY-MM"
+        liquidacionService.generarLiquidacionesMensuales(ym);
+        return "redirect:/admin/liquidaciones?periodo=" + ym;
+    }
+
+    @PostMapping("/liquidaciones/{id}/pagar")
+    public String pagar(@PathVariable Long id) {
+        Optional<Liquidacion> opt = liquidacionService.findById(id);
+        if (opt.isPresent() && opt.get().getEstado() == Liquidacion.EstadoLiquidacion.PENDIENTE) {
+            liquidacionService.marcarComoPagada(id);
+        }
+        return "redirect:/admin/liquidaciones";
+    }
+
+    @GetMapping("/liquidaciones/{id}")
+    public ResponseEntity<byte[]> generarPdf(@PathVariable Long id) {
+        Liquidacion liq = liquidacionService.obtenerPorId(id);
+        byte[] pdf = pdfGeneratorService.generarPdfDesdeLiquidacion(liq);
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=liquidacion-" + id + ".pdf")
+                .contentType(MediaType.APPLICATION_PDF)
+                .body(pdf);
+    }
     @GetMapping("/create")
     public String create(Model model) {
         Arbitro arbitro = new Arbitro();

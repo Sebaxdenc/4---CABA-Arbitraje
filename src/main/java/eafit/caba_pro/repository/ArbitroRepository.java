@@ -31,16 +31,9 @@ public interface ArbitroRepository extends JpaRepository<Arbitro, Long> {
     // Ordenar por nombre (usado en findAllOrderByNombre)
     List<Arbitro> findAllByOrderByNombreAsc();
     
-    // Búsqueda por escala
-    List<Arbitro> findByScale(String scale);
-    List<Arbitro> findByScaleOrderByNombreAsc(String scale);
-    
     // Búsqueda por nombre (case-insensitive)
     List<Arbitro> findByNombreContainingIgnoreCase(String nombre);
-    
-    // Búsqueda combinada
-    List<Arbitro> findByScaleAndNombreContainingIgnoreCase(String scale, String nombre);
-    
+        
     // MÉTODOS PARA LA RELACIÓN CON PARTIDOS
     
     // Encontrar árbitros disponibles en una fecha y hora específica
