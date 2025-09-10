@@ -40,10 +40,32 @@
             <!-- Contenido del perfil -->
             <div class="bg-white p-6 rounded-lg shadow-md">
                 
-                <!-- Sección de foto de perfil (opcional) -->
+                <!-- Sección de foto de perfil -->
                 <div class="flex items-center mb-6 pb-6 border-b border-gray-200">
-                    <div class="h-20 w-20 rounded-full bg-gray-300 flex items-center justify-center mr-6">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <div class="h-20 w-20 rounded-full overflow-hidden bg-gray-300 flex items-center justify-center mr-6 border-2 border-gray-200">
+                        <!-- Mostrar foto del árbitro si existe -->
+                        <img th:if="${arbitro.hasPhoto()}" 
+                             th:src="@{/arbitro/mi-foto}" 
+                             th:alt="${arbitro.nombre}" 
+                             class="h-full w-full object-cover"
+                             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                        <!-- Mostrar ícono por defecto si no hay foto o si hay error -->
+                        <svg th:unless="${arbitro.hasPhoto()}" 
+                             xmlns="http://www.w3.org/2000/svg" 
+                             class="h-10 w-10 text-gray-500" 
+                             fill="none" 
+                             viewBox="0 0 24 24" 
+                             stroke="currentColor"
+                             style="display: flex;">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                        </svg>
+                        <!-- SVG de fallback para errores de carga -->
+                        <svg xmlns="http://www.w3.org/2000/svg" 
+                             class="h-10 w-10 text-gray-500" 
+                             fill="none" 
+                             viewBox="0 0 24 24" 
+                             stroke="currentColor"
+                             style="display: none;">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                         </svg>
                     </div>

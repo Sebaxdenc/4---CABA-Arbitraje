@@ -307,4 +307,39 @@ public class ArbitroController {
         return "arbitro/notificaciones";
     }
 
+    /**
+     * Endpoint para que el árbitro acceda a su propia foto
+     */
+    @GetMapping("/mi-foto")
+    @ResponseBody
+    public ResponseEntity<byte[]> getMiFoto(Authentication authentication) {
+        try {
+            String username = authentication.getName();
+            Optional<Arbitro> arbitroOpt = arbitroService.findByUsername(username);
+            
+            if (arbitroOpt.isEmpty()) {
+                return ResponseEntity.notFound().build();
+            }
+            
+            Arbitro arbitro = arbitroOpt.get();
+            
+            if (!arbitro.hasPhoto()) {
+                return ResponseEntity.notFound().build();
+            }
+            
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.parseMediaType(arbitro.getPhotoContentType()));
+            headers.setContentLength(arbitro.getPhotoData().length);
+            headers.setCacheControl("max-age=3600"); // Cache por 1 hora
+            
+            return ResponseEntity.ok()
+                .headers(headers)
+                .body(arbitro.getPhotoData());
+                
+        } catch (Exception e) {
+            System.err.println("Error al obtener foto del árbitro: " + e.getMessage());
+            return ResponseEntity.notFound().build();
+        }
+    }
+
 }

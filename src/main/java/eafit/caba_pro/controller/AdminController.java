@@ -101,6 +101,11 @@ public class AdminController {
         return "admin/arbitros";
     }
    
+    @GetMapping("/notificaciones")
+    public String notificaciones(Model model){
+        model.addAttribute("notificaciones", notificacionService.obtenerNotificacionesAdmin());
+        return "admin/notificaciones";
+    }
 
     @GetMapping("/liquidaciones")
     public String listarLiquidaciones(String periodo, Model model) {
@@ -129,6 +134,7 @@ public class AdminController {
         liquidacionService.generarLiquidacionesMensuales(ym);
         return "redirect:/admin/liquidaciones?periodo=" + ym;
     }
+
 
     @PostMapping("/liquidaciones/{id}/pagar")
     public String pagar(@PathVariable Long id) {
@@ -627,16 +633,7 @@ public class AdminController {
 
     }
 
-    if (partido.getArbitro() != null && partido.getArbitro().getId() != null) {
-        arbitroService.findById(partido.getArbitro().getId())
-                      .ifPresent(partido::setArbitro);
-    } else {
-        partido.setArbitro(null);
-    }
 
-    partidoService.crearPartido(partido);
-    return "redirect:/admin/partidos";
-}
 
 
     @GetMapping("/partidos/edit/{id}")
@@ -718,10 +715,6 @@ public class AdminController {
             model.addAttribute("estados", Partido.EstadoPartido.values());
             return "admin/partido_form";
         }
-    @GetMapping("/notificaciones")
-    public String notificaciones(Model model){
-        model.addAttribute("notificaciones", notificacionService.obtenerNotificacionesAdmin());
-        return "admin/notificaciones";
-    }
 
+    }
 }
