@@ -1,7 +1,10 @@
 package eafit.caba_pro.service;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+
+import jakarta.annotation.PostConstruct;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -58,5 +61,38 @@ public class UsuarioService implements UserDetailsService{
     
     public void createUsuario(Usuario usuario){
         usuarioRepository.save(usuario);
+    }
+
+    /**
+     * Método para corregir passwords existentes que no tienen el prefijo {noop}
+     * Se ejecuta al inicializar la aplicación
+     */
+    @PostConstruct
+    @Transactional
+    public void fixExistingPasswords() {
+        try {
+            List<Usuario> usuarios = usuarioRepository.findAll();
+            boolean hasUpdates = false;
+            
+            for (Usuario usuario : usuarios) {
+                String password = usuario.getPassword();
+                if (password != null && !password.startsWith("{")) {
+                    // Password sin prefijo, agregar {noop}
+                    usuario.setPassword("{noop}" + password);
+                    usuarioRepository.save(usuario);
+                    hasUpdates = true;
+                    System.out.println("Corrigiendo password para usuario: " + usuario.getUsername());
+                }
+            }
+            
+            if (hasUpdates) {
+                System.out.println("✓ Passwords corregidos exitosamente con prefijo {noop}");
+            } else {
+                System.out.println("✓ Todos los passwords ya tienen el formato correcto");
+            }
+            
+        } catch (Exception e) {
+            System.err.println("Error al corregir passwords existentes: " + e.getMessage());
+        }
     }
 }

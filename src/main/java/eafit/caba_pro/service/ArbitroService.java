@@ -30,13 +30,15 @@ public class ArbitroService {
     private final PartidoRepository partidoRepository;
     private final UsuarioRepository usuarioRepository;
     private final UsuarioService usuarioService;
+    private final NotificacionService notificacionService;
 
     // Constructor para inyección de dependencias
-    public ArbitroService(ArbitroRepository arbitroRepository, PartidoRepository partidoRepository,UsuarioRepository usuarioRepository,UsuarioService usuarioService) {
+    public ArbitroService(NotificacionService notificacionService, ArbitroRepository arbitroRepository, PartidoRepository partidoRepository,UsuarioRepository usuarioRepository,UsuarioService usuarioService) {
         this.arbitroRepository = arbitroRepository;
         this.partidoRepository = partidoRepository;
         this.usuarioRepository = usuarioRepository;
         this.usuarioService = usuarioService;
+        this.notificacionService = notificacionService;
     }
 
     // ========== OPERACIONES DE LECTURA ==========
@@ -145,6 +147,93 @@ public class ArbitroService {
         }
 
         return arbitroRepository.save(arbitro);
+    }
+
+    /**
+     * Actualizar árbitro con archivo de foto (guarda BLOB en BD)
+     */
+    @Transactional
+    public Arbitro updateArbitroWithPhoto(Arbitro arbitro, MultipartFile photoFile, boolean removePhoto, boolean updatePassword) throws IOException {
+        // Buscar el árbitro existente
+        Arbitro existingArbitro = arbitroRepository.findById(arbitro.getId())
+            .orElseThrow(() -> new RuntimeException("Árbitro no encontrado"));
+
+        // Validaciones de duplicados (excluyendo el árbitro actual)
+        if (arbitro.getCedula() != null && !arbitro.getCedula().equals(existingArbitro.getCedula()) 
+            && arbitroRepository.existsByCedula(arbitro.getCedula())) {
+            throw new RuntimeException("Esta cédula ya está registrada: " + arbitro.getCedula());
+        }
+        
+        if (arbitro.getPhone() != null && !arbitro.getPhone().equals(existingArbitro.getPhone()) 
+            && arbitroRepository.existsByPhone(arbitro.getPhone())) {
+            throw new RuntimeException("Este teléfono ya está registrado: " + arbitro.getPhone());
+        }
+
+        // Actualizar campos básicos
+        existingArbitro.setNombre(arbitro.getNombre());
+        existingArbitro.setCedula(arbitro.getCedula());
+        existingArbitro.setPhone(arbitro.getPhone());
+        existingArbitro.setSpeciality(arbitro.getSpeciality());
+        existingArbitro.setEscalafon(arbitro.getEscalafon());
+
+        // Manejar usuario
+        Usuario usuario = arbitro.getUsuario();
+        if (usuario != null) {
+            Usuario existingUsuario = existingArbitro.getUsuario();
+            if (existingUsuario != null) {
+                existingUsuario.setUsername(usuario.getUsername());
+                
+                // Solo actualizar contraseña si se especifica
+                if (updatePassword && usuario.getPassword() != null && !usuario.getPassword().isEmpty()) {
+                    // Agregar prefijo {noop} si no está presente
+                    String password = usuario.getPassword();
+                    if (!password.startsWith("{")) {
+                        password = "{noop}" + password;
+                    }
+                    existingUsuario.setPassword(password);
+                    usuarioRepository.save(existingUsuario);
+                }
+            }
+            existingArbitro.setUsername(usuario.getUsername());
+        }
+
+        // Manejar imagen
+        if (removePhoto) {
+            // Remover foto actual
+            existingArbitro.setPhotoData(null);
+            existingArbitro.setPhotoContentType(null);
+            existingArbitro.setPhotoFilename(null);
+            System.out.println("Foto removida para el árbitro: " + existingArbitro.getNombre());
+        } else if (photoFile != null && !photoFile.isEmpty()) {
+            // Actualizar con nueva foto
+            try {
+                // Validar tipo de archivo
+                String contentType = photoFile.getContentType();
+                if (contentType == null || !contentType.startsWith("image/")) {
+                    throw new RuntimeException("El archivo debe ser una imagen válida (JPG, PNG, GIF)");
+                }
+
+                // Validar tamaño (máximo 5MB)
+                if (photoFile.getSize() > 5 * 1024 * 1024) {
+                    throw new RuntimeException("La imagen no puede ser mayor a 5MB");
+                }
+
+                // Guardar datos de la nueva imagen
+                existingArbitro.setPhotoData(photoFile.getBytes());
+                existingArbitro.setPhotoContentType(contentType);
+                existingArbitro.setPhotoFilename(photoFile.getOriginalFilename());
+
+                System.out.println("Nueva imagen procesada: " + photoFile.getOriginalFilename() + 
+                                 " (" + photoFile.getSize() + " bytes)");
+
+            } catch (IOException e) {
+                System.err.println("Error al procesar imagen: " + e.getMessage());
+                throw new IOException("Error al procesar la imagen", e);
+            }
+        }
+        // Si no se especifica removePhoto ni se proporciona nueva foto, mantener la foto actual
+
+        return arbitroRepository.save(existingArbitro);
     }
 
     /**
@@ -284,7 +373,7 @@ public class ArbitroService {
         // 1. Crear Usuario
         Usuario usuario = new Usuario();
         usuario.setUsername(arbitro.getNombre());
-        usuario.setPassword(arbitro.getContraseña()); 
+        usuario.setPassword("{noop}" + arbitro.getContraseña());
         usuario.setRole("ROLE_ARBITRO");
 
         usuarioService.createUsuario(usuario);
@@ -341,6 +430,7 @@ public class ArbitroService {
                 return "No tienes permiso para confirmar este partido";
             }
 
+            notificacionService.notificarArbitro("Disponibilidad confirmada", arbitro);
             // Cambiar estado a PROGRAMADO
             partido.setEstado(Partido.EstadoPartido.PROGRAMADO);
             partidoRepository.save(partido);

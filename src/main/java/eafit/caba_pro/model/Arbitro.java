@@ -64,8 +64,8 @@ public class Arbitro {
     private String phone;
 
         
-    @NotNull(message = "El teléfono no puede ser nulo")
-    @NotEmpty(message = "El teléfono no puede estar vacío")
+    @NotNull(message = "La especialidad no puede ser nulo")
+    @NotEmpty(message = "La especialidad no puede estar vacío")
     @Column(nullable = false, length = 100)
     private String speciality;
     
