@@ -13,8 +13,11 @@ import java.util.Optional;
 @Transactional
 public class EntrenadorService {
     
-    @Autowired
-    private EntrenadorRepository entrenadorRepository;
+    private final EntrenadorRepository entrenadorRepository;
+
+    public EntrenadorService(EntrenadorRepository entrenadorRepository){
+        this.entrenadorRepository=entrenadorRepository;
+    }
     
     /**
      * Obtener todos los entrenadores

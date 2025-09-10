@@ -45,7 +45,7 @@
                                     <svg class="w-6 h-6 mr-2 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
                                     </svg>
-                                    Calendario de <span th:text="${arbitro.nombre}">Sebastián Medina</span>
+                                    Calendario de <span th:text="${arbitro.nombre}"></span>
                                 </h1>
                                 <div class="flex items-center mt-2 space-x-2">
                                     <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
@@ -183,23 +183,16 @@
 
     <!-- Pasar datos del servidor al JavaScript -->
     <script th:inline="javascript">
-        console.log('🔧 Iniciando configuración del calendario...');
-        
-        // Verificar que tenemos las variables del servidor
-        const serverCalendarioData = /*[[${calendarioData}]]*/ null;
-        const serverCurrentYear = /*[[${currentYear}]]*/ null;
-        const serverCurrentMonth = /*[[${currentMonth}]]*/ null;
-        const serverArbitro = /*[[${arbitro}]]*/ null;
-        const serverEstadisticasGlobales = /*[[${estadisticasGlobales}]]*/ null;
-        
-        console.log('📊 Variables del servidor:');
-        console.log('  - calendarioData:', serverCalendarioData);
-        console.log('  - currentYear:', serverCurrentYear);
-        console.log('  - currentMonth:', serverCurrentMonth);
-        console.log('  - arbitro:', serverArbitro);
-        console.log('  - estadisticasGlobales:', serverEstadisticasGlobales);
-        
+        console.log(' Iniciando configuración del calendario...');        
         // Variables globales para el calendario con valores seguros
+        var serverCalendarioData = /*[[${calendarioData}]]*/ {};
+        var serverCurrentYear = /*[[${currentYear}]]*/ 0;
+        var serverCurrentMonth = /*[[${currentMonth}]]*/ 0;
+        var serverArbitro = {
+            id: /*[[${arbitro.id}]]*/,
+            nombre: /*[['${arbitro.nombre}']]*/
+        };
+        var serverEstadisticasGlobales = /*[[${estadisticasGlobales}]]*/ {};
         window.CALENDARIO_CONFIG = {
             calendarioData: serverCalendarioData || {partidos: {}, totalPartidos: 0},
             currentYear: serverCurrentYear || new Date().getFullYear(),
@@ -209,8 +202,7 @@
             estadisticasGlobales: serverEstadisticasGlobales || {partidosFuturos: 0, totalPartidos: 0, partidosPasados: 0}
         };
         
-        console.log('✅ CALENDARIO_CONFIG creado:', window.CALENDARIO_CONFIG);
-        
+        console.log('CALENDARIO_CONFIG creado:', window.CALENDARIO_CONFIG);
              
         // Generar calendario cuando se carga la página
         document.addEventListener('DOMContentLoaded', generarCalendario);

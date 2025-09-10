@@ -4,7 +4,6 @@ import eafit.caba_pro.model.Equipo;
 import eafit.caba_pro.repository.EquipoRepository;
 
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -13,8 +12,11 @@ import java.util.Optional;
 @Service
 public class EquipoService {
 
-    @Autowired
-    EquipoRepository equipoRepository;    
+    private final EquipoRepository equipoRepository;   
+    
+    public EquipoService(EquipoRepository equipoRepository){
+        this.equipoRepository = equipoRepository;
+    }
 
     @Transactional(readOnly = true)
     public List <Equipo> findAll(){

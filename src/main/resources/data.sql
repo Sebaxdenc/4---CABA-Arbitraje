@@ -13,12 +13,22 @@ VALUES ('sebastian.medina','{noop}arbitro123','ROLE_ARBITRO');
 INSERT INTO usuario(username, password, role)
 VALUES ('paula.lp','{noop}arbitro1234','ROLE_ARBITRO');
 
---Arbitros
-INSERT INTO arbitro (nombre, contraseña, username, cedula, phone, speciality, scale, photo_data, photo_content_type, photo_filename, usuario_id) 
-VALUES ('paula lop','arbitro1234' ,'paula.lp', '34567', '3222469936', 'Campo', 'Internacional', NULL, NULL, NULL, 5);
+-- Escalafones disponibles
+INSERT INTO escalafon (nombre, honorario_base) 
+VALUES ('INTERNACIONAL', 250000);
 
-INSERT INTO arbitro (nombre, contraseña, username, cedula, phone, speciality, scale, photo_data, photo_content_type, photo_filename, usuario_id) 
-VALUES ('Sebastian Medina', '{noop}arbitro123', 'sebastian.medina', '1058198772', '3222469936', 'Campo', 'Internacional', NULL, NULL, NULL, 4);
+INSERT INTO escalafon (nombre, honorario_base) 
+VALUES ('NACIONAL', 180000);
+
+INSERT INTO escalafon (nombre, honorario_base) 
+VALUES ('LOCAL', 120000);
+
+--Arbitros
+INSERT INTO arbitro (nombre, contraseña, username, cedula, phone, speciality, photo_data, photo_content_type, photo_filename, usuario_id, escalafon_id) 
+VALUES ('Paula Lop', '{noop}arbitro1234', 'paula.lp', '34567', '3222469936', 'Campo', NULL, NULL, NULL, 5, 1);
+
+INSERT INTO arbitro (nombre, contraseña, username, cedula, phone, speciality, photo_data, photo_content_type, photo_filename, usuario_id, escalafon_id) 
+VALUES ('Sebastian Medina', '{noop}arbitro123', 'sebastian.medina', '1058198772', '3222469936', 'Campo', NULL, NULL, NULL, 4, 1);
 
 -- Equipos
 INSERT INTO equipo(nombre, estado, ciudad, fundacion,logo)

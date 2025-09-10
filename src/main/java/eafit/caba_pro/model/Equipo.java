@@ -42,10 +42,12 @@ public class Equipo {
     private String logo;
 
     @OneToMany(mappedBy = "equipoLocal",fetch = FetchType.LAZY)
-    @JsonManagedReference
+    //@JsonManagedReference("local")
+    @JsonIgnore
     private List<Partido> partidosLocal;
 
     @OneToMany(mappedBy = "equipoVisitante",fetch = FetchType.LAZY)
-    @JsonManagedReference
+    //@JsonManagedReference("visitante")
+    @JsonIgnore
     private List<Partido> partidosVisitante;
 } 

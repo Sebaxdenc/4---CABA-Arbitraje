@@ -1,10 +1,14 @@
 package eafit.caba_pro.controller;
 
+import java.nio.charset.StandardCharsets;
+import java.time.YearMonth;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import org.springframework.http.HttpHeaders;
 
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -19,10 +23,13 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import eafit.caba_pro.model.Arbitro;
+import eafit.caba_pro.model.Liquidacion;
 import eafit.caba_pro.model.Partido;
 import eafit.caba_pro.model.Usuario;
 import eafit.caba_pro.service.ArbitroService;
+import eafit.caba_pro.service.LiquidacionService;
 import eafit.caba_pro.service.PartidoService;
+import eafit.caba_pro.service.PdfService;
 import jakarta.validation.Valid;
 
 @Controller
@@ -31,11 +38,15 @@ public class AdminController {
 
     private final ArbitroService arbitroService;
     private final PartidoService partidoService;
+    private final LiquidacionService liquidacionService;
+    private final PdfService pdfGeneratorService;
 
 
-    public AdminController(ArbitroService arbitroService, PartidoService partidoService) {
+    public AdminController(PdfService pdfService ,LiquidacionService liquidacionService, ArbitroService arbitroService, PartidoService partidoService) {
         this.arbitroService = arbitroService;
         this.partidoService = partidoService;
+        this.liquidacionService = liquidacionService;
+        this.pdfGeneratorService = pdfService;
     }
     
     @GetMapping()
@@ -67,28 +78,52 @@ public class AdminController {
         return "admin/finanzas";
     }
 
-    @GetMapping("/reportes")
-    public String reportes(
-            @RequestParam(name = "mes", required = false) Integer mes,
-            @RequestParam(name = "anio", required = false) Integer anio,
-            Model model) {
+    @GetMapping("/liquidaciones")
+    public String listarLiquidaciones(String periodo, Model model) {
 
-        model.addAttribute("mes", mes);
-        model.addAttribute("anio", anio);
-        return "admin/reportes";
+        // Periodo por defecto = mes actual
+        YearMonth periodoSeleccionado;
+        if (periodo != null) {
+            periodoSeleccionado = YearMonth.parse(periodo); // formato "2025-09"
+        } else {
+            periodoSeleccionado = YearMonth.now();
+        }
+        
+        // Liquidaciones de ese periodo
+        List<Liquidacion> liquidaciones = liquidacionService.obtenerLiquidacionesPorPeriodo(periodoSeleccionado);
+
+        // Pasar al modelo
+        model.addAttribute("liquidaciones", liquidaciones);
+        model.addAttribute("periodoSeleccionado", periodoSeleccionado);
+
+        return "admin/liquidaciones";
     }
 
+    @PostMapping("/liquidaciones/generar")
+    public String generarLiquidaciones(@RequestParam String periodo) {
+        YearMonth ym = YearMonth.parse(periodo); // formato "YYYY-MM"
+        liquidacionService.generarLiquidacionesMensuales(ym);
+        return "redirect:/admin/liquidaciones?periodo=" + ym;
+    }
 
-    @GetMapping("/reportes/pdf")
-    public String generarReportePdf(
-            @RequestParam("mes") Integer mes,
-            @RequestParam("anio") Integer anio,
-            Model model) {
+    @PostMapping("/liquidaciones/{id}/pagar")
+    public String pagar(@PathVariable Long id) {
+        Optional<Liquidacion> opt = liquidacionService.findById(id);
+        if (opt.isPresent() && opt.get().getEstado() == Liquidacion.EstadoLiquidacion.PENDIENTE) {
+            liquidacionService.marcarComoPagada(id);
+        }
+        return "redirect:/admin/liquidaciones";
+    }
 
-        model.addAttribute("mes", mes);
-        model.addAttribute("anio", anio);
+    @GetMapping("/liquidaciones/{id}")
+    public ResponseEntity<byte[]> generarPdf(@PathVariable Long id) {
+        Liquidacion liq = liquidacionService.obtenerPorId(id);
+        byte[] pdf = pdfGeneratorService.generarPdfDesdeLiquidacion(liq);
 
-        return "admin/reportes"; 
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=liquidacion-" + id + ".pdf")
+                .contentType(MediaType.APPLICATION_PDF)
+                .body(pdf);
     }
 
     @GetMapping("/create")
@@ -199,7 +234,6 @@ public class AdminController {
         return "admin/partido_form";
     }
 
-
     @PostMapping("/partidos/save")
     public String guardar(@ModelAttribute Partido partido) {
         if (partido.getArbitro() != null && partido.getArbitro().getId() != null) {
@@ -211,7 +245,6 @@ public class AdminController {
         partidoService.crearPartido(partido);
         return "redirect:/admin/partidos";
     }
-
 
     @GetMapping("/partidos/edit/{id}")
     public String editar(@PathVariable Long id, Model model) {

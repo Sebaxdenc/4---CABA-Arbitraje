@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head>
+    <meta charset="UTF-8"/>
+    <style>
+        body { font-family: Arial, sans-serif; font-size: 12px; }
+        h1 { text-align: center; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #333; padding: 6px; text-align: left; }
+        th { background-color: #eee; }
+    </style>
+</head>
+<body>
+    <h1>Liquidación Mensual</h1>
+    <p><strong>Árbitro:</strong> <span th:text="${liquidacion.arbitro.nombre}"></span></p>
+    <p><strong>Periodo:</strong> <span th:text="${liquidacion.periodo}"></span></p>
+    <p><strong>Total:</strong> $<span th:text="${#numbers.formatDecimal(liquidacion.total,1,'POINT',2,'COMMA')}"></span></p>
+    <p><strong>Estado:</strong> <span th:text="${liquidacion.estado}"></span></p>
+
+    <h2>Partidos</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Fecha</th>
+                <th>Local</th>
+                <th>Visitante</th>
+                <th>Honorario</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="p : ${liquidacion.partidos}">
+                <td th:text="${p.fecha}"></td>
+                <td th:text="${p.equipoLocal.nombre}"></td>
+                <td th:text="${p.equipoVisitante.nombre}"></td>
+                <td th:text="${'$' + #numbers.formatDecimal(p.arbitro.escalafon.honorarioBase,1,'POINT',2,'COMMA')}"></td>
+            </tr>
+        </tbody>
+    </table>
+</body>
+</html>

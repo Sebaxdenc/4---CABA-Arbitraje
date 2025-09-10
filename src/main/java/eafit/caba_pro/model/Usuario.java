@@ -1,5 +1,7 @@
 package eafit.caba_pro.model;
 
+import java.util.List;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.CascadeType;
@@ -9,15 +11,13 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.Data;
-import lombok.ToString;
 
 @Entity
 @Table(name = "usuario")
 @Data
-@ToString(exclude = {"arbitro"}) // Exclude circular references
 public class Usuario {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -31,10 +31,4 @@ public class Usuario {
 
     @Column
     private String role;
-    
-    // Relación uno a uno con Arbitro (lado inverso)
-    @OneToOne(mappedBy = "usuario", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JsonIgnore // Evitar serialización circular
-    private Arbitro arbitro;
-    
 }

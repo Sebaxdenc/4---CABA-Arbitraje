@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -15,9 +17,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import eafit.caba_pro.model.Arbitro;
+import eafit.caba_pro.model.Liquidacion;
 import eafit.caba_pro.model.Partido;
 import eafit.caba_pro.service.ArbitroService;
+import eafit.caba_pro.service.LiquidacionService;
+import eafit.caba_pro.service.NotificacionService;
 import eafit.caba_pro.service.PartidoService;
+import eafit.caba_pro.service.PdfService;
 import eafit.caba_pro.service.UsuarioService;
 import eafit.caba_pro.service.ReseñaService;
 
@@ -30,12 +36,18 @@ public class ArbitroController {
     private final PartidoService partidoService;
     private final UsuarioService usuarioService;
     private final ReseñaService reseñaService;
+    private final LiquidacionService liquidacionService;
+    private final PdfService pdfGeneratorService;
+    private final NotificacionService notificacionService;
 
-    public ArbitroController(ArbitroService arbitroService, PartidoService partidoService, UsuarioService usuarioService, ReseñaService reseñaService) {
+    public ArbitroController(NotificacionService notificacionService,PdfService pdfGeneratorService, LiquidacionService liquidacionService, ArbitroService arbitroService, PartidoService partidoService, UsuarioService usuarioService, ReseñaService reseñaService) {
+        this.notificacionService = notificacionService;
+        this.pdfGeneratorService = pdfGeneratorService;
         this.arbitroService = arbitroService;
         this.partidoService = partidoService;
         this.usuarioService = usuarioService;
         this.reseñaService = reseñaService;
+        this.liquidacionService = liquidacionService;
     }
 
     // ========== ENDPOINTS WEB (TEMPLATES) ==========
@@ -82,16 +94,8 @@ public class ArbitroController {
         
         // Si no se encuentra el árbitro, redirigir a la lista
         return "redirect:/arbitros";
-  }
-    @GetMapping("/lop")
-    public ResponseEntity<Map<String, Object>> show(Model model) {
-        Map<String, Object> response = new HashMap<>();
-        Optional<Arbitro> arbitro = arbitroService.findByUsername(usuarioService.getCurrentUsername());
-        //YearMonth yearMonth = yearMonth.now();
-        Map<String, Object> arbri = new HashMap<>();
-        arbri.put("arbitro", arbitro.orElse(null));
-        return ResponseEntity.ok(arbri);
     }
+
   
     @GetMapping("/calendario")
     public String calendario(@RequestParam(required = false) Integer year,
@@ -181,39 +185,46 @@ public class ArbitroController {
         
         return "arbitro/partidos";
     }
-    
-    // API endpoint para obtener datos del calendario (AJAX)
-    @GetMapping("/lop1")
-    public ResponseEntity<Map<String, Object>> getCalendarioData(
-            @PathVariable Long id,
-            @RequestParam(required = false) Integer year,
-            @RequestParam(required = false) Integer month) {
-        
-        Optional<Arbitro> arbitroOpt = arbitroService.findById(id);
-        
+
+    @GetMapping("/liquidaciones")
+    public String liquidaciones(Model model) {
+        Optional<Arbitro> arbitroOpt = arbitroService.findByUsername(usuarioService.getCurrentUsername());
+
         if (!arbitroOpt.isPresent()) {
-            return ResponseEntity.notFound().build();
+            return "redirect:/arbitros";
         }
         
-        YearMonth yearMonth = (year != null && month != null) 
-            ? YearMonth.of(year, month) 
-            : YearMonth.now();
-        
-        Map<String, Object> calendarioData = partidoService.getCalendarioDataByArbitro(arbitroOpt.get(), yearMonth);
-        
-        return ResponseEntity.ok(calendarioData);
+        Arbitro arbitro = arbitroOpt.get();
+
+        List<Liquidacion> liquidaciones = liquidacionService.obtenerLiquidacionesPorArbitro(arbitro.getId());
+        model.addAttribute("arbitro", arbitro);
+        model.addAttribute("liquidaciones", liquidaciones);
+        return "arbitro/liquidaciones";
     }
 
+    @GetMapping("/liquidaciones/{id}")
+    public ResponseEntity<byte[]> generarPdf(@PathVariable Long id) {
+        Liquidacion liq = liquidacionService.obtenerPorId(id);
+        byte[] pdf = pdfGeneratorService.generarPdfDesdeLiquidacion(liq);
 
-    // ========== ENDPOINTS REST API (JSON/BLOB) ==========
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=liquidacion-" + id + ".pdf")
+                .contentType(MediaType.APPLICATION_PDF)
+                .body(pdf);
+    }
 
-    /**
-     *  ENDPOINT ESENCIAL: Servir imágenes BLOB desde la base de datos
-     */
-    @GetMapping("/api/arbitros/{id:[0-9]+}/photo")
-    @ResponseBody
-    public ResponseEntity<byte[]> getArbitroPhoto(@PathVariable Long id) {
-        return arbitroService.buildPhotoResponse(id);
+    @GetMapping("/notificaciones")
+    public String notificaciones(Model model){
+        Optional<Arbitro> arbitroOpt = arbitroService.findByUsername(usuarioService.getCurrentUsername());
+
+        if (!arbitroOpt.isPresent()) {
+            return "redirect:/arbitros";
+        }
+
+        Arbitro arbitro = arbitroOpt.get();
+        model.addAttribute("arbitro", arbitro);
+        model.addAttribute("notificaciones", notificacionService.obtenerNotificacionesArbitro(arbitro.getId()));
+        return "arbitro/notificaciones";
     }
 
 }
