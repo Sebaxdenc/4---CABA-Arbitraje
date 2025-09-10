@@ -66,7 +66,7 @@
               <label class="block text-sm font-medium">Equipo Local *</label>
               <select th:field="*{equipoLocal.id}" required class="mt-1 block w-full border rounded px-3 py-2">
                 <option value="" disabled>Selecciona...</option>
-                <option th:each="eq : ${equipos != null ? equipos : {}}"
+                <option th:each="eq : ${equipos}"
                         th:value="${eq.id}" th:text="${eq.nombre}"></option>
               </select>
               <p class="mt-1 text-sm text-red-600" th:if="${#fields.hasErrors('equipoLocal')}" th:errors="*{equipoLocal}"></p>
@@ -75,7 +75,7 @@
               <label class="block text-sm font-medium">Equipo Visitante *</label>
               <select th:field="*{equipoVisitante.id}" required class="mt-1 block w-full border rounded px-3 py-2">
                 <option value="" disabled>Selecciona...</option>
-                <option th:each="eq : ${equipos != null ? equipos : {}}"
+                <option th:each="eq : ${equipos}"
                         th:value="${eq.id}" th:text="${eq.nombre}"></option>
               </select>
               <p class="mt-1 text-sm text-red-600" th:if="${#fields.hasErrors('equipoVisitante')}" th:errors="*{equipoVisitante}"></p>
@@ -90,62 +90,83 @@
 
         <!-- ===== FORM CREAR ===== -->
         <form th:unless="${partido.id != null}"
-              th:action="@{/admin/partidos/save}"
-              th:object="${partido}" method="post" class="space-y-4">
-          <input type="hidden" th:if="${_csrf != null}" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
-
-          <!-- (los mismos campos que arriba) -->
-          <div>
-            <label class="block text-sm font-medium">Fecha *</label>
-            <input type="date" th:field="*{fecha}" required class="mt-1 block w-full border rounded px-3 py-2"/>
-            <p class="mt-1 text-sm text-red-600" th:if="${#fields.hasErrors('fecha')}" th:errors="*{fecha}"></p>
+              th:action="@{/admin/partidos/save}" method="post" th:object="${partido}">
+          
+          <!-- Errores globales -->
+          <div th:if="${#fields.hasErrors('*')}" class="alert alert-warning alert-dismissible fade show" role="alert">
+              <i class="fas fa-exclamation-circle me-2"></i>
+              <strong>Por favor corrige los siguientes errores:</strong>
+              <ul class="mb-0 mt-2">
+                  <li th:each="err : ${#fields.errors('*')}" th:text="${err}"></li>
+              </ul>
+              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
           </div>
 
-          <div>
-            <label class="block text-sm font-medium">Hora *</label>
-            <input type="time" th:field="*{hora}" required class="mt-1 block w-full border rounded px-3 py-2"/>
-            <p class="mt-1 text-sm text-red-600" th:if="${#fields.hasErrors('hora')}" th:errors="*{hora}"></p>
+          <!-- Fecha -->
+          <div class="mb-3">
+              <label for="fecha" class="form-label">Fecha <span class="text-danger">*</span></label>
+              <input type="date" id="fecha" class="form-control" th:field="*{fecha}" 
+                    th:classappend="${#fields.hasErrors('fecha')} ? 'is-invalid' : ''" required>
+              <div class="invalid-feedback" th:if="${#fields.hasErrors('fecha')}" th:errors="*{fecha}"></div>
           </div>
 
-          <div>
-            <label class="block text-sm font-medium">Estado *</label>
-            <select th:field="*{estado}" required class="mt-1 block w-full border rounded px-3 py-2">
-              <option th:each="e : ${T(eafit.caba_pro.model.Partido$EstadoPartido).values()}"
-                      th:value="${e}" th:text="${e}"></option>
-            </select>
+          <!-- Hora -->
+          <div class="mb-3">
+              <label for="hora" class="form-label">Hora <span class="text-danger">*</span></label>
+              <input type="time" id="hora" class="form-control" th:field="*{hora}" 
+                    th:classappend="${#fields.hasErrors('hora')} ? 'is-invalid' : ''" required>
+              <div class="invalid-feedback" th:if="${#fields.hasErrors('hora')}" th:errors="*{hora}"></div>
           </div>
 
-          <div>
-            <label class="block text-sm font-medium">Árbitro (opcional)</label>
-            <select th:field="*{arbitro.id}" class="mt-1 block w-full border rounded px-3 py-2">
-              <option value="">Sin asignar</option>
-              <option th:each="a : ${arbitros != null ? arbitros : {}}"
-                      th:value="${a.id}" th:text="${a.nombre}"></option>
-            </select>
-          </div>
-
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label class="block text-sm font-medium">Equipo Local *</label>
-              <select th:field="*{equipoLocal.id}" required class="mt-1 block w-full border rounded px-3 py-2">
-                <option value="" disabled selected>Selecciona...</option>
-                <option th:each="eq : ${equipos != null ? equipos : {}}"
-                        th:value="${eq.id}" th:text="${eq.nombre}"></option>
+          <!-- Estado -->
+          <div class="mb-3">
+              <label for="estado" class="form-label">Estado <span class="text-danger">*</span></label>
+              <select id="estado" class="form-control" th:field="*{estado}" 
+                      th:classappend="${#fields.hasErrors('estado')} ? 'is-invalid' : ''" required>
+                  <option value="">Seleccione un estado</option>
+                  <option th:each="e : ${T(eafit.caba_pro.model.Partido$EstadoPartido).values()}" 
+                          th:value="${e}" th:text="${e}">
+                  </option>
               </select>
-            </div>
-            <div>
-              <label class="block text-sm font-medium">Equipo Visitante *</label>
-              <select th:field="*{equipoVisitante.id}" required class="mt-1 block w-full border rounded px-3 py-2">
-                <option value="" disabled selected>Selecciona...</option>
-                <option th:each="eq : ${equipos != null ? equipos : {}}"
-                        th:value="${eq.id}" th:text="${eq.nombre}"></option>
-              </select>
-            </div>
+              <div class="invalid-feedback" th:if="${#fields.hasErrors('estado')}" th:errors="*{estado}"></div>
           </div>
 
-          <div class="flex justify-end space-x-3 pt-2">
-            <a th:href="@{/admin/partidos}" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300">Cancelar</a>
-            <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">Guardar</button>
+          <!-- Árbitro -->
+          <div class="mb-3">
+              <label for="arbitro" class="form-label">Árbitro (opcional)</label>
+              <select id="arbitro" class="form-control" th:field="*{arbitro.id}">
+                  <option value="">Sin asignar</option>
+                  <option th:each="a : ${arbitros}" th:value="${a.id}" th:text="${a.nombre}"></option>
+              </select>
+          </div>
+
+          <!-- Equipos -->
+          <div class="row">
+              <div class="col-md-6 mb-3">
+                  <label for="equipoLocal" class="form-label">Equipo Local <span class="text-danger">*</span></label>
+                  <select id="equipoLocal" class="form-control" th:field="*{equipoLocal.id}" 
+                          th:classappend="${#fields.hasErrors('equipoLocal')} ? 'is-invalid' : ''" required>
+                      <option value="">Seleccione...</option>
+                      <option th:each="eq : ${equipos}" th:value="${eq.id}" th:text="${eq.nombre}"></option>
+                  </select>
+                  <div class="invalid-feedback" th:if="${#fields.hasErrors('equipoLocal')}" th:errors="*{equipoLocal}"></div>
+              </div>
+
+              <div class="col-md-6 mb-3">
+                  <label for="equipoVisitante" class="form-label">Equipo Visitante <span class="text-danger">*</span></label>
+                  <select id="equipoVisitante" class="form-control" th:field="*{equipoVisitante.id}" 
+                          th:classappend="${#fields.hasErrors('equipoVisitante')} ? 'is-invalid' : ''" required>
+                      <option value="">Seleccione...</option>
+                      <option th:each="eq : ${equipos}" th:value="${eq.id}" th:text="${eq.nombre}"></option>
+                  </select>
+                  <div class="invalid-feedback" th:if="${#fields.hasErrors('equipoVisitante')}" th:errors="*{equipoVisitante}"></div>
+              </div>
+          </div>
+
+          <!-- Botones -->
+          <div class="d-flex justify-content-between">
+              <a th:href="@{/admin/partidos}" class="btn btn-secondary">Cancelar</a>
+              <input type="submit" class="btn btn-primary" value="Guardar Partido">
           </div>
         </form>
 
