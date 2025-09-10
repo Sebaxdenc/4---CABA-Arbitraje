@@ -36,6 +36,11 @@ public class Usuario {
     }
 
     // Getters y Setters
+
+    public boolean isActivo() {
+    return this.activo;
+    }
+
     public Long getId() {
         return id;
     }

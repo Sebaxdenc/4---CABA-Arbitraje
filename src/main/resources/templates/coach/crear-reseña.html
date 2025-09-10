@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crear Reseña - CABA Pro</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="bg-gray-50">
+    <div class="flex min-h-screen">
+        <!-- Sidebar -->
+        <div th:replace="~{fragments/EntrenadorFragments/sideBar :: sideBar('crear-reseña')}"></div>
+        
+        <!-- Main Content -->
+        <div class="flex-1 md:ml-64">
+            <!-- Top bar -->
+            <div th:replace="~{fragments/EntrenadorFragments/upBar :: upBar('Crear Reseña', ${entrenador.nombre})}"></div>
+            
+            <!-- Content -->
+            <div class="p-6">
+                <!-- Header -->
+                <div class="mb-8">
+                    <h1 class="text-3xl font-bold text-gray-900 mb-2">Crear Nueva Reseña</h1>
+                    <p class="text-gray-600">Califica y comenta el desempeño de un árbitro</p>
+                </div>
+
+                <!-- Mensajes de error/éxito -->
+                <div th:if="${error}" class="mb-6 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative">
+                    <strong class="font-bold">Error:</strong>
+                    <span class="block sm:inline" th:text="${error}"></span>
+                </div>
+
+                <div th:if="${mensaje}" 
+                     th:class="'mb-6 px-4 py-3 rounded relative border ' + (${tipoMensaje == 'success'} ? 'bg-green-100 border-green-400 text-green-700' : 'bg-blue-100 border-blue-400 text-blue-700')">
+                    <span th:text="${mensaje}"></span>
+                </div>
+
+                <!-- Formulario de Reseña -->
+                <div class="max-w-2xl mx-auto">
+                    <form th:action="@{/coach/crear-reseña}" th:object="${nuevaReseña}" method="post" 
+                          class="bg-white shadow-lg rounded-lg p-8">
+                        
+                        <!-- Selección de Árbitro -->
+                        <div class="mb-6">
+                            <label for="arbitroId" class="block text-sm font-medium text-gray-700 mb-2">
+                                <i class="fas fa-user-tie mr-2"></i>Seleccionar Árbitro *
+                            </label>
+                            <select name="arbitroId" id="arbitroId" required
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                                <option value="">-- Selecciona un árbitro --</option>
+                                <option th:each="arbitro : ${arbitros}" 
+                                        th:value="${arbitro.id}" 
+                                        th:text="${arbitro.nombre + ' ' + arbitro.apellido + ' (' + arbitro.cedula + ')'}">
+                                    Árbitro Nombre
+                                </option>
+                            </select>
+                        </div>
+
+                        <!-- Selección de Partido (opcional) -->
+                        <div class="mb-6">
+                            <label for="partidoId" class="block text-sm font-medium text-gray-700 mb-2">
+                                <i class="fas fa-basketball-ball mr-2"></i>Partido Relacionado (Opcional)
+                            </label>
+                            <select name="partidoId" id="partidoId"
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                                <option value="">-- Ningún partido específico --</option>
+                                <option th:each="partido : ${partidosFinalizados}" 
+                                        th:value="${partido.id}" 
+                                        th:text="${partido.equipoLocal + ' vs ' + partido.equipoVisitante + ' - ' + partido.fecha}">
+                                    Partido Info
+                                </option>
+                            </select>
+                            <p class="text-sm text-gray-500 mt-1">
+                                Puedes asociar esta reseña a un partido específico donde arbitró
+                            </p>
+                        </div>
+
+                        <!-- Puntuación -->
+                        <div class="mb-6">
+                            <label for="puntuacion" class="block text-sm font-medium text-gray-700 mb-2">
+                                <i class="fas fa-star mr-2"></i>Puntuación *
+                            </label>
+                            <div class="flex items-center space-x-4">
+                                <div class="flex space-x-1" id="star-rating">
+                                    <button type="button" class="star-btn" data-rating="1">
+                                        <i class="fas fa-basketball-ball text-gray-300 text-2xl hover:text-yellow-400 transition-colors"></i>
+                                    </button>
+                                    <button type="button" class="star-btn" data-rating="2">
+                                        <i class="fas fa-basketball-ball text-gray-300 text-2xl hover:text-yellow-400 transition-colors"></i>
+                                    </button>
+                                    <button type="button" class="star-btn" data-rating="3">
+                                        <i class="fas fa-basketball-ball text-gray-300 text-2xl hover:text-yellow-400 transition-colors"></i>
+                                    </button>
+                                    <button type="button" class="star-btn" data-rating="4">
+                                        <i class="fas fa-basketball-ball text-gray-300 text-2xl hover:text-yellow-400 transition-colors"></i>
+                                    </button>
+                                    <button type="button" class="star-btn" data-rating="5">
+                                        <i class="fas fa-basketball-ball text-gray-300 text-2xl hover:text-yellow-400 transition-colors"></i>
+                                    </button>
+                                </div>
+                                <span id="rating-text" class="text-sm text-gray-600">Selecciona una puntuación</span>
+                            </div>
+                            <input type="hidden" th:field="*{puntuacion}" id="puntuacion" required />
+                            <div th:if="${#fields.hasErrors('puntuacion')}" class="text-red-600 text-sm mt-1">
+                                <span th:errors="*{puntuacion}"></span>
+                            </div>
+                        </div>
+
+                        <!-- Descripción -->
+                        <div class="mb-6">
+                            <label for="descripcion" class="block text-sm font-medium text-gray-700 mb-2">
+                                <i class="fas fa-comment mr-2"></i>Comentario *
+                            </label>
+                            <textarea th:field="*{descripcion}" id="descripcion" rows="4" required
+                                      placeholder="Describe tu experiencia con este árbitro..."
+                                      class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"></textarea>
+                            <div th:if="${#fields.hasErrors('descripcion')}" class="text-red-600 text-sm mt-1">
+                                <span th:errors="*{descripcion}"></span>
+                            </div>
+                            <p class="text-sm text-gray-500 mt-1">
+                                Máximo 1000 caracteres. Sé específico y constructivo.
+                            </p>
+                        </div>
+
+                        <!-- Botones -->
+                        <div class="flex justify-between">
+                            <a th:href="@{/coach}" 
+                               class="px-6 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition-colors">
+                                <i class="fas fa-arrow-left mr-2"></i>Cancelar
+                            </a>
+                            <button type="submit" 
+                                    class="px-6 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors">
+                                <i class="fas fa-save mr-2"></i>Crear Reseña
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript para manejo de estrellas -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const starButtons = document.querySelectorAll('.star-btn');
+            const ratingInput = document.getElementById('puntuacion');
+            const ratingText = document.getElementById('rating-text');
+            
+            const ratingTexts = {
+                1: '1 Balón - Muy Malo',
+                2: '2 Balones - Malo',
+                3: '3 Balones - Regular',
+                4: '4 Balones - Bueno',
+                5: '5 Balones - Excelente'
+            };
+            
+            starButtons.forEach((button, index) => {
+                button.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const rating = parseInt(this.dataset.rating);
+                    
+                    // Actualizar el valor del input
+                    ratingInput.value = rating;
+                    
+                    // Actualizar las estrellas visualmente
+                    starButtons.forEach((btn, btnIndex) => {
+                        const icon = btn.querySelector('i');
+                        if (btnIndex < rating) {
+                            icon.className = 'fas fa-basketball-ball text-yellow-400 text-2xl';
+                        } else {
+                            icon.className = 'fas fa-basketball-ball text-gray-300 text-2xl hover:text-yellow-400 transition-colors';
+                        }
+                    });
+                    
+                    // Actualizar el texto
+                    ratingText.textContent = ratingTexts[rating];
+                });
+                
+                // Efecto hover
+                button.addEventListener('mouseenter', function() {
+                    const rating = parseInt(this.dataset.rating);
+                    starButtons.forEach((btn, btnIndex) => {
+                        const icon = btn.querySelector('i');
+                        if (btnIndex < rating) {
+                            icon.className = 'fas fa-basketball-ball text-yellow-300 text-2xl';
+                        }
+                    });
+                });
+                
+                button.addEventListener('mouseleave', function() {
+                    const currentRating = parseInt(ratingInput.value) || 0;
+                    starButtons.forEach((btn, btnIndex) => {
+                        const icon = btn.querySelector('i');
+                        if (btnIndex < currentRating) {
+                            icon.className = 'fas fa-basketball-ball text-yellow-400 text-2xl';
+                        } else {
+                            icon.className = 'fas fa-basketball-ball text-gray-300 text-2xl hover:text-yellow-400 transition-colors';
+                        }
+                    });
+                });
+            });
+        });
+    </script>
+</body>
+</html>
