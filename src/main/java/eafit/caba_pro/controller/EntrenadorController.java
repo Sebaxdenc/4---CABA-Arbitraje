@@ -13,7 +13,7 @@ import java.security.Principal;
 import java.util.Optional;
 
 @Controller
-@RequestMapping("/coach")
+@RequestMapping("/entrenador")
 public class EntrenadorController {
     
     @Autowired
@@ -54,7 +54,7 @@ public class EntrenadorController {
             model.addAttribute("partidosEmpatados", partidosEmpatados);
             model.addAttribute("porcentajeVictorias", String.format("%.1f", porcentajeVictorias));
             
-            return "coach/panel";
+            return "entrenador/panel";
             
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", "Error al cargar el panel del entrenador");
@@ -147,7 +147,7 @@ public class EntrenadorController {
             model.addAttribute("entrenador", entrenadorOpt.get());
             model.addAttribute("categorias", Entrenador.Categoria.values());
             
-            return "coach/perfil";
+            return "entrenador/perfil";
             
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", "Error al cargar el perfil");
