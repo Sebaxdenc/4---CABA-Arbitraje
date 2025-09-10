@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8" />
+  <title>Detalle Torneo</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen">
+  <div class="max-w-5xl mx-auto p-6 space-y-6">
+
+    <div th:if="${errorMessage}" class="p-3 rounded bg-red-50 text-red-800 border border-red-200" th:text="${errorMessage}"></div>
+    <div th:if="${ok}" class="p-3 rounded bg-green-50 text-green-800 border border-green-200" th:text="${ok}"></div>
+
+    <div class="bg-white p-4 rounded shadow">
+      <h1 class="text-2xl font-semibold" th:text="${torneo.nombre}">Torneo</h1>
+      <p class="mt-2"><b>Sede:</b> <span th:text="${torneo.sede}">-</span></p>
+      <p class="mt-1">
+        <b>Fechas:</b>
+        <span th:text="${torneo.fechaInicio != null ? #temporals.format(torneo.fechaInicio,'dd/MM/yyyy') : '-'}">-</span>
+        –
+        <span th:text="${torneo.fechaFin != null ? #temporals.format(torneo.fechaFin,'dd/MM/yyyy') : '-'}">-</span>
+      </p>
+    </div>
+
+    <!-- Asignar partido (solo programados y sin torneo) -->
+    <div class="bg-white p-4 rounded shadow">
+      <h2 class="font-semibold mb-3">Asignar partido</h2>
+      <form th:action="@{|/admin/torneos/${torneo.id}/asignar-partido|}" method="post" class="flex gap-3">
+        <input type="hidden" th:if="${_csrf != null}" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+        <select name="partidoId" class="rounded border-gray-300 min-w-64" required>
+          <option value="" disabled selected>Selecciona un partido</option>
+          <option th:each="p : ${partidosSinTorneo}"
+                  th:value="${p.id}"
+                  th:text="${(p.equipoLocal != null && p.equipoVisitante != null 
+                              ? p.equipoLocal.nombre + ' vs ' + p.equipoVisitante.nombre 
+                              : 'Partido ' + p.id)
+                            + ' - ' + (p.fecha != null ? #temporals.format(p.fecha,'dd/MM/yyyy') : '-') 
+                            + ' ' + (p.hora  != null ? #temporals.format(p.hora,'HH:mm')     : '')}">
+          </option>
+        </select>
+        <button class="px-4 py-2 bg-indigo-600 text-white rounded">Asignar</button>
+      </form>
+    </div>
+
+    <!-- Partidos asignados -->
+    <div class="bg-white p-4 rounded shadow overflow-x-auto">
+      <h2 class="font-semibold mb-3">Partidos del torneo</h2>
+      <table class="min-w-full text-left">
+        <thead class="bg-gray-100">
+          <tr>
+            <th class="p-2">ID</th>
+            <th class="p-2">Descripción</th>
+            <th class="p-2">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr th:each="p : ${partidosAsignados}" class="border-t">
+            <td class="p-2" th:text="${p.id}">1</td>
+            <td class="p-2"
+                th:text="${(p.equipoLocal != null && p.equipoVisitante != null 
+                            ? p.equipoLocal.nombre + ' vs ' + p.equipoVisitante.nombre
+                            : 'Partido ' + p.id)
+                          + ' - ' + (p.fecha != null ? #temporals.format(p.fecha,'dd/MM') : '-') 
+                          + ' ' + (p.hora  != null ? #temporals.format(p.hora,'HH:mm') : '')}">
+            </td>
+            <td class="p-2">
+              <form th:action="@{|/admin/torneos/${torneo.id}/quitar-partido|}" method="post" class="inline">
+                <input type="hidden" th:if="${_csrf != null}" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                <input type="hidden" name="partidoId" th:value="${p.id}">
+                <button class="text-red-600 hover:underline"
+                        onclick="return confirm('¿Quitar partido del torneo?')">Quitar</button>
+              </form>
+            </td>
+          </tr>
+          <tr th:if="${#lists.isEmpty(partidosAsignados)}">
+            <td class="p-4 text-center text-gray-500" colspan="3">Aún no hay partidos asignados.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div>
+      <a class="px-4 py-2 rounded border" th:href="@{/admin/torneos}">Volver</a>
+    </div>
+  </div>
+</body>
+</html>

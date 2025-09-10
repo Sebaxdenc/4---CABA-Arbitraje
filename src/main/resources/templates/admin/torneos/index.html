@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8" />
+  <title>Gestión de Torneos</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" th:href="@{/css/style.css}">
+  <style> body { font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, 'Helvetica Neue', Arial; } </style>
+</head>
+<body class="flex bg-gray-100 min-h-screen">
+  
+  <aside th:replace="~{admin/sidebar :: sidebar('torneos')}"></aside>
+
+  <div class="flex-1 overflow-x-hidden overflow-y-auto">
+
+    <header th:replace="~{admin/header :: header('Gestión de Torneos')}"></header>
+
+    <main class="p-6 space-y-6">
+      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-2">
+        <h3 class="text-2xl font-semibold text-gray-800">Torneos</h3>
+        <a th:href="@{/admin/torneos/nuevo}"
+           class="mt-4 sm:mt-0 px-4 py-2 bg-indigo-600 text-white rounded-lg shadow hover:bg-indigo-700">
+          + Crear Torneo
+        </a>
+      </div>
+
+      <div th:if="${ok}"
+           class="p-3 rounded bg-green-50 text-green-800 border border-green-200"
+           th:text="${ok}"></div>
+
+      <div class="bg-white p-6 rounded-lg shadow">
+        <input id="buscar" type="text" placeholder="Buscar por nombre o sede..."
+               class="w-full mb-4 px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+               oninput="filtraFilas()">
+
+        <div class="overflow-x-auto">
+          <table id="tabla-torneos" class="min-w-full divide-y divide-gray-200 text-left">
+            <thead class="bg-gray-50">
+              <tr>
+                <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase">Nombre</th>
+                <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase">Sede</th>
+                <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase">Inicio</th>
+                <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase">Fin</th>
+                <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase"># Partidos</th>
+                <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase">Acciones</th>
+              </tr>
+            </thead>
+
+            <tbody class="bg-white divide-y divide-gray-200 text-sm text-gray-800">
+              <tr th:each="t : ${torneos}">
+                <td class="px-6 py-4 font-medium" th:text="${t.nombre}">Nombre</td>
+                <td class="px-6 py-4" th:text="${t.sede}">Sede</td>
+
+                <td class="px-6 py-4"
+                    th:text="${t.fechaInicio != null ? #temporals.format(t.fechaInicio, 'dd/MM/yyyy') : '-'}">01/01/2025</td>
+                <td class="px-6 py-4"
+                    th:text="${t.fechaFin != null ? #temporals.format(t.fechaFin, 'dd/MM/yyyy') : '-'}">31/01/2025</td>
+
+                <td class="px-6 py-4" th:text="${#lists.size(t.partidos)}">0</td>
+
+                <td class="px-6 py-4 space-x-4">
+                  <a class="text-indigo-600 hover:text-indigo-900"
+                     th:href="@{|/admin/torneos/${t.id}|}">Ver</a>
+                  <a class="text-amber-600 hover:text-amber-900"
+                     th:href="@{|/admin/torneos/${t.id}/editar|}">Editar</a>
+                  <form method="post" th:action="@{|/admin/torneos/${t.id}/eliminar|}" class="inline">
+                    <input type="hidden" th:name="${_csrf?.parameterName}" th:value="${_csrf?.token}">
+                    <button class="text-red-600 hover:text-red-900" type="submit"
+                            onclick="return confirm('¿Eliminar torneo?')">Eliminar</button>
+                  </form>
+                </td>
+              </tr>
+
+              <tr th:if="${#lists.isEmpty(torneos)}">
+                <td colspan="6" class="px-6 py-6 text-center text-gray-500">No hay torneos aún.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+  </div>
+
+ 
+  <script>
+    function filtraFilas() {
+      const q = (document.getElementById('buscar').value || '').toLowerCase();
+      const rows = document.querySelectorAll('#tabla-torneos tbody tr');
+      rows.forEach(r => {
+        if (r.querySelector('td[colspan]')) return;
+        const nombre = (r.children[0]?.textContent || '').toLowerCase();
+        const sede   = (r.children[1]?.textContent || '').toLowerCase();
+        r.style.display = (nombre.includes(q) || sede.includes(q)) ? '' : 'none';
+      });
+    }
+  </script>
+</body>
+</html>
