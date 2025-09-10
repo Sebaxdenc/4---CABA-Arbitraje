@@ -242,6 +242,7 @@ public class AdminController {
             .orElseThrow(() -> new IllegalArgumentException("Árbitro no encontrado"));
         model.addAttribute("arbitro", arbitro);
         return "admin/arbitro_view"; // ver plantilla en el punto 4
+    }
   
     // ==================== COACHES/ENTRENADORES ====================
 
@@ -464,11 +465,6 @@ public class AdminController {
 
     // ==================== FUNCIONALIDADES ORIGINALES ====================
     
-    @GetMapping("/finanzas")
-    public String finanzas() {
-        return "admin/finanzas";
-    }
-
     @GetMapping("/reportes")
     public String reportes(
             @RequestParam(name = "mes", required = false) Integer mes,

@@ -187,12 +187,22 @@ public class ArbitroController {
         return "arbitro/partidos";
     }
 
-  @GetMapping("/liquidaciones")
+    @GetMapping("/liquidaciones")
     public String liquidaciones(Model model) {
         Optional<Arbitro> arbitroOpt = arbitroService.findByUsername(usuarioService.getCurrentUsername());
 
         if (!arbitroOpt.isPresent()) {
             return "redirect:/arbitros";
+        }
+        
+        Arbitro arbitro = arbitroOpt.get();
+
+        List<Liquidacion> liquidaciones = liquidacionService.obtenerLiquidacionesPorArbitro(arbitro.getId());
+        model.addAttribute("arbitro", arbitro);
+        model.addAttribute("liquidaciones", liquidaciones);
+        return "arbitro/liquidaciones";
+    }
+
     // ========== ENDPOINTS DE DISPONIBILIDAD ==========
 
     @GetMapping("/disponibilidad")
@@ -237,17 +247,15 @@ public class ArbitroController {
         return "redirect:/arbitro/disponibilidad";
     }
         
-
     @GetMapping("/liquidaciones/{id}")
     public ResponseEntity<byte[]> generarPdf(@PathVariable Long id) {
         Liquidacion liq = liquidacionService.obtenerPorId(id);
         byte[] pdf = pdfGeneratorService.generarPdfDesdeLiquidacion(liq);
-        Arbitro arbitro = arbitroOpt.get();
 
-        List<Liquidacion> liquidaciones = liquidacionService.obtenerLiquidacionesPorArbitro(arbitro.getId());
-        model.addAttribute("arbitro", arbitro);
-        model.addAttribute("liquidaciones", liquidaciones);
-        return "arbitro/liquidaciones";
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=liquidacion-" + id + ".pdf")
+                .contentType(MediaType.APPLICATION_PDF)
+                .body(pdf);
     }
 
 
@@ -284,11 +292,6 @@ public class ArbitroController {
         return "redirect:/arbitro/disponibilidad";
     }
 
-        return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=liquidacion-" + id + ".pdf")
-                .contentType(MediaType.APPLICATION_PDF)
-                .body(pdf);
-    }
 
     @GetMapping("/notificaciones")
     public String notificaciones(Model model){
