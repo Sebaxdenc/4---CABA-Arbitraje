@@ -206,7 +206,7 @@ public class AdminController {
         model.addAttribute("arbitro", arbitro);
         model.addAttribute("escalafones", escalafonRepository.findAll());
         model.addAttribute("modoEdicion", true);
-        return "admin/arbitro_form"; // Changed to use the proper form template
+        return "admin/createArbitro"; // Use the existing form template for editing
     }
 
     @GetMapping("/arbitros/{id}/photo")

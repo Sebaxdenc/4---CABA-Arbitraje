@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Crear Árbitro</title>
+    <title th:text="${modoEdicion != null ? 'Editar Árbitro' : 'Crear Árbitro'}">Crear Árbitro</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -23,7 +23,7 @@
         <div class="row justify-content-center">
             <div class="col-md-8">
                 <div class="card">
-                    <div class="card-header">Crear Nuevo Árbitro</div>
+                    <div class="card-header" th:text="${modoEdicion != null ? 'Editar Árbitro' : 'Crear Nuevo Árbitro'}">Crear Nuevo Árbitro</div>
                     <div class="card-body">
                         <!-- Mensaje de error general -->
                         <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
@@ -32,7 +32,11 @@
                             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                         </div>
                         
-                        <form th:action="@{/admin/arbitros/save}" method="post" th:object="${arbitro}" enctype="multipart/form-data">
+                        <form th:action="${modoEdicion != null ? '/admin/arbitros/update/' + arbitro.id : '/admin/arbitros/save'}" 
+                              method="post" th:object="${arbitro}" enctype="multipart/form-data">
+                            
+                            <!-- ID oculto para edición -->
+                            <input type="hidden" th:field="*{id}" th:if="${modoEdicion != null}">
                             
                             <!-- Campos ocultos para el usuario -->
                             <input type="hidden" th:field="*{usuario.username}" id="hiddenUsername">
@@ -85,7 +89,7 @@
 
                             <div class="mb-3">
                                 <label for="email" class="form-label">Email <span class="text-danger">*</span></label>
-                                <input type="email" id="email" class="form-control" 
+                                <input type="email" id="email" class="form-control" th:field="*{usuario.email}"
                                        th:classappend="${#fields.hasErrors('usuario.email')} ? 'is-invalid' : ''"
                                        required maxlength="100" placeholder="Ej: juan.perez@email.com"
                                        onchange="updateHiddenEmail()" onkeyup="updateHiddenEmail()">
@@ -148,7 +152,7 @@
                             <div class="mb-3">
                                 <label for="escalafon" class="form-label">Escalafón <span class="text-danger">*</span></label>
                                 <select id="escalafon" class="form-control" th:field="*{escalafon.id}" 
-                                        th:classappend="${#fields.hasErrors('escalafon')} ? 'is-invalid' : ''" required>
+                                        th:classappend="${#fields.hasErrors('escalafon.nombre')} ? 'is-invalid' : ''" required>
                                     <option value="">Seleccione un escalafón</option>
                                     <option th:each="escalafon : ${escalafones}" 
                                             th:value="${escalafon.id}" 
@@ -156,7 +160,7 @@
                                         Escalafón
                                     </option>
                                 </select>
-                                <div class="invalid-feedback" th:if="${#fields.hasErrors('escalafon')}" th:errors="*{escalafon}">
+                                <div class="invalid-feedback" th:if="${#fields.hasErrors('escalafon.nombre')}" th:errors="*{escalafon}">
                                     Error en escalafón
                                 </div>
                                 <small class="form-text text-muted">Campo obligatorio</small>
@@ -164,7 +168,7 @@
 
                             <div class="d-flex justify-content-between">
                                 <a th:href="@{/admin/arbitros}" class="btn btn-secondary">Cancelar</a>
-                                <input type="submit" class="btn btn-primary" value="Guardar Árbitro">
+                                <input type="submit" class="btn btn-primary" th:value="${modoEdicion != null ? 'Actualizar Árbitro' : 'Guardar Árbitro'}">
                             </div>
                         </form>
                     </div>
@@ -194,7 +198,12 @@
             const password = "{noop}"+ document.getElementById('contraseña').value;
             const hiddenPassword = document.getElementById('hiddenPassword');
             if (hiddenPassword) {
-                hiddenPassword.value = password;
+                // Solo agregar {noop} si no lo tiene ya
+                if (password && !password.startsWith('{noop}')) {
+                    hiddenPassword.value = "{noop}" + password;
+                } else {
+                    hiddenPassword.value = password;
+                }
             }
         }
 
@@ -252,9 +261,10 @@
 
         // Sincronizar al cargar la página
         document.addEventListener('DOMContentLoaded', function() {
+            // En modo edición, limpiar los campos ocultos primero
             updateHiddenUsername();
-            updateHiddenPassword();
             updateHiddenEmail();
+            updateHiddenPassword();
         });
     </script>
 </body>
