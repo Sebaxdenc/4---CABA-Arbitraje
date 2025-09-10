@@ -19,11 +19,17 @@ import java.util.ArrayList;
 @Service
 public class PartidoService {
     
-    @Autowired
-    private PartidoRepository partidoRepository;
-    
-    @Autowired
+    private PartidoRepository partidoRepository;    
     private ArbitroRepository arbitroRepository;
+    private final NotificacionService notificacionService;
+
+    public PartidoService(PartidoRepository partidoRepository, 
+                         ArbitroRepository arbitroRepository,
+                         NotificacionService notificacionService) {
+        this.partidoRepository = partidoRepository;
+        this.arbitroRepository = arbitroRepository;
+        this.notificacionService = notificacionService;
+    }
     
     // CRUD básico
     public List<Partido> findAll() {
@@ -167,7 +173,20 @@ public class PartidoService {
     
     public Partido crearPartido(Partido partido) {
         validarPartido(partido);
-        return save(partido);
+        
+        // Guardar el partido primero
+        Partido partidoGuardado = save(partido);
+        
+        // Si hay un árbitro asignado, notificar que tiene un partido pendiente por confirmar
+        if (partidoGuardado.getArbitro() != null) {
+            String mensaje = "Nuevo partido asignado: Tiene un partido pendiente por confirmar" +
+                            " programado para el " + partidoGuardado.getFecha() + " a las " + partidoGuardado.getHora() +
+                            ". Por favor confirme su disponibilidad.";
+
+            notificacionService.notificarArbitro(mensaje, partidoGuardado.getArbitro());
+        }
+
+        return partidoGuardado;
     }
     
     // MÉTODOS NUEVOS PARA LA RELACIÓN BIDIRECCIONAL

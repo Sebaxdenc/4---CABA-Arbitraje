@@ -574,29 +574,57 @@ public class AdminController {
     @GetMapping("/partidos/create")
     public String mostrarFormularioCrear(Model model) {
         Partido p = new Partido();
+        // Establecer el estado por defecto
+        p.setEstado(Partido.EstadoPartido.PENDIENTE_CONFIRMACION);
         // Evita null al evaluar *{arbitro.id} y *{equipo*.id} en la vista
         p.setArbitro(new Arbitro());
         p.setEquipoLocal(new Equipo());
         p.setEquipoVisitante(new Equipo());
 
         model.addAttribute("partido", p);
-        // Si no usas @ModelAttribute (ver abajo), entonces añade estas 3 líneas:
-        model.addAttribute("arbitros", arbitroService.findAll());
-        model.addAttribute("equipos",  equipoService.findAll());
-        model.addAttribute("estados",  Partido.EstadoPartido.values());
+        // Asegurar que siempre hay listas no nulas
+        List<Arbitro> arbitros = arbitroService.findAll();
+        List<Equipo> equipos = equipoService.findAll();
+        model.addAttribute("arbitros", arbitros != null ? arbitros : new java.util.ArrayList<>());
+        model.addAttribute("equipos", equipos != null ? equipos : new java.util.ArrayList<>());
+        model.addAttribute("estados", Partido.EstadoPartido.values());
 
         return "admin/partido_form";
     }
+    @PostMapping("/partidos/save")
+    public String guardar(@ModelAttribute Partido partido, Model model, RedirectAttributes redirectAttributes) {
+        try {
+            // Validar que los equipos sean diferentes
+            if (partido.getEquipoLocal() != null && partido.getEquipoVisitante() != null &&
+                partido.getEquipoLocal().getId().equals(partido.getEquipoVisitante().getId())) {
+                model.addAttribute("errorMessage", "No se puede seleccionar el mismo equipo como local y visitante");
+                model.addAttribute("partido", partido);
+                model.addAttribute("arbitros", arbitroService.findAll());
+                model.addAttribute("equipos", equipoService.findAll());
+                model.addAttribute("estados", Partido.EstadoPartido.values());
+                return "admin/partido_form";
+            }
+            
+            if (partido.getArbitro() != null && partido.getArbitro().getId() != null) {
+                arbitroService.findById(partido.getArbitro().getId())
+                            .ifPresent(partido::setArbitro);
+            } else {
+                partido.setArbitro(null);
+            }
+            
+            partidoService.crearPartido(partido);
+            redirectAttributes.addFlashAttribute("successMessage", "Partido creado exitosamente");
+            return "redirect:/admin/partidos";
+            
+        } catch (Exception e) {
+            model.addAttribute("errorMessage", "Error al crear el partido: " + e.getMessage());
+            model.addAttribute("partido", partido);
+            model.addAttribute("arbitros", arbitroService.findAll());
+            model.addAttribute("equipos", equipoService.findAll());
+            model.addAttribute("estados", Partido.EstadoPartido.values());
+            return "admin/partido_form";
+        }
 
- @PostMapping("/partidos/save")
-public String guardar(@Valid @ModelAttribute Partido partido,
-                      BindingResult result, Model model) {
-    if (result.hasErrors()) {
-        // Recarga listas para la vista si hay errores
-        model.addAttribute("arbitros", arbitroService.findAll());
-        model.addAttribute("equipos",  equipoService.findAll());
-        model.addAttribute("estados",  Partido.EstadoPartido.values());
-        return "admin/partido_form";
     }
 
     if (partido.getArbitro() != null && partido.getArbitro().getId() != null) {
@@ -616,8 +644,11 @@ public String guardar(@Valid @ModelAttribute Partido partido,
         Partido partido = partidoService.findById(id)
             .orElseThrow(() -> new IllegalArgumentException("Partido no encontrado"));
         model.addAttribute("partido", partido);
-        model.addAttribute("arbitros", arbitroService.findAll());
-        model.addAttribute("equipos", equipoService.findAll());       // <-- necesario
+        // Asegurar que siempre hay listas no nulas
+        List<Arbitro> arbitros = arbitroService.findAll();
+        List<Equipo> equipos = equipoService.findAll();
+        model.addAttribute("arbitros", arbitros != null ? arbitros : new java.util.ArrayList<>());
+        model.addAttribute("equipos", equipos != null ? equipos : new java.util.ArrayList<>());
         model.addAttribute("estados", Partido.EstadoPartido.values());
         return "admin/partido_form";
     }
@@ -645,6 +676,48 @@ public String guardar(@Valid @ModelAttribute Partido partido,
         return "redirect:/admin/partidos";
     }
 
+    @PostMapping("/partidos/update/{id}")
+    public String actualizar(@PathVariable Long id, @ModelAttribute Partido partido, Model model, RedirectAttributes redirectAttributes) {
+        try {
+            // Validar que los equipos sean diferentes
+            if (partido.getEquipoLocal() != null && partido.getEquipoVisitante() != null &&
+                partido.getEquipoLocal().getId().equals(partido.getEquipoVisitante().getId())) {
+                model.addAttribute("errorMessage", "No se puede seleccionar el mismo equipo como local y visitante");
+                model.addAttribute("partido", partido);
+                model.addAttribute("arbitros", arbitroService.findAll());
+                model.addAttribute("equipos", equipoService.findAll());
+                model.addAttribute("estados", Partido.EstadoPartido.values());
+                return "admin/partido_form";
+            }
+            
+            // Verificar que el partido existe
+            if (!partidoService.findById(id).isPresent()) {
+                redirectAttributes.addFlashAttribute("errorMessage", "Partido no encontrado");
+                return "redirect:/admin/partidos";
+            }
+            
+            // Establecer el ID para la actualización
+            partido.setId(id);
+            
+            if (partido.getArbitro() != null && partido.getArbitro().getId() != null) {
+                arbitroService.findById(partido.getArbitro().getId())
+                            .ifPresent(partido::setArbitro);
+            } else {
+                partido.setArbitro(null);
+            }
+            
+            partidoService.crearPartido(partido); // Reutilizar crearPartido que debería manejar tanto crear como actualizar
+            redirectAttributes.addFlashAttribute("successMessage", "Partido actualizado exitosamente");
+            return "redirect:/admin/partidos";
+            
+        } catch (Exception e) {
+            model.addAttribute("errorMessage", "Error al actualizar el partido: " + e.getMessage());
+            model.addAttribute("partido", partido);
+            model.addAttribute("arbitros", arbitroService.findAll());
+            model.addAttribute("equipos", equipoService.findAll());
+            model.addAttribute("estados", Partido.EstadoPartido.values());
+            return "admin/partido_form";
+        }
     @GetMapping("/notificaciones")
     public String notificaciones(Model model){
         model.addAttribute("notificaciones", notificacionService.obtenerNotificacionesAdmin());

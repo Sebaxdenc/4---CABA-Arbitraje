@@ -20,7 +20,6 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -47,7 +46,7 @@ public class Partido {
     
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private EstadoPartido estado = EstadoPartido.PROGRAMADO;
+    private EstadoPartido estado = EstadoPartido.PENDIENTE_CONFIRMACION;
     
     // Relación con el árbitro
     @ManyToOne(fetch = FetchType.EAGER)
