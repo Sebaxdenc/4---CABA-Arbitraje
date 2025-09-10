@@ -349,4 +349,30 @@ public Map<String, Object> getEstadisticasDetalladasByEquipo(String equipo) {
     
     return estadisticas;
 }
+
+/**
+ * Obtener partidos finalizados de un árbitro específico
+ */
+public List<Partido> findPartidosFinalizadosByArbitro(Long arbitroId) {
+    Optional<Arbitro> arbitroOpt = arbitroRepository.findById(arbitroId);
+    if (arbitroOpt.isEmpty()) {
+        return new ArrayList<>();
+    }
+    
+    Arbitro arbitro = arbitroOpt.get();
+    return partidoRepository.findByArbitroAndEstado(arbitro, Partido.EstadoPartido.FINALIZADO);
+}
+
+/**
+ * Obtener partidos finalizados por árbitro y equipo específico
+ */
+public List<Partido> findPartidosFinalizadosByArbitroYEquipo(Long arbitroId, String equipoNombre) {
+    Optional<Arbitro> arbitroOpt = arbitroRepository.findById(arbitroId);
+    if (arbitroOpt.isEmpty()) {
+        return new ArrayList<>();
+    }
+    
+    Arbitro arbitro = arbitroOpt.get();
+    return partidoRepository.findByArbitroAndEstadoAndEquipo(arbitro, Partido.EstadoPartido.FINALIZADO, equipoNombre);
+}
 }

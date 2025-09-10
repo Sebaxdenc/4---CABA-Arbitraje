@@ -140,4 +140,16 @@ public interface PartidoRepository extends JpaRepository<Partido, Long> {
            "p.estado = 'PROGRAMADO' AND p.fecha >= CURRENT_DATE " +
            "ORDER BY p.fecha ASC, p.hora ASC LIMIT 5")
     List<Partido> findProximos5PartidosByEquipo(@Param("equipo") String equipo);
+    
+    // Encontrar partidos finalizados por árbitro
+    @Query("SELECT p FROM Partido p WHERE p.arbitro = :arbitro AND p.estado = :estado ORDER BY p.fecha DESC")
+    List<Partido> findByArbitroAndEstado(@Param("arbitro") Arbitro arbitro, @Param("estado") Partido.EstadoPartido estado);
+    
+    // Encontrar partidos finalizados por árbitro y que involucren un equipo específico
+    @Query("SELECT p FROM Partido p WHERE p.arbitro = :arbitro AND p.estado = :estado " +
+           "AND (p.equipoLocal.nombre = :equipoNombre OR p.equipoVisitante.nombre = :equipoNombre) " +
+           "ORDER BY p.fecha DESC")
+    List<Partido> findByArbitroAndEstadoAndEquipo(@Param("arbitro") Arbitro arbitro, 
+                                                  @Param("estado") Partido.EstadoPartido estado,
+                                                  @Param("equipoNombre") String equipoNombre);
 }

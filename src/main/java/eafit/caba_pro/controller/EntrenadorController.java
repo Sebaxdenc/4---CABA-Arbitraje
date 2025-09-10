@@ -17,8 +17,10 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import jakarta.validation.Valid;
 import java.security.Principal;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/coach")
@@ -126,14 +128,10 @@ public class EntrenadorController {
             
             Entrenador entrenador = entrenadorOpt.get();
             
-            // Obtener partidos finalizados del equipo para poder crear reseñas
-            var partidosFinalizados = partidoService.findPartidosFinalizadosByEquipo(entrenador.getEquipo());
-            
             // Obtener todos los árbitros activos
             var arbitros = arbitroService.findAllActivos();
             
             model.addAttribute("entrenador", entrenador);
-            model.addAttribute("partidosFinalizados", partidosFinalizados);
             model.addAttribute("arbitros", arbitros);
             model.addAttribute("nuevaReseña", new Reseña());
             
@@ -185,8 +183,8 @@ public class EntrenadorController {
                     partido = partidoOpt.get();
                     
                     // Verificar que el partido pertenece al equipo del entrenador
-                    if (!partido.getEquipoLocal().equals(entrenador.getEquipo()) && 
-                        !partido.getEquipoVisitante().equals(entrenador.getEquipo())) {
+                    if (!partido.getEquipoLocal().getNombre().equals(entrenador.getEquipo()) && 
+                        !partido.getEquipoVisitante().getNombre().equals(entrenador.getEquipo())) {
                         redirectAttributes.addFlashAttribute("error", "No puedes crear reseñas para partidos que no involucran a tu equipo");
                         return "redirect:/coach/crear-reseña";
                     }
@@ -202,11 +200,9 @@ public class EntrenadorController {
             
             if (result.hasErrors()) {
                 // Recargar datos para el formulario
-                var partidosFinalizados = partidoService.findPartidosFinalizadosByEquipo(entrenador.getEquipo());
                 var arbitros = arbitroService.findAllActivos();
                 
                 model.addAttribute("entrenador", entrenador);
-                model.addAttribute("partidosFinalizados", partidosFinalizados);
                 model.addAttribute("arbitros", arbitros);
                 
                 return "coach/crear-reseña";
@@ -358,6 +354,53 @@ public class EntrenadorController {
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", "Error al cargar las estadísticas");
             return "redirect:/coach";
+        }
+    }
+    
+    @GetMapping("/api/arbitro/{arbitroId}/partidos-finalizados")
+    @ResponseBody
+    public List<java.util.Map<String, Object>> getPartidosFinalizadosByArbitro(@PathVariable Long arbitroId, Principal principal) {
+        try {
+            // Obtener el entrenador en sesión
+            String username = principal.getName();
+            Optional<Entrenador> entrenadorOpt = entrenadorService.findByUsuarioUsername(username);
+            
+            if (entrenadorOpt.isEmpty()) {
+                return new ArrayList<>();
+            }
+            
+            String equipoEntrenador = entrenadorOpt.get().getEquipo();
+            
+            // Obtener partidos finalizados donde el árbitro arbitró Y el equipo del entrenador participó
+            List<Partido> partidos = partidoService.findPartidosFinalizadosByArbitroYEquipo(arbitroId, equipoEntrenador);
+            
+            // Convertir a mapas simples para evitar problemas de serialización JSON
+            return partidos.stream()
+                    .map(partido -> {
+                        java.util.Map<String, Object> partidoMap = new java.util.HashMap<>();
+                        partidoMap.put("id", partido.getId());
+                        partidoMap.put("fecha", partido.getFecha().toString());
+                        partidoMap.put("hora", partido.getHora().toString());
+                        partidoMap.put("estado", partido.getEstado().toString());
+                        
+                        // Información de equipos
+                        java.util.Map<String, Object> equipoLocal = new java.util.HashMap<>();
+                        equipoLocal.put("id", partido.getEquipoLocal().getId());
+                        equipoLocal.put("nombre", partido.getEquipoLocal().getNombre());
+                        
+                        java.util.Map<String, Object> equipoVisitante = new java.util.HashMap<>();
+                        equipoVisitante.put("id", partido.getEquipoVisitante().getId());
+                        equipoVisitante.put("nombre", partido.getEquipoVisitante().getNombre());
+                        
+                        partidoMap.put("equipoLocal", equipoLocal);
+                        partidoMap.put("equipoVisitante", equipoVisitante);
+                        
+                        return partidoMap;
+                    })
+                    .collect(Collectors.toList());
+        } catch (Exception e) {
+            // En caso de error, devolver lista vacía
+            return new ArrayList<>();
         }
     }
 }

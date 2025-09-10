@@ -135,7 +135,7 @@
                                 <!-- Header de la reseña -->
                                 <div class="flex items-center justify-between mb-3 pb-3 border-b border-gray-100">
                                     <div>
-                                        <h6 class="text-lg font-medium text-gray-900" th:text="${reseña.entrenador?.nombre ?: 'Entrenador Anónimo'}">Nombre del Entrenador</h6>
+                                        <h6 class="text-lg font-medium text-gray-900" th:text="${reseña.entrenador?.nombreCompleto ?: 'Entrenador Anónimo'}">Nombre del Entrenador</h6>
                                         <p class="text-sm text-gray-500" th:text="${reseña.entrenador?.equipo ?: ''}">Equipo</p>
                                     </div>
                                     <div class="text-right">
