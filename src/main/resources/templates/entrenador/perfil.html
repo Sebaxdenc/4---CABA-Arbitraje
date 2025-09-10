@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Perfil - <span th:text="${entrenador.nombreCompleto}"></span></title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body class="bg-gray-100 min-h-screen">
+
+    <div th:replace="~{fragments/CoachFragments/side_bar :: side_bar('perfil')}"></div>
+
+    <!-- Contenido Principal -->
+    <main class="ml-0 md:ml-64 flex flex-col min-h-screen">
+
+        <div th:replace="~{fragments/CoachFragments/up_bar :: up_bar('Mi Perfil', ${entrenador.nombreCompleto})}"></div>
+
+        <!-- Contenido de Mi Perfil -->
+        <div class="flex-1 p-6 space-y-6">
+            
+            <!-- Título de la página -->
+            <div class="mb-6">
+                <h3 class="text-2xl font-semibold text-gray-800">Mi Perfil</h3>
+                <p class="text-gray-600 mt-1">Gestiona tu información personal y profesional</p>
+            </div>
+
+            <!-- Mensajes de éxito/error -->
+            <div th:if="${mensaje}" th:class="${'alert alert-' + (tipoMensaje ?: 'success')} + ' alert-dismissible fade show'" role="alert">
+                <span th:text="${mensaje}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            
+            <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                <span th:text="${error}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+
+            <!-- Contenido del perfil -->
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                
+                <!-- Sección de foto de perfil (opcional) -->
+                <div class="flex items-center mb-6 pb-6 border-b border-gray-200">
+                    <div class="h-20 w-20 rounded-full bg-gray-300 flex items-center justify-center mr-6">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                        </svg>
+                    </div>
+                    <div>
+                        <h4 class="text-xl font-semibold text-gray-800" th:text="${entrenador.nombreCompleto}">Nombre del Coach</h4>
+                        <p class="text-gray-600" th:text="${entrenador.equipoConCategoria}">Equipo - Categoría</p>
+                        <p class="text-sm text-gray-500 mt-1" th:text="${entrenador.nivelExperiencia}">Nivel de experiencia</p>
+                    </div>
+                </div>
+
+                <!-- Formulario de información personal -->
+                <form th:action="@{/coach/perfil}" method="post" th:object="${entrenador}" class="space-y-6">
+                    
+                    <!-- Información Personal (Solo lectura) -->
+                    <div>
+                        <h5 class="text-lg font-medium text-gray-800 mb-4">Información Personal</h5>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <!-- Nombre Completo -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Nombre Completo</label>
+                                <input type="text" 
+                                       th:value="${entrenador.nombreCompleto}"
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-gray-50" 
+                                       readonly>
+                            </div>
+                            
+                            <!-- Cédula -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Cédula</label>
+                                <input type="text" 
+                                       th:value="${entrenador.cedula}"
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-gray-50" 
+                                       readonly>
+                            </div>
+                            
+                            <!-- Teléfono (Editable) -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Teléfono *</label>
+                                <input type="tel" 
+                                       th:field="*{telefono}"
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                                       placeholder="Número de teléfono"
+                                       pattern="[0-9]{10}"
+                                       required>
+                                <div th:if="${#fields.hasErrors('telefono')}" class="text-red-500 text-sm mt-1">
+                                    <span th:errors="*{telefono}"></span>
+                                </div>
+                            </div>
+                            
+                            <!-- Email (Editable) -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Email *</label>
+                                <input type="email" 
+                                       th:field="*{email}"
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                                       placeholder="correo@ejemplo.com"
+                                       required>
+                                <div th:if="${#fields.hasErrors('email')}" class="text-red-500 text-sm mt-1">
+                                    <span th:errors="*{email}"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Información Profesional -->
+                    <div class="border-t border-gray-200 pt-6">
+                        <h5 class="text-lg font-medium text-gray-800 mb-4">Información Profesional</h5>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <!-- Equipo (Solo lectura) -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Equipo</label>
+                                <input type="text" 
+                                       th:value="${entrenador.equipo}"
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-gray-50" 
+                                       readonly>
+                            </div>
+                            
+                            <!-- Categoría (Solo lectura) -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Categoría</label>
+                                <input type="text" 
+                                       th:value="${entrenador.categoria.displayName}"
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-gray-50" 
+                                       readonly>
+                            </div>
+                            
+                            <!-- Experiencia (Editable) -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Años de Experiencia *</label>
+                                <input type="number" 
+                                       th:field="*{experiencia}"
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                                       min="0" max="50" 
+                                       required>
+                                <div th:if="${#fields.hasErrors('experiencia')}" class="text-red-500 text-sm mt-1">
+                                    <span th:errors="*{experiencia}"></span>
+                                </div>
+                            </div>
+                            
+                            <!-- Nivel de Experiencia (Calculado) -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Nivel de Experiencia</label>
+                                <input type="text" 
+                                       th:value="${entrenador.nivelExperiencia}"
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-gray-50" 
+                                       readonly>
+                            </div>
+                        </div>
+                        
+                        <!-- Especialidades (Editable) -->
+                        <div class="mt-6">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Especialidades</label>
+                            <textarea th:field="*{especialidades}"
+                                      class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                                      rows="4"
+                                      placeholder="Describe tus especialidades como entrenador (ej: Técnica individual, Estrategia ofensiva, Preparación física, etc.)"
+                                      maxlength="500"></textarea>
+                            <p class="text-sm text-gray-500 mt-1">Máximo 500 caracteres</p>
+                            <div th:if="${#fields.hasErrors('especialidades')}" class="text-red-500 text-sm mt-1">
+                                <span th:errors="*{especialidades}"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Estadísticas de Rendimiento (Solo lectura) -->
+                    <div class="border-t border-gray-200 pt-6">
+                        <h5 class="text-lg font-medium text-gray-800 mb-4">Estadísticas de Rendimiento</h5>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <!-- Nivel de Experiencia -->
+                            <div class="bg-blue-50 p-4 rounded-lg">
+                                <div class="flex items-center">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-blue-600 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                    <div>
+                                        <p class="text-sm font-medium text-blue-600">Experiencia</p>
+                                        <p class="text-lg font-bold text-blue-900" th:text="${entrenador.experienciaDescripcion}">0 años</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Estado -->
+                            <div class="bg-green-50 p-4 rounded-lg">
+                                <div class="flex items-center">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-green-600 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                    <div>
+                                        <p class="text-sm font-medium text-green-600">Estado</p>
+                                        <p class="text-lg font-bold text-green-900" th:text="${entrenador.activo ? 'Activo' : 'Inactivo'}">Activo</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Categoría -->
+                            <div class="bg-purple-50 p-4 rounded-lg">
+                                <div class="flex items-center">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-purple-600 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                                    </svg>
+                                    <div>
+                                        <p class="text-sm font-medium text-purple-600">Categoría</p>
+                                        <p class="text-lg font-bold text-purple-900" th:text="${entrenador.categoria.displayName}">Categoría</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Botones de acción -->
+                    <div class="border-t border-gray-200 pt-6">
+                        <div class="flex justify-between items-center">
+                            <p class="text-sm text-gray-500">Los campos marcados con * son obligatorios</p>
+                            <div class="flex space-x-4">
+                                <button type="reset" 
+                                        class="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-colors duration-200">
+                                    <i class="fas fa-undo mr-2"></i>
+                                    Restablecer
+                                </button>
+                                <button type="submit" 
+                                        class="px-6 py-2 bg-indigo-600 text-white rounded-lg shadow-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-colors duration-200">
+                                    <i class="fas fa-save mr-2"></i>
+                                    Guardar Cambios
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
