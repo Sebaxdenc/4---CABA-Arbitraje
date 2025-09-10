@@ -20,6 +20,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -106,5 +107,28 @@ public class Partido {
     public boolean tieneArbitro(Arbitro arbitro) {
         return (this.arbitro != null && this.arbitro.getId().equals(arbitro.getId()));
     }
+
+    @Column(name = "goles_local")
+    private Integer golesLocal;
+
+    @Column(name = "goles_visitante")  
+    private Integer golesVisitante;
+
+     // Getters y setters
+public Integer getGolesLocal() {
+    return golesLocal;
+}
+
+public void setGolesLocal(Integer golesLocal) {
+    this.golesLocal = golesLocal;
+}
+
+public Integer getGolesVisitante() {
+    return golesVisitante;
+}
+
+public void setGolesVisitante(Integer golesVisitante) {
+    this.golesVisitante = golesVisitante;
+}
     
 }
