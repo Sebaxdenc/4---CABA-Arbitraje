@@ -56,7 +56,7 @@ INSERT INTO partido (fecha, hora, equipo_local, equipo_visitante, estado, arbitr
 VALUES ('2025-11-05', '18:30', 3, 2, 'PROGRAMADO', 2);
 
 INSERT INTO partido (fecha, hora, equipo_local, equipo_visitante, estado, arbitro_id) 
-VALUES ('2025-09-08', '20:00', 2, 3, 'EN_CURSO', 2);
+VALUES ('2025-09-08', '20:00', 2, 3, 'FINALIZADO', 2);
 
 -- Entrenadores (ajusta el nombre de tabla según sea necesario: entrenador vs entrenadores)
 INSERT INTO entrenadores (nombre_completo, cedula, email, telefono, equipo, experiencia, categoria, activo, fecha_creacion, usuario_id) 
