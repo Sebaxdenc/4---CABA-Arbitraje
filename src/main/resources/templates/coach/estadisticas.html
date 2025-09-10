@@ -33,17 +33,17 @@
                     </div>
                     
                     <div class="bg-white p-6 rounded-lg shadow-md text-center">
-                        <div class="text-3xl font-bold text-green-600 mb-2" th:text="${estadisticas.partidosGanados}">0</div>
+                        <div class="text-3xl font-bold text-green-600 mb-2" th:text="${estadisticas['partidosGanados']}">0</div>
                         <div class="text-gray-600 text-sm font-medium">Victorias</div>
                     </div>
                     
                     <div class="bg-white p-6 rounded-lg shadow-md text-center">
-                        <div class="text-3xl font-bold text-red-600 mb-2" th:text="${estadisticas.partidosPerdidos}">0</div>
+                        <div class="text-3xl font-bold text-red-600 mb-2" th:text="${estadisticas['partidosPerdidos']}">0</div>
                         <div class="text-gray-600 text-sm font-medium">Derrotas</div>
                     </div>
                     
                     <div class="bg-white p-6 rounded-lg shadow-md text-center">
-                        <div class="text-3xl font-bold text-yellow-600 mb-2" th:text="${estadisticas.partidosEmpatados ?: 0}">0</div>
+                        <div class="text-3xl font-bold text-yellow-600 mb-2" th:text="${estadisticas['partidosEmpatados ?: 0']}">0</div>
                         <div class="text-gray-600 text-sm font-medium">Empates</div>
                     </div>
                 </div>
