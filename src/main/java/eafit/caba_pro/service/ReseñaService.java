@@ -2,6 +2,7 @@ package eafit.caba_pro.service;
 
 import eafit.caba_pro.model.Reseña;
 import eafit.caba_pro.model.Arbitro;
+import eafit.caba_pro.model.Partido;
 import eafit.caba_pro.repository.ReseñaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -68,6 +69,11 @@ public class ReseñaService {
         long estrella1 = todasLasReseñas.stream().filter(r -> r.getPuntuacion() == 1).count();
         
         return new ReseñaStats(promedio, total, estrella5, estrella4, estrella3, estrella2, estrella1);
+    }
+    
+    // Método para verificar si ya existe una reseña de un entrenador para un partido específico
+    public List<Reseña> findByArbitroAndPartidoAndEntrenador(Arbitro arbitro, Partido partido, Long entrenadorId) {
+        return reseñaRepository.findByArbitroAndPartidoAndEntrenadorId(arbitro, partido, entrenadorId);
     }
     
     // Clase interna para estadísticas

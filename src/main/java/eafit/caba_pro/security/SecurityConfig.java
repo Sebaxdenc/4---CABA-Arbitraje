@@ -23,7 +23,7 @@ public class SecurityConfig {
             .authorizeHttpRequests(authorize -> authorize
             .requestMatchers("/","/h2-consola/**","/login","/css/**","/js/**","/images/**").permitAll()
             .requestMatchers("/admin/**").hasRole("ADMIN")
-            .requestMatchers("/entrenador/**").hasRole("ENTRENADOR")
+            .requestMatchers("/coach/**").hasRole("ENTRENADOR")
             .requestMatchers("/arbitro/**").hasRole("ARBITRO")
             .anyRequest().authenticated()
             )

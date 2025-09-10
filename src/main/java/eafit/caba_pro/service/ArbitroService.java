@@ -306,6 +306,14 @@ public class ArbitroService {
                 .toList();
     }
 
+    /**
+     * Buscar todos los árbitros activos
+     */
+    public List<Arbitro> findAllActivos() {
+        return arbitroRepository.findAll().stream()
+                .filter(arbitro -> arbitro.getUsuario() != null && arbitro.getUsuario().isActivo())
+                .toList();
+    }
     // ========== MÉTODOS DE DISPONIBILIDAD ==========
 
     /**
