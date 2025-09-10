@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8" />
+  <title th:text="${torneo.id} != null ? 'Editar Torneo' : 'Crear Torneo'">Torneo</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body class="flex bg-gray-100 min-h-screen">
+
+  <aside th:replace="~{admin/sidebar :: sidebar('torneos')}"></aside>
+
+  <div class="flex-1 flex flex-col overflow-x-hidden overflow-y-auto">
+
+    <header th:replace="~{admin/header :: header(${torneo.id != null ? 'Editar Torneo' : 'Crear Torneo'})}"></header>
+
+    <main class="p-6 flex-1">
+      <div class="bg-white p-6 rounded-lg shadow max-w-2xl mx-auto">
+        <h3 class="text-2xl font-semibold text-gray-800 mb-4"
+            th:text="${torneo.id} != null ? 'Editar Torneo' : 'Crear Torneo'">
+          Crear Torneo
+        </h3>
+
+        <div th:if="${errorMessage}" class="mb-4 rounded-md bg-red-50 p-4 text-red-700"
+             th:text="${errorMessage}"></div>
+
+        <form th:action="${torneo.id} != null 
+                    ? @{/admin/torneos/{id}/actualizar(id=${torneo.id})} 
+                    : @{/admin/torneos/guardar}"
+               th:object="${torneo}" method="post" class="space-y-4">
+
+          <input type="hidden" th:if="${_csrf != null}"
+                 th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+
+          <input type="hidden" th:field="*{id}"/>
+
+          <div>
+            <label for="nombre" class="block text-sm font-medium text-gray-700">Nombre *</label>
+            <input id="nombre" th:field="*{nombre}" required autocomplete="off" maxlength="120"
+                   class="mt-1 block w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"/>
+            <p class="mt-1 text-sm text-red-600" th:if="${#fields.hasErrors('nombre')}" th:errors="*{nombre}"></p>
+          </div>
+
+          <div>
+            <label for="sede" class="block text-sm font-medium text-gray-700">Sede</label>
+            <input id="sede" th:field="*{sede}" autocomplete="off" maxlength="120"
+                   placeholder="Ciudad / Dirección"
+                   class="mt-1 block w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"/>
+            <p class="mt-1 text-sm text-red-600" th:if="${#fields.hasErrors('sede')}" th:errors="*{sede}"></p>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label for="fechaInicio" class="block text-sm font-medium text-gray-700">Fecha de inicio</label>
+              <input type="date" id="fechaInicio" th:field="*{fechaInicio}" autocomplete="off"
+                     class="mt-1 block w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                     oninput="document.getElementById('fechaFin').min=this.value"/>
+              <p class="mt-1 text-sm text-red-600" th:if="${#fields.hasErrors('fechaInicio')}" th:errors="*{fechaInicio}"></p>
+            </div>
+            <div>
+              <label for="fechaFin" class="block text-sm font-medium text-gray-700">Fecha de fin</label>
+              <input type="date" id="fechaFin" th:field="*{fechaFin}" autocomplete="off"
+                     class="mt-1 block w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"/>
+              <p class="mt-1 text-sm text-red-600" th:if="${#fields.hasErrors('fechaFin')}" th:errors="*{fechaFin}"></p>
+            </div>
+          </div>
+
+        <div th:if="${torneo.id} == null">
+          <label class="block text-sm font-medium text-gray-700">Partidos del torneo *</label>
+
+          <div th:if="${#lists.isEmpty(partidosSinTorneo)}"
+              class="mb-2 p-3 rounded border border-amber-200 bg-amber-50 text-amber-800">
+            No hay partidos disponibles (PROGRAMADOS y sin torneo).
+          </div>
+
+          <select name="partidoIds" multiple size="6" required
+                  class="mt-1 block w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  th:disabled="${#lists.isEmpty(partidosSinTorneo)}">
+            <option th:each="p : ${partidosSinTorneo}"
+                    th:value="${p.id}"
+                    th:text="${p.equipoLocal.nombre + ' vs ' + p.equipoVisitante.nombre 
+                            + ' - ' + #temporals.format(p.fecha, 'dd/MM/yyyy') 
+                            + ' ' + #temporals.format(p.hora, 'HH:mm')}">
+            </option>
+          </select>
+
+          <p class="mt-1 text-sm text-red-600" th:if="${errorMessage}" th:text="${errorMessage}"></p>
+        </div>
+
+          <div class="flex justify-end space-x-3 pt-2">
+            <a th:href="@{/admin/torneos}" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300">
+              Cancelar
+            </a>
+            <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">
+              Guardar
+            </button>
+          </div>
+        </form>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    const fi = document.getElementById('fechaInicio');
+    const ff = document.getElementById('fechaFin');
+    function validaFechas(){
+      if (fi && ff && fi.value && ff.value && ff.value < fi.value) {
+        ff.setCustomValidity('La fecha de fin no puede ser anterior a la fecha de inicio.');
+      } else {
+        ff.setCustomValidity('');
+      }
+    }
+    if (fi && ff){ fi.addEventListener('input', validaFechas); ff.addEventListener('input', validaFechas); }
+  </script>
+</body>
+</html>

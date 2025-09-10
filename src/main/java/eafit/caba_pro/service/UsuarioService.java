@@ -27,10 +27,11 @@ public class UsuarioService implements UserDetailsService{
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 
-        Usuario usuario = usuarioRepository.findByUsername(username);
-        if (usuario == null) {
-            throw new UsernameNotFoundException("Usuario no encontrado: " + username);
-        }
+        Usuario usuario = usuarioRepository.findByUsername(username)
+            .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado: " + username));
+        
+        // QUITAR la llave } que está aquí
+        
         Set<GrantedAuthority> grantList = new HashSet<>();
         GrantedAuthority grantedAuthority = new SimpleGrantedAuthority(usuario.getRole());
         grantList.add(grantedAuthority);
@@ -49,13 +50,13 @@ public class UsuarioService implements UserDetailsService{
             if (principal instanceof UserDetails) {
                 return ((UserDetails) principal).getUsername();
             } else {
-                return principal.toString(); // For cases where principal isn't UserDetails
+                return principal.toString();
             }
         }
         return null;
     }    
+    
     public void createUsuario(Usuario usuario){
         usuarioRepository.save(usuario);
     }
-
 }

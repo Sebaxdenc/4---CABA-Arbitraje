@@ -253,4 +253,126 @@ public class PartidoService {
         return porcentajes;
     }
 
+    // ========== MÉTODOS ADICIONALES PARA DISPONIBILIDAD ==========
+
+    /**
+     * Buscar partidos por árbitro y estado
+     */
+    public List<Partido> findByArbitroAndEstado(Arbitro arbitro, Partido.EstadoPartido estado) {
+        return partidoRepository.findAll().stream()
+                .filter(partido -> partido.getArbitro() != null && 
+                                 partido.getArbitro().getId().equals(arbitro.getId()) && 
+                                 partido.getEstado() == estado)
+                .toList();
+    }
+
+// ==================== MÉTODOS PARA ENTRENADORES/COACHES ====================
+
+/**
+ * Contar partidos por equipo (como local o visitante)
+ */
+public int countPartidosByEquipo(String equipo) {
+    return partidoRepository.countPartidosByEquipo(equipo);
+}
+
+/**
+ * Contar partidos ganados por un equipo
+ */
+public int countPartidosGanadosByEquipo(String equipo) {
+    return partidoRepository.countPartidosGanadosByEquipo(equipo);
+}
+
+/**
+ * Contar partidos perdidos por un equipo
+ */
+public int countPartidosPerdidosByEquipo(String equipo) {
+    return partidoRepository.countPartidosPerdidosByEquipo(equipo);
+}
+
+/**
+ * Contar partidos empatados por un equipo
+ */
+public int countPartidosEmpatadosByEquipo(String equipo) {
+    return partidoRepository.countPartidosEmpatadosByEquipo(equipo);
+}
+
+/**
+ * Obtener partidos programados de un equipo
+ */
+public List<Partido> findPartidosProgramadosByEquipo(String equipo) {
+    return partidoRepository.findPartidosProgramadosByEquipo(equipo);
+}
+
+/**
+ * Obtener partidos finalizados de un equipo
+ */
+public List<Partido> findPartidosFinalizadosByEquipo(String equipo) {
+    return partidoRepository.findPartidosFinalizadosByEquipo(equipo);
+}
+
+/**
+ * Obtener últimos 5 partidos de un equipo
+ */
+public List<Partido> findUltimos5PartidosByEquipo(String equipo) {
+    return partidoRepository.findUltimos5PartidosByEquipo(equipo);
+}
+
+/**
+ * Obtener próximos 5 partidos de un equipo
+ */
+public List<Partido> findProximos5PartidosByEquipo(String equipo) {
+    return partidoRepository.findProximos5PartidosByEquipo(equipo);
+}
+
+/**
+ * Obtener estadísticas detalladas de un equipo
+ */
+public Map<String, Object> getEstadisticasDetalladasByEquipo(String equipo) {
+    Map<String, Object> estadisticas = new HashMap<>();
+    
+    int totalPartidos = countPartidosByEquipo(equipo);
+    int ganados = countPartidosGanadosByEquipo(equipo);
+    int perdidos = countPartidosPerdidosByEquipo(equipo);
+    int empatados = countPartidosEmpatadosByEquipo(equipo);
+    
+    double porcentajeVictorias = totalPartidos > 0 ? (ganados * 100.0 / totalPartidos) : 0;
+    double porcentajeDerrotas = totalPartidos > 0 ? (perdidos * 100.0 / totalPartidos) : 0;
+    double porcentajeEmpates = totalPartidos > 0 ? (empatados * 100.0 / totalPartidos) : 0;
+    
+    estadisticas.put("totalPartidos", totalPartidos);
+    estadisticas.put("partidosGanados", ganados);
+    estadisticas.put("partidosPerdidos", perdidos);
+    estadisticas.put("partidosEmpatados", empatados);
+    estadisticas.put("porcentajeVictorias", porcentajeVictorias);
+    estadisticas.put("porcentajeDerrotas", porcentajeDerrotas);
+    estadisticas.put("porcentajeEmpates", porcentajeEmpates);
+    
+    return estadisticas;
+}
+
+/**
+ * Obtener partidos finalizados de un árbitro específico
+ */
+public List<Partido> findPartidosFinalizadosByArbitro(Long arbitroId) {
+    Optional<Arbitro> arbitroOpt = arbitroRepository.findById(arbitroId);
+    if (arbitroOpt.isEmpty()) {
+        return new ArrayList<>();
+    }
+    
+    Arbitro arbitro = arbitroOpt.get();
+    return partidoRepository.findByArbitroAndEstado(arbitro, Partido.EstadoPartido.FINALIZADO);
+}
+
+/**
+ * Obtener partidos finalizados por árbitro y equipo específico
+ */
+public List<Partido> findPartidosFinalizadosByArbitroYEquipo(Long arbitroId, String equipoNombre) {
+    Optional<Arbitro> arbitroOpt = arbitroRepository.findById(arbitroId);
+    if (arbitroOpt.isEmpty()) {
+        return new ArrayList<>();
+    }
+    
+    Arbitro arbitro = arbitroOpt.get();
+    return partidoRepository.findByArbitroAndEstadoAndEquipo(arbitro, Partido.EstadoPartido.FINALIZADO, equipoNombre);
+}
 }

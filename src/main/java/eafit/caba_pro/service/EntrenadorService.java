@@ -1,11 +1,16 @@
 package eafit.caba_pro.service;
 
 import eafit.caba_pro.model.Entrenador;
+import eafit.caba_pro.model.Usuario;
+import eafit.caba_pro.model.Reseña;
 import eafit.caba_pro.repository.EntrenadorRepository;
+import eafit.caba_pro.repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import eafit.caba_pro.repository.ReseñaRepository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -19,170 +24,264 @@ public class EntrenadorService {
         this.entrenadorRepository=entrenadorRepository;
     }
     
+    @Autowired
+    private UsuarioRepository usuarioRepository;
+
+    @Autowired
+    private ReseñaRepository reseñaRepository;
+
     /**
-     * Obtener todos los entrenadores
+     * Métodos básicos CRUD
      */
     public List<Entrenador> findAll() {
         return entrenadorRepository.findAll();
     }
-    
-    /**
-     * Obtener todos los entrenadores activos
-     */
+
     public List<Entrenador> findAllActive() {
         return entrenadorRepository.findByActivoTrue();
     }
-    
-    /**
-     * Buscar entrenador por ID
-     */
+
     public Optional<Entrenador> findById(Long id) {
         return entrenadorRepository.findById(id);
     }
-    
-    /**
-     * Buscar entrenador por documento
-     */
-    public Optional<Entrenador> findByDocumento(String documento) {
-        return entrenadorRepository.findByDocumento(documento);
-    }
-    
-    /**
-     * Buscar entrenador por email
-     */
-    public Optional<Entrenador> findByEmail(String email) {
-        return entrenadorRepository.findByEmail(email);
-    }
-    
-    /**
-     * Guardar un entrenador (crear o actualizar)
-     */
+
     public Entrenador save(Entrenador entrenador) {
-        // Validaciones adicionales antes de guardar
-        validateEntrenador(entrenador);
+        if (entrenador.getId() == null) {
+            entrenador.setFechaCreacion(LocalDateTime.now());
+        }
+        entrenador.setFechaActualizacion(LocalDateTime.now());
         return entrenadorRepository.save(entrenador);
     }
-    
+
+    public boolean deleteById(Long id) {
+        try {
+            Optional<Entrenador> entrenadorOpt = entrenadorRepository.findById(id);
+            if (entrenadorOpt.isPresent()) {
+                Entrenador entrenador = entrenadorOpt.get();
+                entrenador.setActivo(false); // Soft delete
+                entrenador.setFechaActualizacion(LocalDateTime.now());
+                entrenadorRepository.save(entrenador);
+                return true;
+            }
+            return false;
+        } catch (Exception e) {
+            throw new RuntimeException("Error al eliminar entrenador: " + e.getMessage());
+        }
+    }
+
     /**
-     * Eliminar entrenador por ID (eliminación lógica)
+     * Métodos de búsqueda específicos
      */
-    public void deleteById(Long id) {
+    public List<Entrenador> findByNombreCompleto(String nombre) {
+        return entrenadorRepository.findByNombreCompletoContainingIgnoreCaseAndActivoTrue(nombre);
+    }
+
+    public List<Entrenador> findByEquipo(String equipo) {
+        return entrenadorRepository.findByEquipoContainingIgnoreCaseAndActivoTrue(equipo);
+    }
+
+    public List<Entrenador> findByCategoria(Entrenador.Categoria categoria) {
+        return entrenadorRepository.findByCategoriaAndActivoTrue(categoria);
+    }
+
+    public Optional<Entrenador> findByUsuarioUsername(String username) {
+        return entrenadorRepository.findByUsuario_UsernameAndActivoTrue(username);
+    }
+
+    public Optional<Entrenador> findByCedula(String cedula) {
+        return entrenadorRepository.findByCedulaAndActivoTrue(cedula);
+    }
+
+    public Optional<Entrenador> findByEmail(String email) {
+        return entrenadorRepository.findByEmailAndActivoTrue(email);
+    }
+
+    /**
+     * Métodos de validación
+     */
+    public boolean existsByCedula(String cedula) {
+        return entrenadorRepository.existsByCedulaAndActivoTrue(cedula);
+    }
+
+    public boolean existsByEmail(String email) {
+        return entrenadorRepository.existsByEmailAndActivoTrue(email);
+    }
+
+    public boolean existsByUsuarioUsername(String username) {
+        return entrenadorRepository.existsByUsuario_UsernameAndActivoTrue(username);
+    }
+
+    /**
+     * Métodos de conteo
+     */
+    public long count() {
+        return entrenadorRepository.count();
+    }
+
+    public long countActive() {
+        return entrenadorRepository.countByActivoTrue();
+    }
+
+    public long countByCategoria(Entrenador.Categoria categoria) {
+        return entrenadorRepository.countByCategoriaAndActivoTrue(categoria);
+    }
+
+    /**
+     * Crear entrenador con usuario asociado (para admin)
+     */
+    public Entrenador createCoachWithUser(Entrenador entrenador) {
+        try {
+            // Validar que no exista la cédula
+            if (existsByCedula(entrenador.getCedula())) {
+                throw new RuntimeException("Ya existe un entrenador con la cédula: " + entrenador.getCedula());
+            }
+
+            // Validar que no exista el email
+            if (existsByEmail(entrenador.getEmail())) {
+                throw new RuntimeException("Ya existe un entrenador con el email: " + entrenador.getEmail());
+            }
+
+            // Crear usuario para el entrenador
+            Usuario usuario = new Usuario();
+            usuario.setUsername(entrenador.getCedula()); // Username = cédula
+            usuario.setEmail(entrenador.getEmail());
+            usuario.setPassword(entrenador.getCedula()); // Password inicial = cédula
+            usuario.setRole("COACH");
+            usuario.setActivo(true);
+            usuario.setFechaCreacion(LocalDateTime.now());
+            
+            // Guardar usuario
+            Usuario savedUsuario = usuarioRepository.save(usuario);
+
+            // Asociar usuario al entrenador
+            entrenador.setUsuario(savedUsuario);
+            entrenador.setActivo(true);
+            entrenador.setFechaCreacion(LocalDateTime.now());
+            entrenador.setFechaActualizacion(LocalDateTime.now());
+
+            return entrenadorRepository.save(entrenador);
+
+        } catch (Exception e) {
+            throw new RuntimeException("Error al crear entrenador con usuario: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Actualizar entrenador (preservando usuario)
+     */
+    public Entrenador updateCoach(Entrenador entrenadorActualizado) {
+        try {
+            Optional<Entrenador> existingOpt = entrenadorRepository.findById(entrenadorActualizado.getId());
+            
+            if (existingOpt.isEmpty()) {
+                throw new RuntimeException("Entrenador no encontrado");
+            }
+
+            Entrenador existing = existingOpt.get();
+            
+            // Actualizar campos (preservando usuario y fechas)
+            existing.setNombreCompleto(entrenadorActualizado.getNombreCompleto());
+            existing.setCedula(entrenadorActualizado.getCedula());
+            existing.setTelefono(entrenadorActualizado.getTelefono());
+            existing.setEmail(entrenadorActualizado.getEmail());
+            existing.setEquipo(entrenadorActualizado.getEquipo());
+            existing.setCategoria(entrenadorActualizado.getCategoria());
+            existing.setExperiencia(entrenadorActualizado.getExperiencia());
+            existing.setEspecialidades(entrenadorActualizado.getEspecialidades());
+            existing.setFechaActualizacion(LocalDateTime.now());
+
+            // Actualizar email del usuario si cambió
+            if (existing.getUsuario() != null && 
+                !existing.getUsuario().getEmail().equals(entrenadorActualizado.getEmail())) {
+                existing.getUsuario().setEmail(entrenadorActualizado.getEmail());
+                usuarioRepository.save(existing.getUsuario());
+            }
+
+            return entrenadorRepository.save(existing);
+
+        } catch (Exception e) {
+            throw new RuntimeException("Error al actualizar entrenador: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Métodos para reseñas
+     */
+public List<Reseña> findReseñasByEntrenador(Long entrenadorId) {
+    return reseñaRepository.findByEntrenador_IdOrderByFechaCreacionDesc(entrenadorId);
+}
+
+public double getPromedioCalificaciones(Long entrenadorId) {
+    Double promedio = reseñaRepository.findPromedioCalificacionByEntrenador(entrenadorId);
+    return promedio != null ? promedio : 0.0;
+}
+
+    /**
+     * Métodos adicionales para estadísticas
+     */
+    public List<Entrenador> findTop5ByCategoria(Entrenador.Categoria categoria) {
+        return entrenadorRepository.findTop5ByCategoriaAndActivoTrueOrderByFechaCreacionDesc(categoria);
+    }
+
+    public List<Entrenador> findEntrenadoresConMasExperiencia() {
+        return entrenadorRepository.findByActivoTrueOrderByExperienciaDesc();
+    }
+
+    public List<Entrenador> findRecentlyCreated() {
+        LocalDateTime unMesAtras = LocalDateTime.now().minusMonths(1);
+        return entrenadorRepository.findByActivoTrueAndFechaCreacionAfterOrderByFechaCreacionDesc(unMesAtras);
+    }
+
+    /**
+     * Cambiar estado de activación
+     */
+    public void activateCoach(Long id) {
+        Optional<Entrenador> entrenadorOpt = entrenadorRepository.findById(id);
+        if (entrenadorOpt.isPresent()) {
+            Entrenador entrenador = entrenadorOpt.get();
+            entrenador.setActivo(true);
+            entrenador.setFechaActualizacion(LocalDateTime.now());
+            entrenadorRepository.save(entrenador);
+        }
+    }
+
+    public void deactivateCoach(Long id) {
         Optional<Entrenador> entrenadorOpt = entrenadorRepository.findById(id);
         if (entrenadorOpt.isPresent()) {
             Entrenador entrenador = entrenadorOpt.get();
             entrenador.setActivo(false);
+            entrenador.setFechaActualizacion(LocalDateTime.now());
             entrenadorRepository.save(entrenador);
-        } else {
-            throw new RuntimeException("Entrenador con ID " + id + " no encontrado");
         }
     }
-    
+
     /**
-     * Eliminar entrenador definitivamente
+     * Resetear contraseña de un coach
      */
-    public void hardDeleteById(Long id) {
-        if (entrenadorRepository.existsById(id)) {
-            entrenadorRepository.deleteById(id);
-        } else {
-            throw new RuntimeException("Entrenador con ID " + id + " no encontrado");
-        }
-    }
-    
-    /**
-     * Buscar entrenadores por equipo
-     */
-    public List<Entrenador> findByEquipo(String equipo) {
-        return entrenadorRepository.findByEquipoContainingIgnoreCase(equipo);
-    }
-    
-    /**
-     * Buscar entrenadores por categoría
-     */
-    public List<Entrenador> findByCategoria(Entrenador.Categoria categoria) {
-        return entrenadorRepository.findByCategoria(categoria);
-    }
-    
-    /**
-     * Buscar entrenadores con experiencia mínima
-     */
-    public List<Entrenador> findEntrenadoresWithExperience(Integer minExperience) {
-        return entrenadorRepository.findEntrenadoresWithExperience(minExperience);
-    }
-    
-    /**
-     * Buscar entrenadores por nombre completo
-     */
-    public List<Entrenador> findByNombreCompleto(String nombreCompleto) {
-        return entrenadorRepository.findByNombreCompletoContaining(nombreCompleto);
-    }
-    
-    /**
-     * Contar entrenadores activos
-     */
-    public long countActiveEntrenadores() {
-        return entrenadorRepository.countByActivoTrue();
-    }
-    
-    /**
-     * Contar entrenadores por equipo
-     */
-    public long countByEquipo(String equipo) {
-        return entrenadorRepository.countByEquipo(equipo);
-    }
-    
-    /**
-     * Activar/Desactivar entrenador
-     */
-    public void toggleEntrenadorStatus(Long id) {
-        Optional<Entrenador> entrenadorOpt = entrenadorRepository.findById(id);
+    public void resetPassword(Long entrenadorId) {
+        Optional<Entrenador> entrenadorOpt = entrenadorRepository.findById(entrenadorId);
         if (entrenadorOpt.isPresent()) {
             Entrenador entrenador = entrenadorOpt.get();
-            entrenador.setActivo(!entrenador.getActivo());
-            entrenadorRepository.save(entrenador);
-        } else {
-            throw new RuntimeException("Entrenador con ID " + id + " no encontrado");
-        }
-    }
-    
-    /**
-     * Validaciones de negocio para entrenador
-     */
-    private void validateEntrenador(Entrenador entrenador) {
-        // Verificar que el documento no esté duplicado
-        if (entrenador.getId() == null) {
-            // Es un entrenador nuevo
-            if (entrenadorRepository.findByDocumento(entrenador.getDocumento()).isPresent()) {
-                throw new RuntimeException("Ya existe un entrenador con el documento: " + entrenador.getDocumento());
-            }
-        } else {
-            // Es un entrenador existente, verificar solo si cambió el documento
-            Optional<Entrenador> existingEntrenador = entrenadorRepository.findById(entrenador.getId());
-            if (existingEntrenador.isPresent() && 
-                !existingEntrenador.get().getDocumento().equals(entrenador.getDocumento()) &&
-                entrenadorRepository.findByDocumento(entrenador.getDocumento()).isPresent()) {
-                throw new RuntimeException("Ya existe un entrenador con el documento: " + entrenador.getDocumento());
-            }
-        }
-        
-        // Verificar que el email no esté duplicado
-        if (entrenador.getId() == null) {
-            if (entrenadorRepository.findByEmail(entrenador.getEmail()).isPresent()) {
-                throw new RuntimeException("Ya existe un entrenador con el email: " + entrenador.getEmail());
-            }
-        } else {
-            Optional<Entrenador> existingEntrenador = entrenadorRepository.findById(entrenador.getId());
-            if (existingEntrenador.isPresent() && 
-                !existingEntrenador.get().getEmail().equals(entrenador.getEmail()) &&
-                entrenadorRepository.findByEmail(entrenador.getEmail()).isPresent()) {
-                throw new RuntimeException("Ya existe un entrenador con el email: " + entrenador.getEmail());
+            if (entrenador.getUsuario() != null) {
+                Usuario usuario = entrenador.getUsuario();
+                usuario.setPassword(entrenador.getCedula()); // Reset a la cédula
+                usuarioRepository.save(usuario);
             }
         }
     }
-    
+
     /**
-     * Verificar si existe un entrenador
+     * Buscar entrenadores por múltiples criterios
      */
-    public boolean existsById(Long id) {
-        return entrenadorRepository.existsById(id);
+    public List<Entrenador> findByCriteria(String nombre, String equipo, Entrenador.Categoria categoria) {
+        if (nombre != null && !nombre.trim().isEmpty()) {
+            return findByNombreCompleto(nombre);
+        } else if (equipo != null && !equipo.trim().isEmpty()) {
+            return findByEquipo(equipo);
+        } else if (categoria != null) {
+            return findByCategoria(categoria);
+        } else {
+            return findAllActive();
+        }
     }
 }

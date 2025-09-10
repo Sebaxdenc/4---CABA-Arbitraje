@@ -4,8 +4,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
 
@@ -21,9 +19,9 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception{
         http
             .authorizeHttpRequests(authorize -> authorize
-            .requestMatchers("/","/h2-consola/**","/login").permitAll()
+            .requestMatchers("/","/h2-consola/**","/login","/css/**","/js/**","/images/**").permitAll()
             .requestMatchers("/admin/**").hasRole("ADMIN")
-            .requestMatchers("/entrenador/**").hasRole("ENTRENADOR")
+            .requestMatchers("/coach/**").hasRole("ENTRENADOR")
             .requestMatchers("/arbitro/**").hasRole("ARBITRO")
             .anyRequest().authenticated()
             )
@@ -32,8 +30,20 @@ public class SecurityConfig {
                 .maxSessionsPreventsLogin(true)
             )
             .formLogin(form -> form
-            .successHandler(loginSuccesHandler)
-            .permitAll()
+                .loginPage("/login")
+                .loginProcessingUrl("/login")
+                .usernameParameter("username")
+                .passwordParameter("password")
+                .successHandler(loginSuccesHandler)
+                .failureUrl("/login?error=true")
+                .permitAll()
+            )
+            .logout(logout -> logout
+                .logoutUrl("/logout")
+                .logoutSuccessUrl("/login?logout=true")
+                .invalidateHttpSession(true)
+                .deleteCookies("JSESSIONID")
+                .permitAll()
             )
             .csrf((csrf) -> csrf.disable()) // Nota: en producción, mantener CSRF habilitado y configurar adecuadamente.
             // Permitir frames (necesario para la consola H2)
@@ -43,7 +53,7 @@ public class SecurityConfig {
 
     //@Bean
     //public PasswordEncoder passwordEncoder() {
-    //    return new BCryptPasswordEncoder();
+    //return new BCryptPasswordEncoder();
     //}
 
 

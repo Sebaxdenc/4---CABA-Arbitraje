@@ -1,6 +1,5 @@
 package eafit.caba_pro.controller;
 import java.time.YearMonth;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -8,13 +7,16 @@ import java.util.Optional;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import eafit.caba_pro.model.Arbitro;
 import eafit.caba_pro.model.Liquidacion;
@@ -56,7 +58,6 @@ public class ArbitroController {
     @GetMapping
     public String dashboard(Model model){
         Optional<Arbitro> arbitro = arbitroService.findByUsername(usuarioService.getCurrentUsername());
-
         if (arbitro.isPresent()) {
             model.addAttribute("titulo", "Dashboard");
             model.addAttribute("nombre", arbitro.get().getNombre());
@@ -186,14 +187,61 @@ public class ArbitroController {
         return "arbitro/partidos";
     }
 
-    @GetMapping("/liquidaciones")
+  @GetMapping("/liquidaciones")
     public String liquidaciones(Model model) {
         Optional<Arbitro> arbitroOpt = arbitroService.findByUsername(usuarioService.getCurrentUsername());
 
         if (!arbitroOpt.isPresent()) {
             return "redirect:/arbitros";
-        }
+    // ========== ENDPOINTS DE DISPONIBILIDAD ==========
+
+    @GetMapping("/disponibilidad")
+    public String mostrarDisponibilidad(Model model, Authentication authentication) {
+        // Obtener el árbitro autenticado
+        String username = authentication.getName();
+        Optional<Arbitro> arbitroOpt = arbitroService.findByUsername(username);
         
+        if (arbitroOpt.isEmpty()) {
+            model.addAttribute("errorMessage", "No se encontró el árbitro autenticado");
+            return "redirect:/login";
+        }
+
+        Arbitro arbitro = arbitroOpt.get();
+
+        // Obtener partidos pendientes de confirmación para este árbitro
+        List<Partido> partidosPendientes = partidoService.findByArbitroAndEstado(
+            arbitro, Partido.EstadoPartido.PENDIENTE_CONFIRMACION);
+
+        // Obtener todos los árbitros disponibles (excepto el actual) para reasignación
+        List<Arbitro> arbitrosDisponibles = arbitroService.findAllExcept(arbitro.getId());
+
+        model.addAttribute("arbitro", arbitro);
+        model.addAttribute("partidosPendientes", partidosPendientes);
+        model.addAttribute("arbitrosDisponibles", arbitrosDisponibles);
+
+        return "arbitro/disponibilidad";
+    }
+
+    @PostMapping("/disponibilidad/confirmar")
+    public String confirmarDisponibilidad(@RequestParam("partidoId") Long partidoId,
+                                        Authentication authentication,
+                                        RedirectAttributes redirectAttributes) {
+        String username = authentication.getName();
+        String resultado = arbitroService.confirmarDisponibilidad(partidoId, username);
+        if (resultado.startsWith("SUCCESS:")) {
+            redirectAttributes.addFlashAttribute("successMessage", resultado.substring(8));
+        } else {
+            redirectAttributes.addFlashAttribute("errorMessage", resultado);
+        }
+
+        return "redirect:/arbitro/disponibilidad";
+    }
+        
+
+    @GetMapping("/liquidaciones/{id}")
+    public ResponseEntity<byte[]> generarPdf(@PathVariable Long id) {
+        Liquidacion liq = liquidacionService.obtenerPorId(id);
+        byte[] pdf = pdfGeneratorService.generarPdfDesdeLiquidacion(liq);
         Arbitro arbitro = arbitroOpt.get();
 
         List<Liquidacion> liquidaciones = liquidacionService.obtenerLiquidacionesPorArbitro(arbitro.getId());
@@ -202,10 +250,39 @@ public class ArbitroController {
         return "arbitro/liquidaciones";
     }
 
-    @GetMapping("/liquidaciones/{id}")
-    public ResponseEntity<byte[]> generarPdf(@PathVariable Long id) {
-        Liquidacion liq = liquidacionService.obtenerPorId(id);
-        byte[] pdf = pdfGeneratorService.generarPdfDesdeLiquidacion(liq);
+
+    @PostMapping("/disponibilidad/rechazar")
+    public String rechazarYReasignar(@RequestParam("partidoId") Long partidoId,
+                                   @RequestParam("nuevoArbitroId") Long nuevoArbitroId,
+                                   Authentication authentication,
+                                   RedirectAttributes redirectAttributes) {
+        String username = authentication.getName();
+        String resultado = arbitroService.reasignarPartido(partidoId, nuevoArbitroId, username);
+        
+        if (resultado.startsWith("SUCCESS:")) {
+            redirectAttributes.addFlashAttribute("successMessage", resultado.substring(8));
+        } else {
+            redirectAttributes.addFlashAttribute("errorMessage", resultado);
+        }
+
+        return "redirect:/arbitro/disponibilidad";
+    }
+
+    @PostMapping("/disponibilidad/no-disponible")
+    public String marcarNoDisponible(@RequestParam("partidoId") Long partidoId,
+                                   Authentication authentication,
+                                   RedirectAttributes redirectAttributes) {
+        String username = authentication.getName();
+        String resultado = arbitroService.marcarNoDisponible(partidoId, username);
+        
+        if (resultado.startsWith("SUCCESS:")) {
+            redirectAttributes.addFlashAttribute("successMessage", resultado.substring(8));
+        } else {
+            redirectAttributes.addFlashAttribute("errorMessage", resultado);
+        }
+
+        return "redirect:/arbitro/disponibilidad";
+    }
 
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=liquidacion-" + id + ".pdf")

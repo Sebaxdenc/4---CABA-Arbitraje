@@ -1,17 +1,17 @@
-INSERT INTO usuario(username, password, role)
-VALUES ('user1','{noop}1234','ROLE_ADMIN');
+INSERT INTO usuarios(username, password, role, email, activo) 
+VALUES ('user1', '{noop}1234', 'ROLE_ADMIN', 'admin@test.com', true);
 
-INSERT INTO usuario(username, password, role)
-VALUES ('user2','{noop}1234','ROLE_ARBITRO');
+INSERT INTO usuarios(username, password, role, email, activo) 
+VALUES ('user2', '{noop}1234', 'ROLE_ARBITRO', 'arbitro@test.com', true);
 
-INSERT INTO usuario(username, password, role)
-VALUES ('user3','{noop}1234','ROLE_ENTRENADOR');
+INSERT INTO usuarios(username, password, role, email, activo) 
+VALUES ('user3', '{noop}1234', 'ROLE_ENTRENADOR', 'entrenador@test.com', true);
 
-INSERT INTO usuario(username, password, role)
-VALUES ('sebastian.medina','{noop}arbitro123','ROLE_ARBITRO');
+INSERT INTO usuarios(username, password, role, email, activo) 
+VALUES ('sebastian.medina', '{noop}arbitro123', 'ROLE_ARBITRO', 'sebas@test.com', true);
 
-INSERT INTO usuario(username, password, role)
-VALUES ('paula.lp','{noop}arbitro1234','ROLE_ARBITRO');
+INSERT INTO usuarios(username, password, role, email, activo) 
+VALUES ('paula.lp', '{noop}arbitro1234', 'ROLE_ARBITRO', 'pau@test.com', true);
 
 -- Escalafones disponibles
 INSERT INTO escalafon (nombre, honorario_base) 
@@ -31,23 +31,22 @@ INSERT INTO arbitro (nombre, contraseña, username, cedula, phone, speciality, p
 VALUES ('Sebastian Medina', '{noop}arbitro123', 'sebastian.medina', '1058198772', '3222469936', 'Campo', NULL, NULL, NULL, 4, 1);
 
 -- Equipos
-INSERT INTO equipo(nombre, estado, ciudad, fundacion,logo)
-VALUES ('Lakers',true,'Los Angeles',1947,'https://images.seeklogo.com/logo-png/21/2/los-angeles-lakers-logo-png_seeklogo-216335.png');
+INSERT INTO equipo(nombre, estado, ciudad, fundacion, logo)
+VALUES ('Lakers', true, 'Los Angeles', 1947, 'https://images.seeklogo.com/logo-png/21/2/los-angeles-lakers-logo-png_seeklogo-216335.png');
 
-INSERT INTO equipo(nombre, estado, ciudad, fundacion,logo)
-VALUES ('Chicago Bulls',true, 'Illinois',1996,'https://www.citypng.com/public/uploads/preview/hd-chicago-bulls-vector-logo-png-701751694711025arhvkh69nh.png');
+INSERT INTO equipo(nombre, estado, ciudad, fundacion, logo)
+VALUES ('Chicago Bulls', true, 'Illinois', 1996, 'https://www.citypng.com/public/uploads/preview/hd-chicago-bulls-vector-logo-png-701751694711025arhvkh69nh.png');
 
-INSERT INTO equipo(nombre, estado, ciudad, fundacion,logo)
-VALUES ('Paisitas',false,'Medellin',2025,'https://static.wikia.nocookie.net/logopedia/images/b/b4/Atl%C3%A9tico_Nacional_1.png');
+INSERT INTO equipo(nombre, estado, ciudad, fundacion, logo)
+VALUES ('Paisitas', false, 'Medellin', 2025, 'https://static.wikia.nocookie.net/logopedia/images/b/b4/Atl%C3%A9tico_Nacional_1.png');
 
--- Partidos para sebastian medina 
+-- Partidos para Sebastian Medina (arbitro_id = 2, porque es el segundo árbitro insertado)
 INSERT INTO partido (fecha, hora, equipo_local, equipo_visitante, estado, arbitro_id) 
 VALUES ('2025-10-05', '15:00', 1, 2, 'PROGRAMADO', 2);
 
 INSERT INTO partido (fecha, hora, equipo_local, equipo_visitante, estado, arbitro_id) 
 VALUES ('2025-10-11', '18:00', 1, 3, 'PROGRAMADO', 2);
 
--- Más partidos para Sebastian Medina (mezclando pasados y futuros)
 INSERT INTO partido (fecha, hora, equipo_local, equipo_visitante, estado, arbitro_id) 
 VALUES ('2025-08-15', '16:00', 2, 3, 'FINALIZADO', 2);
 
@@ -64,17 +63,17 @@ INSERT INTO partido (fecha, hora, equipo_local, equipo_visitante, estado, arbitr
 VALUES ('2025-11-05', '18:30', 3, 2, 'PROGRAMADO', 2);
 
 INSERT INTO partido (fecha, hora, equipo_local, equipo_visitante, estado, arbitro_id) 
-VALUES ('2025-09-08', '20:00', 2, 3, 'EN_CURSO', 2);
+VALUES ('2025-09-08', '20:00', 2, 3, 'FINALIZADO', 2);
 
--- entrenador para las reseñas
-INSERT INTO entrenador (nombre, apellidos, documento, email, telefono, equipo, anos_experiencia, categoria, activo) 
-VALUES ('Carlos', 'Rodriguez', '12345678', 'carlos.rodriguez@email.com', '3101234567', 'Lakers', 5, 'PROFESIONAL', true);
+-- Entrenadores (ajusta el nombre de tabla según sea necesario: entrenador vs entrenadores)
+INSERT INTO entrenadores (nombre_completo, cedula, email, telefono, equipo, experiencia, categoria, activo, fecha_creacion, usuario_id) 
+VALUES ('Carlos Rodriguez', '12345678', 'carlos.rodriguez@email.com', '3101234567', 'Lakers', 5, 'PROFESIONAL', true, CURRENT_TIMESTAMP, NULL);
 
-INSERT INTO entrenador (nombre, apellidos, documento, email, telefono, equipo, anos_experiencia, categoria, activo) 
-VALUES ('Ana', 'Martinez', '87654321', 'ana.martinez@email.com', '3207654321', 'Chicago Bulls', 8, 'PROFESIONAL', true);
+INSERT INTO entrenadores (nombre_completo, cedula, email, telefono, equipo, experiencia, categoria, activo, fecha_creacion, usuario_id) 
+VALUES ('Sara López', '87654321', 'sara.lopez@email.com', '3101234568', 'Chicago Bulls', 5, 'PROFESIONAL', true, CURRENT_TIMESTAMP, 6);
 
-INSERT INTO entrenador (nombre, apellidos, documento, email, telefono, equipo, anos_experiencia, categoria, activo) 
-VALUES ('Luis', 'Fernandez', '11223344', 'luis.fernandez@email.com', '3156789012', 'Paisitas', 3, 'MAYOR', true);
+INSERT INTO entrenadores (nombre_completo, cedula, email, telefono, equipo, experiencia, categoria, activo, fecha_creacion, usuario_id) 
+VALUES ('Nicolás Ospina', '11223344', 'nicolas.ospina@email.com', '3101234569', 'Paisitas', 5, 'PROFESIONAL', true, CURRENT_TIMESTAMP, NULL);
 
 -- Reseñas para Sebastian Medina
 INSERT INTO reseña (puntuacion, descripcion, fecha_creacion, arbitro_id, entrenador_id, partido_id) 

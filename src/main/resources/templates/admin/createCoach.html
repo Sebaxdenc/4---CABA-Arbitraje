@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8" />
+  <title>Crear Entrenador</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body class="bg-gray-100 min-h-screen flex">
+  <aside th:replace="~{admin/sidebar :: sidebar('arbitros')}"></aside>
+
+  <div class="flex-1 flex flex-col overflow-x-hidden overflow-y-auto">
+    <header th:replace="~{admin/header :: header('Crear Árbitro')}"></header>
+
+    <main class="p-6 flex-1">
+      <div class="bg-white p-6 rounded-lg shadow max-w-2xl mx-auto">
+        <h3 class="text-2xl font-semibold text-gray-800 mb-4">Crear Nuevo Entrenador</h3>
+
+        <div th:if="${errorMessage}" class="mb-4 rounded-md bg-red-50 p-4 text-red-700" th:text="${errorMessage}"></div>
+
+        <form th:action="@{/admin/arbitros/save}"
+              th:object="${arbitro}"
+              method="post"
+              enctype="multipart/form-data"
+              class="space-y-4">
+
+          <input type="hidden" th:if="${_csrf != null}"
+                 th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+
+            <div>
+            <label for="nombre" class="block text-sm font-medium text-gray-700">Nombre Completo *</label>
+            <input th:field="*{nombre}" autocomplete="name" required
+                    class="mt-1 block w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    placeholder="Juan Pérez"/>
+            <p class="mt-1 text-sm text-red-600"
+                th:if="${#fields.hasErrors('nombre')}" th:errors="*{nombre}"></p>
+            </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700">Número de Documento *</label>
+            <input th:field="*{cedula}" required
+                   class="mt-1 block w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                   placeholder="1058198772"/>
+            <p class="mt-1 text-sm text-red-600" th:if="${#fields.hasErrors('cedula')}" th:errors="*{cedula}"></p>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700">Teléfono *</label>
+            <input th:field="*{phone}" required
+                   class="mt-1 block w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                   placeholder="312 988 5963"/>
+            <p class="mt-1 text-sm text-red-600" th:if="${#fields.hasErrors('phone')}" th:errors="*{phone}"></p>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700">Especialidad *</label>
+            <select th:field="*{speciality}" required
+                    class="mt-1 block w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    <option value="" disabled selected>Seleccione una especialidad</option>
+                    <option value="Campo">Campo</option>
+                    <option value="Mesa">Mesa</option>
+            </select>
+            <p class="mt-1 text-sm text-red-600" th:if="${#fields.hasErrors('speciality')}" th:errors="*{speciality}"></p>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700">Escalafón *</label>
+            <select th:field="*{scale}" required
+                    class="mt-1 block w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    <option value="" disabled selected>Seleccione un escalafón</option>
+                    <option value="FIBA">FIBA</option>
+                    <option value="Primera">Primera</option>
+                    <option value="Segunda">Segunda</option>
+                    <option value="Internacional">Internacional</option>
+            </select>
+            <p class="mt-1 text-sm text-red-600" th:if="${#fields.hasErrors('scale')}" th:errors="*{scale}"></p>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700">Foto (opcional, máx. 5MB)</label>
+            <input type="file" name="photoFile" accept="image/*"
+                   class="mt-1 block w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"/>
+          </div>
+
+        <div>
+        <label for="username">Usuario *</label>
+        <input th:field="*{username}" 
+                placeholder="usuario123" autocomplete="username" required
+                class="mt-1 block w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"/>
+        </div>
+
+
+          <div class="flex justify-end space-x-3 pt-2">
+            <a th:href="@{/admin/arbitros}" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300">Cancelar</a>
+            <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">
+              Crear Árbitro
+            </button>
+
+          </div>
+        </form>
+
+      </div>
+    </main>
+  </div>
+</body>
+</html>

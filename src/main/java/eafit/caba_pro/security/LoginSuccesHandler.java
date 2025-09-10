@@ -17,7 +17,7 @@ public class LoginSuccesHandler extends SavedRequestAwareAuthenticationSuccessHa
 
     private final Map<String, String> roleUrls = Map.of(
         "ROLE_ADMIN", "/admin",
-        "ROLE_ENTRENADOR", "/entrenador",
+        "ROLE_ENTRENADOR", "/coach",
         "ROLE_ARBITRO", "/arbitro"
         );
 

@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Disponibilidad - <span th:text="${arbitro.nombre}"></span></title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body class="bg-gray-100 min-h-screen">
+
+    <div th:replace="~{fragments/ArbitroFragments/side_bar :: side_bar('disponibilidad')}"></div>
+
+    <!-- Contenido Principal -->
+    <main class="ml-0 md:ml-64 flex flex-col min-h-screen">
+
+        <div th:replace="~{fragments/ArbitroFragments/up_bar :: up_bar('Mi Disponibilidad', ${arbitro.nombre})}"></div>
+
+        <!-- Contenido de la página -->
+        <div id="content-container" class="flex-1 p-6 space-y-6">
+
+            <!-- Header de la página -->
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h3 class="text-2xl font-bold text-gray-800 mb-2">
+                            <i class="fas fa-calendar-check text-blue-600 mr-3"></i>
+                            Mi Disponibilidad
+                        </h3>
+                        <p class="text-gray-600">Confirma tu disponibilidad para los partidos asignados</p>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-sm text-gray-500">Partidos pendientes</p>
+                        <p class="text-3xl font-bold text-orange-600" th:text="${#lists.size(partidosPendientes)}">0</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mensajes de éxito/error -->
+            <div th:if="${successMessage}" class="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg">
+                <div class="flex items-center">
+                    <i class="fas fa-check-circle mr-2"></i>
+                    <span th:text="${successMessage}"></span>
+                </div>
+            </div>
+
+            <div th:if="${errorMessage}" class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+                <div class="flex items-center">
+                    <i class="fas fa-exclamation-circle mr-2"></i>
+                    <span th:text="${errorMessage}"></span>
+                </div>
+            </div>
+
+            <!-- Lista de partidos pendientes -->
+            <div class="bg-white rounded-lg shadow-md">
+                <div class="p-6 border-b border-gray-200">
+                    <h4 class="text-lg font-semibold text-gray-800">
+                        Partidos Pendientes de Confirmación
+                    </h4>
+                    <p class="text-sm text-gray-600 mt-1">
+                        Revisa y confirma tu disponibilidad para cada partido
+                    </p>
+                </div>
+
+                <div class="p-6">
+                    <div th:if="${#lists.isEmpty(partidosPendientes)}" class="text-center py-12">
+                        <i class="fas fa-calendar-check text-gray-300 text-6xl mb-4"></i>
+                        <h3 class="text-lg font-medium text-gray-500 mb-2">No tienes partidos pendientes</h3>
+                        <p class="text-gray-400">Todos tus partidos están confirmados o no tienes asignaciones pendientes.</p>
+                    </div>
+
+                    <div th:unless="${#lists.isEmpty(partidosPendientes)}" class="space-y-4">
+                        <div th:each="partido : ${partidosPendientes}" 
+                             class="border border-orange-200 rounded-lg p-6 bg-orange-50 hover:bg-orange-100 transition duration-200">
+                            
+                            <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between">
+                                <!-- Información del partido -->
+                                <div class="flex-1">
+                                    <div class="flex items-center mb-3">
+                                        <div class="bg-orange-100 rounded-full p-2 mr-3">
+                                            <i class="fas fa-futbol text-orange-600"></i>
+                                        </div>
+                                        <div>
+                                            <h5 class="text-lg font-semibold text-gray-800" 
+                                                th:text="${partido.equipoLocal.nombre + ' vs ' + partido.equipoVisitante.nombre}">
+                                                Equipo Local vs Equipo Visitante
+                                            </h5>
+                                            <p class="text-sm text-gray-600">
+                                                ID del partido: <span th:text="${partido.id}" class="font-mono">#001</span>
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    <div class="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm">
+                                        <div class="flex items-center text-gray-600">
+                                            <i class="fas fa-calendar text-orange-500 mr-2"></i>
+                                            <span th:text="${#temporals.format(partido.fecha, 'dd/MM/yyyy')}">15/10/2025</span>
+                                        </div>
+                                        <div class="flex items-center text-gray-600">
+                                            <i class="fas fa-clock text-orange-500 mr-2"></i>
+                                            <span th:text="${#temporals.format(partido.hora, 'HH:mm')}">15:00</span>
+                                        </div>
+                                        <div class="flex items-center text-orange-600">
+                                            <i class="fas fa-exclamation-triangle text-orange-500 mr-2"></i>
+                                            <span class="font-medium">Pendiente Confirmación</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Botones de acción -->
+                                <div class="mt-4 lg:mt-0 lg:ml-6 flex flex-col sm:flex-row gap-3">
+                                    <!-- Confirmar disponibilidad -->
+                                    <form th:action="@{/arbitro/disponibilidad/confirmar}" method="post" class="inline">
+                                        <input type="hidden" name="partidoId" th:value="${partido.id}">
+                                        <button type="submit" 
+                                                onclick="return confirm('¿Confirmas tu disponibilidad para este partido?')"
+                                                class="w-full sm:w-auto px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 transition duration-200 flex items-center justify-center">
+                                            <i class="fas fa-check mr-2"></i>
+                                            Confirmar
+                                        </button>
+                                    </form>
+
+                                    <!-- No disponible -->
+                                    <form th:action="@{/arbitro/disponibilidad/no-disponible}" method="post" class="inline">
+                                        <input type="hidden" name="partidoId" th:value="${partido.id}">
+                                        <button type="submit" 
+                                                onclick="return confirm('¿Estás seguro de que no estás disponible para este partido? El administrador deberá asignar un nuevo árbitro.')"
+                                                class="w-full sm:w-auto px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 transition duration-200 flex items-center justify-center">
+                                            <i class="fas fa-times mr-2"></i>
+                                            No Disponible
+                                        </button>
+                                    </form>
+
+            
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal para seleccionar otro árbitro -->
+    <div id="modalRechazo" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden z-50">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-white rounded-lg shadow-xl max-w-md w-full">
+                <div class="p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg font-semibold text-gray-800">
+                            <i class="fas fa-user-friends text-blue-600 mr-2"></i>
+                            Seleccionar Árbitro Alternativo
+                        </h3>
+                        <button onclick="cerrarModalRechazo()" class="text-gray-400 hover:text-gray-600">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+
+                    <p class="text-gray-600 mb-4">
+                        Como no estás disponible, selecciona otro árbitro para este partido:
+                    </p>
+
+                    <form id="formRechazo" th:action="@{/arbitro/disponibilidad/rechazar}" method="post">
+                        <input type="hidden" id="partidoIdRechazo" name="partidoId">
+                        
+                        <div class="mb-4">
+                            <label for="nuevoArbitroId" class="block text-sm font-medium text-gray-700 mb-2">
+                                Árbitro Alternativo:
+                            </label>
+                            <select id="nuevoArbitroId" name="nuevoArbitroId" required
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="">Selecciona un árbitro...</option>
+                                <option th:each="arbitro : ${arbitrosDisponibles}" 
+                                        th:value="${arbitro.id}" 
+                                        th:text="${arbitro.nombre + ' - ' + arbitro.speciality + ' (' + arbitro.scale + ')'}">
+                                    Árbitro Ejemplo
+                                </option>
+                            </select>
+                        </div>
+
+                        <div class="flex justify-end space-x-3">
+                            <button type="button" 
+                                    onclick="cerrarModalRechazo()"
+                                    class="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50">
+                                Cancelar
+                            </button>
+                            <button type="submit" 
+                                    class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                                <i class="fas fa-exchange-alt mr-2"></i>
+                                Reasignar Partido
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function mostrarModalRechazo(partidoId) {
+            document.getElementById('partidoIdRechazo').value = partidoId;
+            document.getElementById('modalRechazo').classList.remove('hidden');
+        }
+
+        function cerrarModalRechazo() {
+            document.getElementById('modalRechazo').classList.add('hidden');
+            document.getElementById('formRechazo').reset();
+        }
+
+        // Cerrar modal al hacer clic fuera
+        document.getElementById('modalRechazo').addEventListener('click', function(e) {
+            if (e.target === this) {
+                cerrarModalRechazo();
+            }
+        });
+    </script>
+</body>
+</html>

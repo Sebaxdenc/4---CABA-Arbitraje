@@ -1,203 +1,331 @@
-package eafit.caba_pro.model; 
+package eafit.caba_pro.model;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
-import java.time.LocalDate;
-//import java.util.List;
+import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "entrenador")
+@Table(name = "entrenadores")
 public class Entrenador {
-    
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    
-    @NotBlank(message = "El nombre es obligatorio")
-    @Size(max = 100, message = "El nombre no puede exceder 100 caracteres")
-    @Column(name = "nombre", nullable = false)
-    private String nombre;
-    
-    @NotBlank(message = "Los apellidos son obligatorios")
-    @Size(max = 100, message = "Los apellidos no pueden exceder 100 caracteres")
-    @Column(name = "apellidos", nullable = false)
-    private String apellidos;
-    
-    @NotBlank(message = "El documento es obligatorio")
-    @Size(max = 20, message = "El documento no puede exceder 20 caracteres")
-    @Column(name = "documento", unique = true, nullable = false)
-    private String documento;
-    
-    @Email(message = "Debe ser un email válido")
-    @NotBlank(message = "El email es obligatorio")
-    @Column(name = "email", unique = true, nullable = false)
-    private String email;
-    
-    @Pattern(regexp = "^[0-9]{10}$", message = "El teléfono debe tener 10 dígitos")
-    @Column(name = "telefono")
+
+    @NotBlank(message = "El nombre completo es obligatorio")
+    @Size(min = 2, max = 100, message = "El nombre debe tener entre 2 y 100 caracteres")
+    @Column(name = "nombre_completo", nullable = false, length = 100)
+    private String nombreCompleto;
+
+    @NotBlank(message = "La cédula es obligatoria")
+    @Pattern(regexp = "\\d{8,12}", message = "La cédula debe tener entre 8 y 12 dígitos")
+    @Column(name = "cedula", nullable = false, unique = true, length = 12)
+    private String cedula;
+
+    @NotBlank(message = "El teléfono es obligatorio")
+    @Pattern(regexp = "\\d{10}", message = "El teléfono debe tener 10 dígitos")
+    @Column(name = "telefono", nullable = false, length = 10)
     private String telefono;
-    
-    @Past(message = "La fecha de nacimiento debe ser en el pasado")
-    @Column(name = "fecha_nacimiento")
-    private LocalDate fechaNacimiento;
-    
+
+    @NotBlank(message = "El email es obligatorio")
+    @Email(message = "El email debe tener un formato válido")
+    @Column(name = "email", nullable = false, unique = true, length = 100)
+    private String email;
+
     @NotBlank(message = "El equipo es obligatorio")
-    @Size(max = 100, message = "El nombre del equipo no puede exceder 100 caracteres")
-    @Column(name = "equipo", nullable = false)
+    @Size(min = 2, max = 80, message = "El nombre del equipo debe tener entre 2 y 80 caracteres")
+    @Column(name = "equipo", nullable = false, length = 80)
     private String equipo;
-    
-    @Min(value = 0, message = "Los años de experiencia no pueden ser negativos")
-    @Column(name = "anos_experiencia")
-    private Integer anosExperiencia;
-    
+
+    @NotNull(message = "La categoría es obligatoria")
     @Enumerated(EnumType.STRING)
-    @Column(name = "categoria")
+    @Column(name = "categoria", nullable = false)
     private Categoria categoria;
-    
-    @Column(name = "activo")
+
+    @NotNull(message = "Los años de experiencia son obligatorios")
+    @Min(value = 0, message = "La experiencia no puede ser negativa")
+    @Max(value = 50, message = "La experiencia no puede ser mayor a 50 años")
+    @Column(name = "experiencia", nullable = false)
+    private Integer experiencia;
+
+    @Size(max = 500, message = "Las especialidades no pueden exceder 500 caracteres")
+    @Column(name = "especialidades", length = 500)
+    private String especialidades;
+
+    @Column(name = "activo", nullable = false)
     private Boolean activo = true;
-    
-    @Column(name = "observaciones", length = 500)
-    private String observaciones;
-    
-    // Enum para categorías
+
+    @Column(name = "fecha_creacion", nullable = false)
+    private LocalDateTime fechaCreacion;
+
+    @Column(name = "fecha_actualizacion")
+    private LocalDateTime fechaActualizacion;
+
+    // Relación con Usuario (para login)
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JoinColumn(name = "usuario_id", referencedColumnName = "id")
+    private Usuario usuario;
+
+    // Enum para categorías de entrenadores
     public enum Categoria {
+        INFANTIL("Infantil"),
         JUVENIL("Juvenil"),
-        MAYOR("Mayor"),
+        ADULTO("Adulto"),
         PROFESIONAL("Profesional"),
+        FEMENINO("Femenino"),
         MIXTO("Mixto");
-        
+
         private final String displayName;
-        
+
         Categoria(String displayName) {
             this.displayName = displayName;
         }
-        
+
         public String getDisplayName() {
             return displayName;
         }
     }
-    
-    // Constructores
+
+    // ==================== CONSTRUCTORES ====================
+
     public Entrenador() {
+        this.activo = true;
+        this.fechaCreacion = LocalDateTime.now();
+        this.fechaActualizacion = LocalDateTime.now();
     }
-    
-    public Entrenador(String nombre, String apellidos, String documento, String email) {
-        this.nombre = nombre;
-        this.apellidos = apellidos;
-        this.documento = documento;
+
+    public Entrenador(String nombreCompleto, String cedula, String telefono, String email, 
+                     String equipo, Categoria categoria, Integer experiencia) {
+        this();
+        this.nombreCompleto = nombreCompleto;
+        this.cedula = cedula;
+        this.telefono = telefono;
         this.email = email;
+        this.equipo = equipo;
+        this.categoria = categoria;
+        this.experiencia = experiencia;
     }
-    
-    // Getters y Setters
+
+    // ==================== GETTERS Y SETTERS ====================
+
     public Long getId() {
         return id;
     }
-    
+
     public void setId(Long id) {
         this.id = id;
     }
-    
-    public String getNombre() {
-        return nombre;
+
+    public String getNombreCompleto() {
+        return nombreCompleto;
     }
-    
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
+
+    public void setNombreCompleto(String nombreCompleto) {
+        this.nombreCompleto = nombreCompleto;
     }
-    
-    public String getApellidos() {
-        return apellidos;
+
+    public String getCedula() {
+        return cedula;
     }
-    
-    public void setApellidos(String apellidos) {
-        this.apellidos = apellidos;
+
+    public void setCedula(String cedula) {
+        this.cedula = cedula;
     }
-    
-    public String getDocumento() {
-        return documento;
-    }
-    
-    public void setDocumento(String documento) {
-        this.documento = documento;
-    }
-    
-    public String getEmail() {
-        return email;
-    }
-    
-    public void setEmail(String email) {
-        this.email = email;
-    }
-    
+
     public String getTelefono() {
         return telefono;
     }
-    
+
     public void setTelefono(String telefono) {
         this.telefono = telefono;
     }
-    
-    public LocalDate getFechaNacimiento() {
-        return fechaNacimiento;
+
+    public String getEmail() {
+        return email;
     }
-    
-    public void setFechaNacimiento(LocalDate fechaNacimiento) {
-        this.fechaNacimiento = fechaNacimiento;
+
+    public void setEmail(String email) {
+        this.email = email;
     }
-    
+
     public String getEquipo() {
         return equipo;
     }
-    
+
     public void setEquipo(String equipo) {
         this.equipo = equipo;
     }
-    
-    public Integer getAnosExperiencia() {
-        return anosExperiencia;
-    }
-    
-    public void setAnosExperiencia(Integer anosExperiencia) {
-        this.anosExperiencia = anosExperiencia;
-    }
-    
+
     public Categoria getCategoria() {
         return categoria;
     }
-    
+
     public void setCategoria(Categoria categoria) {
         this.categoria = categoria;
     }
-    
+
+    public Integer getExperiencia() {
+        return experiencia;
+    }
+
+    public void setExperiencia(Integer experiencia) {
+        this.experiencia = experiencia;
+    }
+
+    public String getEspecialidades() {
+        return especialidades;
+    }
+
+    public void setEspecialidades(String especialidades) {
+        this.especialidades = especialidades;
+    }
+
     public Boolean getActivo() {
         return activo;
     }
-    
+
     public void setActivo(Boolean activo) {
         this.activo = activo;
     }
-    
-    public String getObservaciones() {
-        return observaciones;
+
+    public LocalDateTime getFechaCreacion() {
+        return fechaCreacion;
     }
-    
-    public void setObservaciones(String observaciones) {
-        this.observaciones = observaciones;
+
+    public void setFechaCreacion(LocalDateTime fechaCreacion) {
+        this.fechaCreacion = fechaCreacion;
     }
-    
-    // Métodos de utilidad
-    public String getNombreCompleto() {
-        return nombre + " " + apellidos;
+
+    public LocalDateTime getFechaActualizacion() {
+        return fechaActualizacion;
     }
-    
+
+    public void setFechaActualizacion(LocalDateTime fechaActualizacion) {
+        this.fechaActualizacion = fechaActualizacion;
+    }
+
+    public Usuario getUsuario() {
+        return usuario;
+    }
+
+    public void setUsuario(Usuario usuario) {
+        this.usuario = usuario;
+    }
+
+    // ==================== MÉTODOS DE UTILIDAD ====================
+
+    /**
+     * Verifica si el entrenador está activo
+     */
+    public boolean isActivo() {
+        return activo != null && activo;
+    }
+
+    /**
+     * Obtiene el nombre para mostrar (nombre completo del entrenador)
+     */
+    public String getDisplayName() {
+        return nombreCompleto;
+    }
+
+    /**
+     * Obtiene información del equipo con categoría
+     */
+    public String getEquipoConCategoria() {
+        return equipo + " (" + categoria.getDisplayName() + ")";
+    }
+
+    /**
+     * Verifica si tiene usuario asociado
+     */
+    public boolean tieneUsuario() {
+        return usuario != null;
+    }
+
+    /**
+     * Obtiene el username del usuario asociado (si existe)
+     */
+    public String getUsername() {
+        return usuario != null ? usuario.getUsername() : null;
+    }
+
+    /**
+     * Verifica si tiene especialidades definidas
+     */
+    public boolean tieneEspecialidades() {
+        return especialidades != null && !especialidades.trim().isEmpty();
+    }
+
+    /**
+     * Obtiene descripción de experiencia
+     */
+    public String getExperienciaDescripcion() {
+        if (experiencia == null) return "No especificado";
+        if (experiencia == 0) return "Sin experiencia";
+        if (experiencia == 1) return "1 año";
+        return experiencia + " años";
+    }
+
+    /**
+     * Verifica si es un entrenador experimentado (más de 5 años)
+     */
+    public boolean esExperimentado() {
+        return experiencia != null && experiencia > 5;
+    }
+
+    /**
+     * Obtiene nivel de experiencia como texto
+     */
+    public String getNivelExperiencia() {
+        if (experiencia == null || experiencia == 0) return "Principiante";
+        if (experiencia <= 2) return "Novato";
+        if (experiencia <= 5) return "Intermedio";
+        if (experiencia <= 10) return "Experimentado";
+        return "Experto";
+    }
+
+    // ==================== MÉTODOS LIFECYCLE ====================
+
+    @PrePersist
+    protected void onCreate() {
+        fechaCreacion = LocalDateTime.now();
+        fechaActualizacion = LocalDateTime.now();
+        if (activo == null) {
+            activo = true;
+        }
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        fechaActualizacion = LocalDateTime.now();
+    }
+
+    // ==================== MÉTODOS OBJECT ====================
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        
+        Entrenador that = (Entrenador) obj;
+        return id != null ? id.equals(that.id) : that.id == null;
+    }
+
+    @Override
+    public int hashCode() {
+        return id != null ? id.hashCode() : 0;
+    }
+
     @Override
     public String toString() {
-        return "Coach{" +
+        return "Entrenador{" +
                 "id=" + id +
-                ", nombre='" + nombre + '\'' +
-                ", apellidos='" + apellidos + '\'' +
+                ", nombreCompleto='" + nombreCompleto + '\'' +
+                ", cedula='" + cedula + '\'' +
                 ", equipo='" + equipo + '\'' +
+                ", categoria=" + categoria +
+                ", experiencia=" + experiencia +
+                ", activo=" + activo +
                 '}';
     }
 }

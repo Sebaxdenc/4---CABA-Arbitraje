@@ -294,4 +294,144 @@ public class ArbitroService {
         arbitroRepository.save(arbitro);
 
     }
+
+    // ========== MÉTODOS ADICIONALES PARA DISPONIBILIDAD ==========
+
+    /**
+     * Obtener todos los árbitros excepto el especificado
+     */
+    public List<Arbitro> findAllExcept(Long arbitroId) {
+        return arbitroRepository.findAll().stream()
+                .filter(arbitro -> !arbitro.getId().equals(arbitroId))
+                .toList();
+    }
+
+    /**
+     * Buscar todos los árbitros activos
+     */
+    public List<Arbitro> findAllActivos() {
+        return arbitroRepository.findAll().stream()
+                .filter(arbitro -> arbitro.getUsuario() != null && arbitro.getUsuario().isActivo())
+                .toList();
+    }
+    // ========== MÉTODOS DE DISPONIBILIDAD ==========
+
+    /**
+     * Confirmar disponibilidad de un árbitro para un partido
+     */
+    @Transactional
+    public String confirmarDisponibilidad(Long partidoId, String username) {
+        try {
+            Optional<Arbitro> arbitroOpt = findByUsername(username);
+            
+            if (arbitroOpt.isEmpty()) {
+                return "Árbitro no encontrado";
+            }
+
+            Arbitro arbitro = arbitroOpt.get();
+            Optional<Partido> partidoOpt = partidoRepository.findById(partidoId);
+            
+            if (partidoOpt.isEmpty()) {
+                return "Partido no encontrado";
+            }
+
+            Partido partido = partidoOpt.get();
+
+            if (!partido.getArbitro().getId().equals(arbitro.getId())) {
+                return "No tienes permiso para confirmar este partido";
+            }
+
+            // Cambiar estado a PROGRAMADO
+            partido.setEstado(Partido.EstadoPartido.PROGRAMADO);
+            partidoRepository.save(partido);
+
+            return "SUCCESS:Disponibilidad confirmada exitosamente para el partido " + 
+                   partido.getEquipoLocal().getNombre() + " vs " + partido.getEquipoVisitante().getNombre();
+
+        } catch (Exception e) {
+            return "Error al confirmar la disponibilidad: " + e.getMessage();
+        }
+    }
+
+    /**
+     * Marcar árbitro como no disponible para un partido
+     */
+    @Transactional
+    public String marcarNoDisponible(Long partidoId, String username) {
+        try {
+            Optional<Arbitro> arbitroOpt = findByUsername(username);
+            
+            if (arbitroOpt.isEmpty()) {
+                return "Árbitro no encontrado";
+            }
+
+            Arbitro arbitro = arbitroOpt.get();
+            Optional<Partido> partidoOpt = partidoRepository.findById(partidoId);
+            
+            if (partidoOpt.isEmpty()) {
+                return "Partido no encontrado";
+            }
+
+            Partido partido = partidoOpt.get();
+
+            if (!partido.getArbitro().getId().equals(arbitro.getId())) {
+                return "No tienes permiso para modificar este partido";
+            }
+
+            // Cambiar estado a ARBITRO_NO_DISPONIBLE
+            partido.setEstado(Partido.EstadoPartido.ARBITRO_NO_DISPONIBLE);
+            partidoRepository.save(partido);
+
+            return "SUCCESS:Has marcado tu no disponibilidad para el partido " + 
+                   partido.getEquipoLocal().getNombre() + " vs " + partido.getEquipoVisitante().getNombre() + 
+                   ". El administrador deberá asignar un nuevo árbitro.";
+
+        } catch (Exception e) {
+            return "Error al marcar no disponibilidad: " + e.getMessage();
+        }
+    }
+
+    /**
+     * Reasignar partido a otro árbitro
+     */
+    @Transactional
+    public String reasignarPartido(Long partidoId, Long nuevoArbitroId, String username) {
+        try {
+            Optional<Arbitro> arbitroActualOpt = findByUsername(username);
+            
+            if (arbitroActualOpt.isEmpty()) {
+                return "Árbitro actual no encontrado";
+            }
+
+            Arbitro arbitroActual = arbitroActualOpt.get();
+            Optional<Partido> partidoOpt = partidoRepository.findById(partidoId);
+            Optional<Arbitro> nuevoArbitroOpt = findById(nuevoArbitroId);
+            
+            if (partidoOpt.isEmpty()) {
+                return "Partido no encontrado";
+            }
+
+            if (nuevoArbitroOpt.isEmpty()) {
+                return "Árbitro seleccionado no encontrado";
+            }
+
+            Partido partido = partidoOpt.get();
+            Arbitro nuevoArbitro = nuevoArbitroOpt.get();
+
+            if (!partido.getArbitro().getId().equals(arbitroActual.getId())) {
+                return "No tienes permiso para modificar este partido";
+            }
+
+            // Reasignar el partido al nuevo árbitro
+            partido.setArbitro(nuevoArbitro);
+            // Mantener el estado como PENDIENTE_CONFIRMACION para que el nuevo árbitro lo confirme
+            partidoRepository.save(partido);
+
+            return "SUCCESS:Partido reasignado exitosamente a " + nuevoArbitro.getNombre() + 
+                   ". El nuevo árbitro deberá confirmar su disponibilidad.";
+
+        } catch (Exception e) {
+            return "Error al reasignar el partido: " + e.getMessage();
+        }
+    }
 }
