@@ -430,7 +430,14 @@ public class ArbitroService {
                 return "No tienes permiso para confirmar este partido";
             }
 
-            notificacionService.notificarArbitro("Disponibilidad confirmada", arbitro);
+            notificacionService.notificarArbitro("Disponibilidad confirmada: El árbitro " + arbitro.getNombre() + " ha confirmado su disponibilidad para el partido " +
+                                           partido.getEquipoLocal().getNombre() + " vs " + partido.getEquipoVisitante().getNombre() +
+                                           " programado para el " + partido.getFecha() + " a las " + partido.getHora() + ".", arbitro);
+                        
+
+            notificacionService.notificarAdmin("Disponibilidad confirmada: El árbitro " + arbitro.getNombre() + " ha confirmado su disponibilidad para el partido " +
+                                           partido.getEquipoLocal().getNombre() + " vs " + partido.getEquipoVisitante().getNombre() +
+                                           " programado para el " + partido.getFecha() + " a las " + partido.getHora() + ".");
             // Cambiar estado a PROGRAMADO
             partido.setEstado(Partido.EstadoPartido.PROGRAMADO);
             partidoRepository.save(partido);
