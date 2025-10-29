@@ -20,6 +20,7 @@ public class SecurityConfig {
         http
             .authorizeHttpRequests(authorize -> authorize
             .requestMatchers("/","/h2-consola/**","/login","/css/**","/js/**","/images/**").permitAll()
+            .requestMatchers("/api/**").permitAll() // Permitir acceso completo a la API REST
             .requestMatchers("/admin/**").hasRole("ADMIN")
             .requestMatchers("/coach/**").hasRole("ENTRENADOR")
             .requestMatchers("/arbitro/**").hasRole("ARBITRO")
