@@ -52,7 +52,7 @@ public class ArbitroController {
         this.liquidacionService = liquidacionService;
     }
 
-    // ========== ENDPOINTS WEB (TEMPLATES) ==========
+    // ========== ENDPOINTS WEB ==========
 
 
     @GetMapping
