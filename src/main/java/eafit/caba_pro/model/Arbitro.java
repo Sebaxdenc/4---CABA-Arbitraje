@@ -33,7 +33,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor // Generates a constructor with no fields acordding to JPA
 public class Arbitro {
     
-    
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -62,7 +61,6 @@ public class Arbitro {
     @NotEmpty(message = "El teléfono no puede estar vacío")
     @Column(nullable = false, length = 20)
     private String phone;
-
         
     @NotNull(message = "La especialidad no puede ser nulo")
     @NotEmpty(message = "La especialidad no puede estar vacío")
@@ -97,7 +95,7 @@ public class Arbitro {
     private List<Reseña> reseñas = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "escalafon_id", nullable = false)
+    @JoinColumn(name = "escalafon_id", nullable = true)
     @JsonBackReference
     private Escalafon escalafon;        
 

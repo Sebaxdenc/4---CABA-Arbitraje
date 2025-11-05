@@ -372,19 +372,23 @@ public class ArbitroService {
     public void crearArbitro(Arbitro arbitro) {
         // 1. Crear Usuario
         Usuario usuario = new Usuario();
-        usuario.setUsername(arbitro.getNombre());
-        usuario.setPassword("{noop}" + arbitro.getContraseña());
+        usuario.setUsername(arbitro.getUsername());
+        if(arbitro.getContraseña() == null){
+            usuario.setPassword("{noop}" + arbitro.getCedula());
+            arbitro.setContraseña("{noop}" + arbitro.getCedula());
+        }else{
+            usuario.setPassword("{noop}" + arbitro.getContraseña());
+        }
         usuario.setRole("ROLE_ARBITRO");
+        usuario.setEmail(arbitro.getUsername());
 
         usuarioService.createUsuario(usuario);
 
         // 2. Asociar usuario al árbitro
         arbitro.setUsuario(usuario);
         arbitroRepository.save(arbitro);
-
+        usuarioRepository.save(usuario);
     }
-
-    // ========== MÉTODOS ADICIONALES PARA DISPONIBILIDAD ==========
 
     /**
      * Obtener todos los árbitros excepto el especificado
