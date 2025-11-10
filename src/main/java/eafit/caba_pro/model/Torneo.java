@@ -6,6 +6,8 @@ import java.util.List;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -38,6 +40,7 @@ public class Torneo {
 
     // Lado inverso. No usamos cascade REMOVE para no borrar partidos al eliminar torneo.
     @OneToMany(mappedBy = "torneo", fetch = FetchType.LAZY)
+    @JsonManagedReference // Evita serialización circular: lado "managed" (Torneo -> partidos)
     private List<Partido> partidos = new ArrayList<>();
 
     /* getters/setters */

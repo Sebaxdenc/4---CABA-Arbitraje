@@ -78,6 +78,7 @@ public class Partido {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "torneo_id", nullable = true)
+    @JsonBackReference
     private Torneo torneo;
 
     public Torneo getTorneo() { return torneo; }
