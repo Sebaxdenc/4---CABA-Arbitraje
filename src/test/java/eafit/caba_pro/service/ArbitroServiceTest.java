@@ -1,20 +1,25 @@
 package eafit.caba_pro.service;
 
-import eafit.caba_pro.model.Arbitro;
-import eafit.caba_pro.repository.ArbitroRepository;
-import eafit.caba_pro.repository.PartidoRepository;
-import eafit.caba_pro.repository.UsuarioRepository;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mockito;
-import org.mockito.junit.jupiter.MockitoExtension;
-
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import static org.mockito.ArgumentMatchers.anyLong;
+import org.mockito.Mockito;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+import eafit.caba_pro.model.Arbitro;
+import eafit.caba_pro.repository.ArbitroRepository;
+import eafit.caba_pro.repository.PartidoRepository;
+import eafit.caba_pro.repository.UsuarioRepository;
 
 @ExtendWith(MockitoExtension.class)
 class ArbitroServiceTest {
@@ -78,8 +83,8 @@ class ArbitroServiceTest {
         when(arbitroRepository.findById(4L)).thenReturn(Optional.of(a));
         when(partidoRepository.findByArbitro(a)).thenReturn(Collections.emptyList());
 
-        boolean ok = service().deleteById(4L);
-        assertTrue(ok);
-        verify(arbitroRepository).deleteById(4L);
+    boolean ok = service().deleteById(4L);
+    assertTrue(ok);
+    verify(arbitroRepository).delete(a);
     }
 }
