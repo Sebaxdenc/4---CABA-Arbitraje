@@ -60,7 +60,6 @@
                     <div>
                         <h4 class="text-xl font-semibold text-gray-800" th:text="${entrenador.nombreCompleto}">Nombre del Coach</h4>
                         <p class="text-gray-600" th:text="${entrenador.equipoConCategoria}">Equipo - Categoría</p>
-                        <p class="text-sm text-gray-500 mt-1" th:text="${entrenador.nivelExperiencia}">Nivel de experiencia</p>
                     </div>
                 </div>
 
@@ -155,14 +154,7 @@
                                 </div>
                             </div>
                             
-                            <!-- Nivel de Experiencia (Calculado) -->
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2" th:text="#{coach.profile.experienceLevel}">Nivel de Experiencia</label>
-                                <input type="text" 
-                                       th:value="${entrenador.nivelExperiencia}"
-                                       class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-gray-50" 
-                                       readonly>
-                            </div>
+                           
                         </div>
                         
                         <!-- Especialidades (Editable) -->
@@ -185,18 +177,7 @@
                         <h5 class="text-lg font-medium text-gray-800 mb-4">Estadísticas de Rendimiento</h5>
                         
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                            <!-- Nivel de Experiencia -->
-                            <div class="bg-blue-50 p-4 rounded-lg">
-                                <div class="flex items-center">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-blue-600 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                    </svg>
-                                    <div>
-                                        <p class="text-sm font-medium text-blue-600">Experiencia</p>
-                                        <p class="text-lg font-bold text-blue-900" th:text="${entrenador.experienciaDescripcion}">0 años</p>
-                                    </div>
-                                </div>
-                            </div>
+                       
                             
                             <!-- Estado -->
                             <div class="bg-green-50 p-4 rounded-lg">
