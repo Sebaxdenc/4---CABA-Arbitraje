@@ -12,7 +12,7 @@
   <aside th:replace="~{admin/sidebar :: sidebar('entrenadores')}"></aside>
 
   <div class="flex-1 overflow-x-hidden overflow-y-auto">
-    <header th:replace="~{admin/header :: header}"></header>
+    <header th:replace="~{admin/header :: header(#{page.admin.entrenadores})}"></header>
 
     <main class="p-6 space-y-6">
       <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-2">

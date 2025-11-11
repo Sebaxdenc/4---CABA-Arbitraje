@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org" th:lang="${#locale}">
 <head>
   <meta charset="UTF-8" />
-  <title th:text="${partido.id != null ? #{page.admin.partido.edit} : #{page.admin.partido.create}}">Partido</title>
+  <title th:text="${partido.id != null} ? #{page.admin.partido.edit} : #{page.admin.partido.create}">Partido</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
@@ -11,12 +11,12 @@
   <aside th:replace="~{admin/sidebar :: sidebar('partidos')}"></aside>
 
   <div class="flex-1 flex flex-col overflow-x-hidden overflow-y-auto">
-    <header th:replace="~{admin/header :: header}"></header>
+    <header th:replace="~{admin/header :: header(${partido.id != null} ? #{page.admin.partido.edit} : #{page.admin.partido.create})}"></header>
 
     <main class="p-6 flex-1">
       <div class="bg-white p-6 rounded-lg shadow max-w-2xl mx-auto">
         <h3 class="text-2xl font-semibold text-gray-800 mb-4"
-            th:text="${partido.id != null ? #{page.admin.partido.edit} : #{page.admin.partido.create}}">Crear Partido</h3>
+            th:text="${partido.id != null} ? #{page.admin.partido.edit} : #{page.admin.partido.create}">Crear Partido</h3>
 
         <!-- Mostrar mensajes de error -->
         <div th:if="${errorMessage}" class="mb-4 rounded-md bg-red-50 p-4 text-red-700" th:text="${errorMessage}"></div>
@@ -112,7 +112,7 @@
             </a>
             <button type="submit" 
                     class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition duration-200">
-              <span th:text="${partido.id != null ? #{btn.update} : #{btn.create}}">Crear</span>
+              <span th:text="${partido.id != null} ? #{btn.update} : #{btn.create}">Crear</span>
             </button>
 
           </div>

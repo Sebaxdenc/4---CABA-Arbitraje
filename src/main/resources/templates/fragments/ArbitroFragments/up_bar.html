@@ -20,15 +20,18 @@
             
             <!-- Información del usuario y botón de cerrar sesión -->
             <div class="flex items-center space-x-4">
+                <!-- Selector de Idioma Compacto -->
+                <div th:replace="~{fragments/language-selector :: languageSelectorCompact}"></div>
+                
                 <p class="text-sm text-gray-600 hidden md:block" 
-                   th:text="'¡Bienvenido, ' + (${userName != null ? userName : 'Usuario'}) + '!'">¡Bienvenido, Usuario!</p>
+                   th:text="#{msg.bienvenido(${userName != null ? userName : 'Usuario'})}">¡Bienvenido, Usuario!</p>
                 
                 <!-- Botón de cerrar sesión -->
                 <form th:action="@{/logout}" method="post" class="inline">
                     <button type="submit" 
                             class="px-4 py-2 bg-red-500 text-white rounded-lg shadow-md hover:bg-red-600 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2">
                         <i class="fas fa-sign-out-alt mr-2"></i>
-                        Cerrar Sesión
+                        <span th:text="#{msg.cerrarSesion}">Cerrar Sesión</span>
                     </button>
                 </form>
             </div>
