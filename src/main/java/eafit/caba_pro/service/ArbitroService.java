@@ -89,25 +89,33 @@ public class ArbitroService {
 
     // ========== OPERACIONES DE ESCRITURA ==========
 
-    /**
-     * Crear árbitro con archivo de foto (guarda BLOB en BD)
-     */
 
+    /**
+     * Crear nuevo árbitro con archivo de foto (guarda BLOB en BD)
+     */
     @Transactional
     public Arbitro createArbitroWithPhoto(Arbitro arbitro, MultipartFile photoFile) throws IOException {
+        System.out.println("=== INICIANDO CREACIÓN DE ÁRBITRO ===");
+        System.out.println("Nombre: " + arbitro.getNombre());
+        System.out.println("Cédula: " + arbitro.getCedula());
+        System.out.println("Username: " + arbitro.getUsername());
+        
         // Validaciones de duplicados
 
         if (arbitro.getCedula() != null && arbitroRepository.existsByCedula(arbitro.getCedula())) {
+            System.out.println("ERROR: Cédula duplicada");
             throw new RuntimeException("Esta cédula ya está registrada: " + arbitro.getCedula());
         }
         
         if (arbitro.getPhone() != null && arbitroRepository.existsByPhone(arbitro.getPhone())) {
+            System.out.println("ERROR: Teléfono duplicado");
             throw new RuntimeException("Este teléfono ya está registrado: " + arbitro.getPhone());
         }
         
         
         Usuario usuario = arbitro.getUsuario();
             if (usuario == null) {
+                System.out.println("ERROR: Usuario nulo");
                 throw new RuntimeException("Debes asociar un usuario al árbitro");
          }
 
@@ -115,7 +123,9 @@ public class ArbitroService {
 
         usuario.setRole("ROLE_ARBITRO");
 
+        System.out.println("Guardando usuario...");
         usuarioRepository.save(usuario);
+        System.out.println("Usuario guardado con ID: " + usuario.getId());
 
         // Procesar imagen si se proporciona
         if (photoFile != null && !photoFile.isEmpty()) {
@@ -147,7 +157,10 @@ public class ArbitroService {
             System.out.println("No se proporcionó imagen para el árbitro");
         }
 
-        return arbitroRepository.save(arbitro);
+        System.out.println("Guardando árbitro en BD...");
+        Arbitro savedArbitro = arbitroRepository.save(arbitro);
+        System.out.println("=== ÁRBITRO GUARDADO EXITOSAMENTE - ID: " + savedArbitro.getId() + " ===");
+        return savedArbitro;
     }
 
     /**

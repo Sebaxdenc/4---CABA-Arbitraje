@@ -330,7 +330,7 @@ public class AdminController {
     }
 
   
-    @GetMapping("/arbitros/{id}")
+    @GetMapping("/arbitros/{id:[0-9]+}")
     public String viewArbitro(@PathVariable Long id, Model model, Locale locale) {
         Arbitro arbitro = arbitroService.findById(id)
             .orElseThrow(() -> new IllegalArgumentException(

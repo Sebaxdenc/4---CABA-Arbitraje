@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org" th:lang="${#locale}">
 <head>
   <meta charset="UTF-8" />
-  <title th:text="${coach.id != null ? #{page.admin.coach.edit} : #{page.admin.coach.create}}">Crear Entrenador</title>
+  <title th:text="${coach.id != null} ? #{page.admin.coach.edit} : #{page.admin.coach.create}">Crear Entrenador</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
@@ -10,12 +10,12 @@
   <aside th:replace="~{admin/sidebar :: sidebar('entrenadores')}"></aside>
 
   <div class="flex-1 flex flex-col overflow-x-hidden overflow-y-auto">
-    <header th:replace="~{admin/header :: header}"></header>
+    <header th:replace="~{admin/header :: header(${coach.id != null} ? #{page.admin.coach.edit} : #{page.admin.coach.create})}"></header>
 
     <main class="p-6 flex-1">
       <div class="bg-white p-6 rounded-lg shadow max-w-2xl mx-auto">
         <h3 class="text-2xl font-semibold text-gray-800 mb-4" 
-            th:text="${coach.id != null ? #{page.admin.coach.edit} : #{page.admin.coach.create}}">Crear Nuevo Entrenador</h3>
+            th:text="${coach.id != null} ? #{page.admin.coach.edit} : #{page.admin.coach.create}">Crear Nuevo Entrenador</h3>
 
         <div th:if="${errorMessage}" class="mb-4 rounded-md bg-red-50 p-4 text-red-700" th:text="${errorMessage}"></div>
 
@@ -89,7 +89,7 @@
                class="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300"
                th:text="#{btn.cancel}">Cancelar</a>
             <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">
-              <span th:text="${coach.id != null ? #{btn.update} : #{btn.create}}">Crear</span>
+              <span th:text="${coach.id != null} ? #{btn.update} : #{btn.create}">Crear</span>
             </button>
           </div>
         </form>
