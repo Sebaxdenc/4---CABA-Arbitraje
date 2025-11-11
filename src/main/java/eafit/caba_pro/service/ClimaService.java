@@ -35,7 +35,8 @@ public class ClimaService {
     }
 
     public String mapCode(Integer code) {
-        Locale locale = LocaleContextHolder.getLocale();
+        //Locale locale = LocaleContextHolder.getLocale();
+        Locale locale = new Locale("es", "CO");
         String key;
 
         if (code == 0) {
@@ -56,7 +57,9 @@ public class ClimaService {
         else {
             key = "weather.unknown";
         }
-        
+
+        log.info(locale.toString());
+
         return messageSource.getMessage(key, null, locale);
     }
 
