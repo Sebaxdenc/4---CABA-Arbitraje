@@ -147,7 +147,7 @@
                                     <div class="text-right">
                                         <p class="text-sm text-gray-500" th:text="#{table.header.estado}">Estado</p>
                                         <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800"
-                                              th:text="#{${'estado.' + partido.estado}}">Programado</span>
+                                              th:text="#{__${'estado.' + #strings.toLowerCase(partido.estado)}__}">Programado</span>
                                     </div>
                                 </div>
                             </div>
@@ -223,7 +223,7 @@
                                     <div class="text-right">
                                         <p class="text-sm text-gray-500" th:text="#{table.header.estado}">Estado</p>
                                         <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800"
-                                              th:text="${partido.estado}">Finalizado</span>
+                                              th:text="#{__${'estado.' + #strings.toLowerCase(partido.estado)}__}">Finalizado</span>
                                     </div>
                                 </div>
                             </div>

@@ -185,12 +185,52 @@ public class ArbitroController {
         List<Partido> partidosFuturos = partidoService.findPartidosFuturosOrdenados(arbitro);
         List<Partido> todosLosPartidos = partidoService.findByArbitro(arbitro);
         
+        // Traducir clima para todos los partidos según el locale actual
+        for (Partido partido : partidosPasados) {
+            if (partido.getClima() != null) {
+                partido.setClima(translateWeather(partido.getClima(), locale));
+            }
+        }
+        for (Partido partido : partidosFuturos) {
+            if (partido.getClima() != null) {
+                partido.setClima(translateWeather(partido.getClima(), locale));
+            }
+        }
+        
         model.addAttribute("arbitro", arbitro);
         model.addAttribute("partidosPasados", partidosPasados);
         model.addAttribute("partidosFuturos", partidosFuturos);
         model.addAttribute("totalPartidos", todosLosPartidos.size());
         
         return "arbitro/partidos";
+    }
+    
+    /**
+     * Traduce el texto del clima al idioma actual
+     */
+    private String translateWeather(String weatherSpanish, Locale locale) {
+        String key;
+        switch (weatherSpanish.toLowerCase()) {
+            case "despejado":
+                key = "weather.clear";
+                break;
+            case "parcialmente nublado":
+                key = "weather.partly_cloudy";
+                break;
+            case "lluvioso":
+                key = "weather.rainy";
+                break;
+            case "tormenta":
+                key = "weather.stormy";
+                break;
+            case "nevado":
+                key = "weather.snowy";
+                break;
+            default:
+                key = "weather.unknown";
+                break;
+        }
+        return messageSource.getMessage(key, null, locale);
     }
 
     @GetMapping("/liquidaciones")
