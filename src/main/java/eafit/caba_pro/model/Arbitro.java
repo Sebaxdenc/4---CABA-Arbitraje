@@ -25,12 +25,14 @@ import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Entity
 @Table(name = "arbitro")
 @Data // Generate getters and setters for all fields using lombok
 @AllArgsConstructor // Generate a contrustuctor with all the fields
 @NoArgsConstructor // Generates a constructor with no fields acordding to JPA
+@ToString(exclude = {"escalafon", "reseñas", "partidos", "usuario", "notificacionesRecibidas"})  // Excluir relaciones del toString
 public class Arbitro {
     
     @Id

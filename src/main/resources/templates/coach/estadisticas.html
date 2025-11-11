@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html th:lang="${#locale}" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Estadísticas - CABA Pro</title>
+    <title th:text="#{page.coach.estadisticas} + ' - CABA Pro'">Estadísticas - CABA Pro</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
@@ -15,36 +15,36 @@
         <!-- Main Content -->
         <div class="flex-1 md:ml-64">
             <!-- Top bar -->
-            <div th:replace="~{fragments/EntrenadorFragments/upBar :: upBar('Estadísticas', ${entrenador.nombreCompleto})}"></div>
+            <div th:replace="~{fragments/EntrenadorFragments/upBar :: upBar(#{page.coach.estadisticas}, ${entrenador.nombreCompleto})}"></div>
             
             <!-- Content -->
             <div class="p-6">
                 <!-- Header -->
                 <div class="mb-8">
-                    <h1 class="text-3xl font-bold text-gray-900 mb-2">Estadísticas del Equipo</h1>
-                    <p class="text-gray-600">Análisis detallado del rendimiento de <span th:text="${entrenador.equipo}">tu equipo</span></p>
+                    <h1 class="text-3xl font-bold text-gray-900 mb-2" th:text="#{coach.stats.title}">Estadísticas del Equipo</h1>
+                    <p class="text-gray-600" th:text="#{coach.stats.subtitle(${entrenador.equipo})}">Análisis detallado del rendimiento de tu equipo</p>
                 </div>
 
                 <!-- Resumen General -->
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
                     <div class="bg-white p-6 rounded-lg shadow-md text-center">
                         <div class="text-3xl font-bold text-blue-600 mb-2" th:text="${estadisticas['totalPartidos']}">0</div>
-                        <div class="text-gray-600 text-sm font-medium">Partidos Jugados</div>
+                        <div class="text-gray-600 text-sm font-medium" th:text="#{coach.stats.matchesPlayed}">Partidos Jugados</div>
                     </div>
                     
                     <div class="bg-white p-6 rounded-lg shadow-md text-center">
                         <div class="text-3xl font-bold text-green-600 mb-2" th:text="${estadisticas['partidosGanados']}">0</div>
-                        <div class="text-gray-600 text-sm font-medium">Victorias</div>
+                        <div class="text-gray-600 text-sm font-medium" th:text="#{coach.stats.victories}">Victorias</div>
                     </div>
                     
                     <div class="bg-white p-6 rounded-lg shadow-md text-center">
                         <div class="text-3xl font-bold text-red-600 mb-2" th:text="${estadisticas['partidosPerdidos']}">0</div>
-                        <div class="text-gray-600 text-sm font-medium">Derrotas</div>
+                        <div class="text-gray-600 text-sm font-medium" th:text="#{coach.stats.defeats}">Derrotas</div>
                     </div>
                     
                     <div class="bg-white p-6 rounded-lg shadow-md text-center">
                         <div class="text-3xl font-bold text-yellow-600 mb-2" th:text="${estadisticas['partidosEmpatados'] ?: 0}">0</div>
-                        <div class="text-gray-600 text-sm font-medium">Empates</div>
+                        <div class="text-gray-600 text-sm font-medium" th:text="#{coach.stats.draws}">Empates</div>
                     </div>
                 </div>
 
@@ -53,12 +53,12 @@
                     <!-- Porcentaje de Victorias -->
                     <div class="bg-white p-6 rounded-lg shadow-md">
                         <h3 class="text-lg font-semibold text-gray-800 mb-4">
-                            <i class="fas fa-chart-pie mr-2 text-blue-600"></i>Distribución de Resultados
+                            <i class="fas fa-chart-pie mr-2 text-blue-600"></i><span th:text="#{coach.stats.resultsDistribution}">Distribución de Resultados</span>
                         </h3>
                         
                         <div class="space-y-4">
                             <div class="flex items-center justify-between">
-                                <span class="text-green-600 font-medium">Victorias</span>
+                                <span class="text-green-600 font-medium" th:text="#{coach.stats.victories}">Victorias</span>
                                 <div class="flex items-center space-x-2">
                                     <div class="w-24 h-2 bg-gray-200 rounded-full">
                                         <div class="h-2 bg-green-500 rounded-full" 
@@ -69,7 +69,7 @@
                             </div>
                             
                             <div class="flex items-center justify-between">
-                                <span class="text-red-600 font-medium">Derrotas</span>
+                                <span class="text-red-600 font-medium" th:text="#{coach.stats.defeats}">Derrotas</span>
                                 <div class="flex items-center space-x-2">
                                     <div class="w-24 h-2 bg-gray-200 rounded-full">
                                         <div class="h-2 bg-red-500 rounded-full" 
@@ -80,7 +80,7 @@
                             </div>
                             
                             <div class="flex items-center justify-between">
-                                <span class="text-yellow-600 font-medium">Empates</span>
+                                <span class="text-yellow-600 font-medium" th:text="#{coach.stats.draws}">Empates</span>
                                 <div class="flex items-center space-x-2">
                                     <div class="w-24 h-2 bg-gray-200 rounded-full">
                                         <div class="h-2 bg-yellow-500 rounded-full" 
@@ -95,22 +95,22 @@
                     <!-- Estadísticas Básicas -->
                     <div class="bg-white p-6 rounded-lg shadow-md">
                         <h3 class="text-lg font-semibold text-gray-800 mb-4">
-                            <i class="fas fa-chart-bar mr-2 text-orange-600"></i>Resumen de Rendimiento
+                            <i class="fas fa-chart-bar mr-2 text-orange-600"></i><span th:text="#{coach.stats.performanceSummary}">Resumen de Rendimiento</span>
                         </h3>
                         
                         <div class="space-y-4">
                             <div class="flex justify-between items-center">
-                                <span class="text-gray-600">Total de partidos</span>
+                                <span class="text-gray-600" th:text="#{coach.stats.matchesPlayed}">Total de partidos</span>
                                 <span class="text-lg font-bold text-blue-600" th:text="${estadisticas['totalPartidos'] ?: '0'}">0</span>
                             </div>
                             
                             <div class="flex justify-between items-center">
-                                <span class="text-gray-600">Partidos ganados</span>
+                                <span class="text-gray-600" th:text="#{coach.stats.matchesWon}">Partidos ganados</span>
                                 <span class="text-lg font-bold text-green-600" th:text="${estadisticas['partidosGanados'] ?: '0'}">0</span>
                             </div>
                             
                             <div class="flex justify-between items-center border-t pt-2">
-                                <span class="text-gray-600 font-medium">Efectividad</span>
+                                <span class="text-gray-600 font-medium" th:text="#{coach.stats.effectiveness}">Efectividad</span>
                                 <span class="text-lg font-bold text-purple-600" 
                                       th:text="${#numbers.formatDecimal(estadisticas['porcentajeVictorias'] ?: 0, 1, 1)} + '%'">0.0%</span>
                             </div>
@@ -123,12 +123,12 @@
                     <!-- Últimos 5 Partidos -->
                     <div class="bg-white p-6 rounded-lg shadow-md">
                         <h3 class="text-lg font-semibold text-gray-800 mb-4">
-                            <i class="fas fa-history mr-2 text-purple-600"></i>Últimos Partidos
+                            <i class="fas fa-history mr-2 text-purple-600"></i><span th:text="#{coach.stats.recentMatches}">Últimos Partidos</span>
                         </h3>
                         
                         <div th:if="${#lists.isEmpty(ultimosPartidos)}" class="text-center text-gray-500 py-4">
                             <i class="fas fa-calendar-times text-3xl mb-2"></i>
-                            <p>No hay partidos recientes</p>
+                            <p th:text="#{coach.stats.noRecentMatches}">No hay partidos recientes</p>
                         </div>
                         
                         <div th:unless="${#lists.isEmpty(ultimosPartidos)}" class="space-y-3">
@@ -151,12 +151,12 @@
                     <!-- Próximos Partidos -->
                     <div class="bg-white p-6 rounded-lg shadow-md">
                         <h3 class="text-lg font-semibold text-gray-800 mb-4">
-                            <i class="fas fa-calendar-plus mr-2 text-blue-600"></i>Próximos Partidos
+                            <i class="fas fa-calendar-plus mr-2 text-blue-600"></i><span th:text="#{coach.stats.upcomingMatches}">Próximos Partidos</span>
                         </h3>
                         
                         <div th:if="${#lists.isEmpty(proximosPartidos)}" class="text-center text-gray-500 py-4">
                             <i class="fas fa-calendar-alt text-3xl mb-2"></i>
-                            <p>No hay partidos programados</p>
+                            <p th:text="#{coach.stats.noUpcomingMatches}">No hay partidos programados</p>
                         </div>
                         
                         <div th:unless="${#lists.isEmpty(proximosPartidos)}" class="space-y-3">
@@ -174,8 +174,8 @@
                                 </div>
                                 
                                 <div class="text-right">
-                                    <span class="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">
-                                        <span th:text="${partido.estado}">Estado</span>
+                                    <span class="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full" th:text="#{${'estado.' + partido.estado}}">
+                                        Estado
                                     </span>
                                 </div>
                             </div>

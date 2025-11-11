@@ -4,8 +4,11 @@ import java.nio.charset.StandardCharsets;
 import java.time.YearMonth;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
 import org.springframework.http.HttpHeaders;
 
 import org.springframework.http.MediaType;
@@ -53,6 +56,9 @@ public class AdminController {
     private final EscalafonRepository escalafonRepository;
     private final NotificacionService notificacionService;
 
+    @Autowired
+    private MessageSource messageSource;
+
     public AdminController(NotificacionService notificacionService,EntrenadorService entrenadorService, EquipoService equipoService, PdfService pdfService ,LiquidacionService liquidacionService, ArbitroService arbitroService, PartidoService partidoService, EscalafonRepository escalafonRepository) {
         this.arbitroService = arbitroService;
         this.partidoService = partidoService;
@@ -96,19 +102,19 @@ public class AdminController {
     // ==================== ÁRBITROS ====================
 
     @GetMapping("/arbitros")
-    public String arbitros(Model model) {
+    public String arbitros(Model model, Locale locale) {
         model.addAttribute("arbitros", arbitroService.findAll());
         return "admin/arbitros";
     }
    
     @GetMapping("/notificaciones")
-    public String notificaciones(Model model){
+    public String notificaciones(Model model, Locale locale){
         model.addAttribute("notificaciones", notificacionService.obtenerNotificacionesAdmin());
         return "admin/notificaciones";
     }
 
     @GetMapping("/liquidaciones")
-    public String listarLiquidaciones(String periodo, Model model) {
+    public String listarLiquidaciones(String periodo, Model model, Locale locale) {
 
         // Periodo por defecto = mes actual
         YearMonth periodoSeleccionado;
@@ -129,18 +135,22 @@ public class AdminController {
     }
 
     @PostMapping("/liquidaciones/generar")
-    public String generarLiquidaciones(@RequestParam String periodo) {
+    public String generarLiquidaciones(@RequestParam String periodo, RedirectAttributes redirectAttributes, Locale locale) {
         YearMonth ym = YearMonth.parse(periodo); // formato "YYYY-MM"
         liquidacionService.generarLiquidacionesMensuales(ym);
+        String successMsg = messageSource.getMessage("msg.success.liquidaciones.generated", null, locale);
+        redirectAttributes.addFlashAttribute("successMessage", successMsg);
         return "redirect:/admin/liquidaciones?periodo=" + ym;
     }
 
 
     @PostMapping("/liquidaciones/{id}/pagar")
-    public String pagar(@PathVariable Long id) {
+    public String pagar(@PathVariable Long id, RedirectAttributes redirectAttributes, Locale locale) {
         Optional<Liquidacion> opt = liquidacionService.findById(id);
         if (opt.isPresent() && opt.get().getEstado() == Liquidacion.EstadoLiquidacion.PENDIENTE) {
             liquidacionService.marcarComoPagada(id);
+            String successMsg = messageSource.getMessage("msg.success.liquidacion.paid", null, locale);
+            redirectAttributes.addFlashAttribute("successMessage", successMsg);
         }
         return "redirect:/admin/liquidaciones";
     }
@@ -157,7 +167,7 @@ public class AdminController {
     }
 
     @GetMapping("/arbitros/create")
-    public String createArbitro(Model model) {
+    public String createArbitro(Model model, Locale locale) {
         Arbitro arbitro = new Arbitro();
         // Inicializar el usuario para evitar el error
         arbitro.setUsuario(new Usuario());
@@ -173,32 +183,37 @@ public class AdminController {
                             BindingResult result,
                             @RequestParam(value = "photoFile", required = false) MultipartFile photoFile,
                             Model model,
-                            RedirectAttributes redirectAttributes) {
+                            RedirectAttributes redirectAttributes,
+                            Locale locale) {
         try {
             if (result.hasErrors()) {
                 model.addAttribute("escalafones", escalafonRepository.findAll());
-                return "admin/createArbitro"; // Changed to match your template
+                return "admin/createArbitro";
             }
 
             arbitroService.createArbitroWithPhoto(arbitro, photoFile);
-            redirectAttributes.addFlashAttribute("successMessage", "Árbitro creado exitosamente");
+            String successMsg = messageSource.getMessage("msg.success.arbitro.created", null, locale);
+            redirectAttributes.addFlashAttribute("successMessage", successMsg);
             return "redirect:/admin/arbitros";
             
         } catch (IllegalArgumentException e) {
-            model.addAttribute("errorMessage", e.getMessage());
+            String errorMsg = messageSource.getMessage("msg.error.duplicate", null, locale);
+            model.addAttribute("errorMessage", errorMsg + ": " + e.getMessage());
             model.addAttribute("escalafones", escalafonRepository.findAll());
-            return "admin/createArbitro"; // Changed to match your template
+            return "admin/createArbitro";
         } catch (Exception e) {
-            model.addAttribute("errorMessage", "Error al crear el árbitro: " + e.getMessage());
+            String errorMsg = messageSource.getMessage("msg.error.save", null, locale);
+            model.addAttribute("errorMessage", errorMsg);
             model.addAttribute("escalafones", escalafonRepository.findAll());
-            return "admin/createArbitro"; // Changed to match your template
+            return "admin/createArbitro";
         }
     }
 
     @GetMapping("/arbitros/edit/{id}")
-    public String editArbitro(@PathVariable Long id, Model model) {
+    public String editArbitro(@PathVariable Long id, Model model, Locale locale) {
         Arbitro arbitro = arbitroService.findById(id)
-            .orElseThrow(() -> new IllegalArgumentException("Árbitro no encontrado"));
+            .orElseThrow(() -> new IllegalArgumentException(
+                messageSource.getMessage("msg.error.arbitro.notfound", null, locale)));
         // Asegura objeto usuario para el form, si lo usas ahí
         if (arbitro.getUsuario() == null) {
             arbitro.setUsuario(new Usuario());
@@ -206,7 +221,7 @@ public class AdminController {
         model.addAttribute("arbitro", arbitro);
         model.addAttribute("escalafones", escalafonRepository.findAll());
         model.addAttribute("modoEdicion", true);
-        return "admin/createArbitro"; // Use the existing form template for editing
+        return "admin/createArbitro";
     }
 
     @GetMapping("/arbitros/{id}/photo")
@@ -240,10 +255,13 @@ public class AdminController {
                                @RequestParam(value = "photoFile", required = false) MultipartFile photoFile,
                                @RequestParam(value = "removePhoto", defaultValue = "false") boolean removePhoto,
                                @RequestParam(value = "updatePassword", defaultValue = "false") boolean updatePassword,
-                               Model model, RedirectAttributes redirectAttributes) {
+                               Model model, 
+                               RedirectAttributes redirectAttributes,
+                               Locale locale) {
 
         if (result.hasErrors()) {
-            model.addAttribute("errorMessage", "Por favor corrige los errores en el formulario");
+            String errorMsg = messageSource.getMessage("msg.error.form.validation", null, locale);
+            model.addAttribute("errorMessage", errorMsg);
             model.addAttribute("escalafones", escalafonRepository.findAll());
             model.addAttribute("modoEdicion", true);
             return "admin/arbitro_form";
@@ -255,8 +273,9 @@ public class AdminController {
             
             Arbitro updatedArbitro = arbitroService.updateArbitroWithPhoto(arbitro, photoFile, removePhoto, updatePassword);
 
-            redirectAttributes.addFlashAttribute("successMessage", 
-                "¡Árbitro '" + updatedArbitro.getNombre() + "' actualizado exitosamente!");
+            String successMsg = messageSource.getMessage("msg.success.arbitro.updated", 
+                new Object[]{updatedArbitro.getNombre()}, locale);
+            redirectAttributes.addFlashAttribute("successMessage", successMsg);
 
             return "redirect:/admin/arbitros";
             
@@ -269,7 +288,8 @@ public class AdminController {
             System.err.println("Error al actualizar árbitro: " + e.getMessage());
             e.printStackTrace();
             
-            model.addAttribute("errorMessage", "Error al actualizar el árbitro. Por favor intenta nuevamente.");
+            String errorMsg = messageSource.getMessage("msg.error.update", null, locale);
+            model.addAttribute("errorMessage", errorMsg);
             model.addAttribute("escalafones", escalafonRepository.findAll());
             model.addAttribute("modoEdicion", true);
             return "admin/arbitro_form";
@@ -277,29 +297,24 @@ public class AdminController {
     }
 
     @PostMapping("/arbitros/delete/{id}")
-    public String delete(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+    public String delete(@PathVariable Long id, RedirectAttributes redirectAttributes, Locale locale) {
         try {
-            Optional<Arbitro> arbitroOpt = arbitroService.findById(id);
-            Arbitro arbitro = arbitroOpt.get();
-            String nombre = arbitro.getNombre();
-            
             boolean deleted = arbitroService.deleteById(id);
             if (deleted) {
-                redirectAttributes.addFlashAttribute("successMessage",
-                    "¡Árbitro '" + nombre + "' eliminado exitosamente!");
+                String successMsg = messageSource.getMessage("msg.success.arbitro.deleted", null, locale);
+                redirectAttributes.addFlashAttribute("successMessage", successMsg);
             } else {
-                redirectAttributes.addFlashAttribute("errorMessage",
-                    "No se pudo encontrar el árbitro a eliminar.");
+                String errorMsg = messageSource.getMessage("msg.error.notfound", null, locale);
+                redirectAttributes.addFlashAttribute("errorMessage", errorMsg);
             }
         } catch (DataIntegrityViolationException e) {
-            redirectAttributes.addFlashAttribute("errorMessage",
-                "No se puede eliminar porque tiene partidos asociados. " +
-                "Desasigna o elimina sus partidos primero.");
+            String errorMsg = messageSource.getMessage("msg.error.delete", null, locale);
+            redirectAttributes.addFlashAttribute("errorMessage", errorMsg);
         } catch (RuntimeException e) {
             redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("errorMessage",
-                "Error interno al eliminar el árbitro. Por favor intenta nuevamente.");
+            String errorMsg = messageSource.getMessage("msg.error.general", null, locale);
+            redirectAttributes.addFlashAttribute("errorMessage", errorMsg);
             System.err.println("Error al eliminar árbitro con ID " + id + ": " + e.getMessage());
         }
         return "redirect:/admin/arbitros";
@@ -307,9 +322,10 @@ public class AdminController {
 
   
     @GetMapping("/arbitros/{id}")
-    public String viewArbitro(@PathVariable Long id, Model model) {
+    public String viewArbitro(@PathVariable Long id, Model model, Locale locale) {
         Arbitro arbitro = arbitroService.findById(id)
-            .orElseThrow(() -> new IllegalArgumentException("Árbitro no encontrado"));
+            .orElseThrow(() -> new IllegalArgumentException(
+                messageSource.getMessage("msg.error.arbitro.notfound", null, locale)));
         model.addAttribute("arbitro", arbitro);
         return "admin/arbitro_view"; // ver plantilla en el punto 4
     }
@@ -318,7 +334,7 @@ public class AdminController {
 
 
     @GetMapping("/coaches")
-    public String listarCoaches(Model model) {
+    public String listarCoaches(Model model, Locale locale) {
         List<Entrenador> coaches = entrenadorService.findAllActive();
         model.addAttribute("coaches", coaches);
         return "admin/coaches";
@@ -329,7 +345,7 @@ public class AdminController {
      * Ruta: /admin/coaches/create
      */
     @GetMapping("/coaches/create")
-    public String mostrarFormularioCrearCoach(Model model) {
+    public String mostrarFormularioCrearCoach(Model model, Locale locale) {
         model.addAttribute("entrenador", new Entrenador());
         model.addAttribute("categorias", Entrenador.Categoria.values());
         return "admin/coaches_form";
@@ -344,25 +360,29 @@ public class AdminController {
             @Valid @ModelAttribute("entrenador") Entrenador entrenador,
             BindingResult bindingResult,
             Model model,
-            RedirectAttributes redirectAttributes) {
+            RedirectAttributes redirectAttributes,
+            Locale locale) {
 
         if (bindingResult.hasErrors()) {
             model.addAttribute("categorias", Entrenador.Categoria.values());
-            model.addAttribute("errorMessage", "Por favor corrige los errores en el formulario");
+            String errorMsg = messageSource.getMessage("msg.error.form.validation", null, locale);
+            model.addAttribute("errorMessage", errorMsg);
             return "admin/coaches_form";
         }
 
         try {
             // Validar que no exista un coach con la misma cédula
             if (entrenadorService.existsByCedula(entrenador.getCedula())) {
-                model.addAttribute("errorMessage", "Ya existe un entrenador con esa cédula");
+                String errorMsg = messageSource.getMessage("msg.error.duplicate.cedula", null, locale);
+                model.addAttribute("errorMessage", errorMsg);
                 model.addAttribute("categorias", Entrenador.Categoria.values());
                 return "admin/coaches_form";
             }
 
             // Validar que no exista un coach con el mismo email
             if (entrenadorService.existsByEmail(entrenador.getEmail())) {
-                model.addAttribute("errorMessage", "Ya existe un entrenador con ese email");
+                String errorMsg = messageSource.getMessage("msg.error.duplicate.email", null, locale);
+                model.addAttribute("errorMessage", errorMsg);
                 model.addAttribute("categorias", Entrenador.Categoria.values());
                 return "admin/coaches_form";
             }
@@ -370,8 +390,9 @@ public class AdminController {
             // Crear el coach con usuario y contraseña por defecto
             Entrenador savedCoach = entrenadorService.createCoachWithUser(entrenador);
 
-            redirectAttributes.addFlashAttribute("successMessage", 
-                "¡Coach '" + savedCoach.getNombreCompleto() + "' creado exitosamente!");
+            String successMsg = messageSource.getMessage("msg.success.coach.created", 
+                new Object[]{savedCoach.getNombreCompleto()}, locale);
+            redirectAttributes.addFlashAttribute("successMessage", successMsg);
 
             return "redirect:/admin/coaches";
 
@@ -383,7 +404,8 @@ public class AdminController {
             System.err.println("Error al crear coach: " + e.getMessage());
             e.printStackTrace();
             
-            model.addAttribute("errorMessage", "Error al crear el coach. Por favor intenta nuevamente.");
+            String errorMsg = messageSource.getMessage("msg.error.save", null, locale);
+            model.addAttribute("errorMessage", errorMsg);
             model.addAttribute("categorias", Entrenador.Categoria.values());
             return "admin/coaches_form";
         }
@@ -394,7 +416,7 @@ public class AdminController {
      * Ruta: /admin/coaches/view/{id}
      */
     @GetMapping("/coaches/view/{id}")
-    public String verCoach(@PathVariable("id") Long id, Model model, RedirectAttributes redirectAttributes) {
+    public String verCoach(@PathVariable("id") Long id, Model model, RedirectAttributes redirectAttributes, Locale locale) {
         Optional<Entrenador> coachOpt = entrenadorService.findById(id);
         
         if (coachOpt.isPresent()) {
@@ -412,7 +434,8 @@ public class AdminController {
             
             return "admin/coaches_view";
         } else {
-            redirectAttributes.addFlashAttribute("errorMessage", "Coach no encontrado");
+            String errorMsg = messageSource.getMessage("msg.error.coach.notfound", null, locale);
+            redirectAttributes.addFlashAttribute("errorMessage", errorMsg);
             return "redirect:/admin/coaches";
         }
     }
@@ -422,7 +445,7 @@ public class AdminController {
      * Ruta: /admin/coaches/edit/{id}
      */
     @GetMapping("/coaches/edit/{id}")
-    public String mostrarFormularioEditarCoach(@PathVariable("id") Long id, Model model, RedirectAttributes redirectAttributes) {
+    public String mostrarFormularioEditarCoach(@PathVariable("id") Long id, Model model, RedirectAttributes redirectAttributes, Locale locale) {
         Optional<Entrenador> coachOpt = entrenadorService.findById(id);
         
         if (coachOpt.isPresent()) {
@@ -431,7 +454,8 @@ public class AdminController {
             model.addAttribute("editMode", true);
             return "admin/coaches_form";
         } else {
-            redirectAttributes.addFlashAttribute("errorMessage", "Coach no encontrado");
+            String errorMsg = messageSource.getMessage("msg.error.coach.notfound", null, locale);
+            redirectAttributes.addFlashAttribute("errorMessage", errorMsg);
             return "redirect:/admin/coaches";
         }
     }
@@ -446,12 +470,14 @@ public class AdminController {
             @Valid @ModelAttribute("entrenador") Entrenador entrenadorActualizado,
             BindingResult bindingResult,
             Model model,
-            RedirectAttributes redirectAttributes) {
+            RedirectAttributes redirectAttributes,
+            Locale locale) {
 
         if (bindingResult.hasErrors()) {
             model.addAttribute("categorias", Entrenador.Categoria.values());
             model.addAttribute("editMode", true);
-            model.addAttribute("errorMessage", "Por favor corrige los errores en el formulario");
+            String errorMsg = messageSource.getMessage("msg.error.form.validation", null, locale);
+            model.addAttribute("errorMessage", errorMsg);
             return "admin/coaches_form";
         }
 
@@ -459,7 +485,8 @@ public class AdminController {
             Optional<Entrenador> coachOpt = entrenadorService.findById(id);
             
             if (coachOpt.isEmpty()) {
-                redirectAttributes.addFlashAttribute("errorMessage", "Coach no encontrado");
+                String errorMsg = messageSource.getMessage("msg.error.coach.notfound", null, locale);
+                redirectAttributes.addFlashAttribute("errorMessage", errorMsg);
                 return "redirect:/admin/coaches";
             }
 
@@ -468,7 +495,8 @@ public class AdminController {
             // Validar cédula única (excluyendo el coach actual)
             if (!coachExistente.getCedula().equals(entrenadorActualizado.getCedula()) &&
                 entrenadorService.existsByCedula(entrenadorActualizado.getCedula())) {
-                model.addAttribute("errorMessage", "Ya existe un entrenador con esa cédula");
+                String errorMsg = messageSource.getMessage("msg.error.duplicate.cedula", null, locale);
+                model.addAttribute("errorMessage", errorMsg);
                 model.addAttribute("categorias", Entrenador.Categoria.values());
                 model.addAttribute("editMode", true);
                 return "admin/coaches_form";
@@ -477,7 +505,8 @@ public class AdminController {
             // Validar email único (excluyendo el coach actual)
             if (!coachExistente.getEmail().equals(entrenadorActualizado.getEmail()) &&
                 entrenadorService.existsByEmail(entrenadorActualizado.getEmail())) {
-                model.addAttribute("errorMessage", "Ya existe un entrenador con ese email");
+                String errorMsg = messageSource.getMessage("msg.error.duplicate.email", null, locale);
+                model.addAttribute("errorMessage", errorMsg);
                 model.addAttribute("categorias", Entrenador.Categoria.values());
                 model.addAttribute("editMode", true);
                 return "admin/coaches_form";
@@ -487,8 +516,9 @@ public class AdminController {
             entrenadorActualizado.setId(id);
             entrenadorService.updateCoach(entrenadorActualizado);
 
-            redirectAttributes.addFlashAttribute("successMessage", 
-                "¡Coach '" + entrenadorActualizado.getNombreCompleto() + "' actualizado correctamente!");
+            String successMsg = messageSource.getMessage("msg.success.coach.updated", 
+                new Object[]{entrenadorActualizado.getNombreCompleto()}, locale);
+            redirectAttributes.addFlashAttribute("successMessage", successMsg);
 
             return "redirect:/admin/coaches/view/" + id;
 
@@ -498,7 +528,8 @@ public class AdminController {
             model.addAttribute("editMode", true);
             return "admin/coaches_form";
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("errorMessage", "Error al actualizar el coach");
+            String errorMsg = messageSource.getMessage("msg.error.update", null, locale);
+            redirectAttributes.addFlashAttribute("errorMessage", errorMsg);
             return "redirect:/admin/coaches";
         }
     }
@@ -508,7 +539,7 @@ public class AdminController {
      * Ruta: POST /admin/coaches/delete/{id}
      */
     @PostMapping("/coaches/delete/{id}")
-    public String eliminarCoach(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+    public String eliminarCoach(@PathVariable Long id, RedirectAttributes redirectAttributes, Locale locale) {
         try {
             Optional<Entrenador> coachOpt = entrenadorService.findById(id);
             String coachName = coachOpt.map(Entrenador::getNombreCompleto).orElse(null);
@@ -516,17 +547,18 @@ public class AdminController {
             boolean deleted = entrenadorService.deleteById(id);
             
             if (deleted) {
-                redirectAttributes.addFlashAttribute("successMessage", 
-                    "¡Coach" + (coachName != null ? " '" + coachName + "'" : "") + " eliminado exitosamente!");
+                String successMsg = messageSource.getMessage("msg.success.coach.deleted", 
+                    new Object[]{coachName != null ? coachName : ""}, locale);
+                redirectAttributes.addFlashAttribute("successMessage", successMsg);
             } else {
-                redirectAttributes.addFlashAttribute("errorMessage", 
-                    "No se pudo encontrar el coach a eliminar.");
+                String errorMsg = messageSource.getMessage("msg.error.notfound", null, locale);
+                redirectAttributes.addFlashAttribute("errorMessage", errorMsg);
             }
         } catch (RuntimeException e) {
             redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("errorMessage", 
-                "Error interno al eliminar el coach. Por favor intenta nuevamente.");
+            String errorMsg = messageSource.getMessage("msg.error.general", null, locale);
+            redirectAttributes.addFlashAttribute("errorMessage", errorMsg);
             System.err.println("Error al eliminar coach con ID " + id + ": " + e.getMessage());
         }
         
@@ -561,14 +593,14 @@ public class AdminController {
     // -------------------- PARTIDOS --------------------
 
     @GetMapping("/partidos")
-    public String partidos(Model model) {
+    public String partidos(Model model, Locale locale) {
         List<Partido> partidos = partidoService.findAll();
         model.addAttribute("partidos", partidos);
         return "admin/partidos";
     }
 
     @GetMapping("/lop")
-    public ResponseEntity<Map<String, Object>> show(Model model) {
+    public ResponseEntity<Map<String, Object>> show(Model model, Locale locale) {
         //Map<String, Object> response = new HashMap<>();
 
         Optional<Partido> partidos = partidoService.findById(1L);
@@ -578,7 +610,7 @@ public class AdminController {
     }
 
     @GetMapping("/partidos/create")
-    public String mostrarFormularioCrear(Model model) {
+    public String mostrarFormularioCrear(Model model, Locale locale) {
         Partido p = new Partido();
         // Establecer el estado por defecto
         p.setEstado(Partido.EstadoPartido.PENDIENTE_CONFIRMACION);
@@ -598,12 +630,13 @@ public class AdminController {
         return "admin/partido_form";
     }
     @PostMapping("/partidos/save")
-    public String guardar(@ModelAttribute Partido partido, Model model, RedirectAttributes redirectAttributes) {
+    public String guardar(@ModelAttribute Partido partido, Model model, RedirectAttributes redirectAttributes, Locale locale) {
         try {
             // Validar que los equipos sean diferentes
             if (partido.getEquipoLocal() != null && partido.getEquipoVisitante() != null &&
                 partido.getEquipoLocal().getId().equals(partido.getEquipoVisitante().getId())) {
-                model.addAttribute("errorMessage", "No se puede seleccionar el mismo equipo como local y visitante");
+                String errorMsg = messageSource.getMessage("msg.error.partido.sameTeam", null, locale);
+                model.addAttribute("errorMessage", errorMsg);
                 model.addAttribute("partido", partido);
                 model.addAttribute("arbitros", arbitroService.findAll());
                 model.addAttribute("equipos", equipoService.findAll());
@@ -619,11 +652,13 @@ public class AdminController {
             }
             
             partidoService.crearPartido(partido);
-            redirectAttributes.addFlashAttribute("successMessage", "Partido creado exitosamente");
+            String successMsg = messageSource.getMessage("msg.success.partido.created", null, locale);
+            redirectAttributes.addFlashAttribute("successMessage", successMsg);
             return "redirect:/admin/partidos";
             
         } catch (Exception e) {
-            model.addAttribute("errorMessage", "Error al crear el partido: " + e.getMessage());
+            String errorMsg = messageSource.getMessage("msg.error.save", null, locale);
+            model.addAttribute("errorMessage", errorMsg + ": " + e.getMessage());
             model.addAttribute("partido", partido);
             model.addAttribute("arbitros", arbitroService.findAll());
             model.addAttribute("equipos", equipoService.findAll());
@@ -637,9 +672,10 @@ public class AdminController {
 
 
     @GetMapping("/partidos/edit/{id}")
-    public String editar(@PathVariable Long id, Model model) {
+    public String editar(@PathVariable Long id, Model model, Locale locale) {
         Partido partido = partidoService.findById(id)
-            .orElseThrow(() -> new IllegalArgumentException("Partido no encontrado"));
+            .orElseThrow(() -> new IllegalArgumentException(
+                messageSource.getMessage("msg.error.partido.notfound", null, locale)));
         model.addAttribute("partido", partido);
         // Asegurar que siempre hay listas no nulas
         List<Arbitro> arbitros = arbitroService.findAll();
@@ -651,7 +687,7 @@ public class AdminController {
     }
 
     @PostMapping("/partidos/delete/{id}")
-    public String deletePartido(@PathVariable Long id, RedirectAttributes ra) {
+    public String deletePartido(@PathVariable Long id, RedirectAttributes ra, Locale locale) {
         try {
             Optional<Partido> opt = partidoService.findById(id);
             String label = opt.map(p -> p.getEquipoLocal().getNombre() + " vs " + p.getEquipoVisitante().getNombre())
@@ -660,26 +696,31 @@ public class AdminController {
             boolean deleted = partidoService.deleteById(id);
 
             if (deleted) {
-                ra.addFlashAttribute("successMessage", "¡Partido \"" + label + "\" eliminado exitosamente!");
+                String successMsg = messageSource.getMessage("msg.success.partido.deleted", 
+                    new Object[]{label}, locale);
+                ra.addFlashAttribute("successMessage", successMsg);
             } else {
-                ra.addFlashAttribute("errorMessage", "No se encontró el partido a eliminar.");
+                String errorMsg = messageSource.getMessage("msg.error.notfound", null, locale);
+                ra.addFlashAttribute("errorMessage", errorMsg);
             }
         } catch (RuntimeException ex) {
             ra.addFlashAttribute("errorMessage", ex.getMessage());
         } catch (Exception ex) {
-            ra.addFlashAttribute("errorMessage", "Error interno al eliminar el partido. Intenta nuevamente.");
+            String errorMsg = messageSource.getMessage("msg.error.general", null, locale);
+            ra.addFlashAttribute("errorMessage", errorMsg);
             System.err.println("Error al eliminar partido " + id + ": " + ex.getMessage());
         }
         return "redirect:/admin/partidos";
     }
 
     @PostMapping("/partidos/update/{id}")
-    public String actualizar(@PathVariable Long id, @ModelAttribute Partido partido, Model model, RedirectAttributes redirectAttributes) {
+    public String actualizar(@PathVariable Long id, @ModelAttribute Partido partido, Model model, RedirectAttributes redirectAttributes, Locale locale) {
         try {
             // Validar que los equipos sean diferentes
             if (partido.getEquipoLocal() != null && partido.getEquipoVisitante() != null &&
                 partido.getEquipoLocal().getId().equals(partido.getEquipoVisitante().getId())) {
-                model.addAttribute("errorMessage", "No se puede seleccionar el mismo equipo como local y visitante");
+                String errorMsg = messageSource.getMessage("msg.error.partido.sameTeam", null, locale);
+                model.addAttribute("errorMessage", errorMsg);
                 model.addAttribute("partido", partido);
                 model.addAttribute("arbitros", arbitroService.findAll());
                 model.addAttribute("equipos", equipoService.findAll());
@@ -689,7 +730,8 @@ public class AdminController {
             
             // Verificar que el partido existe
             if (!partidoService.findById(id).isPresent()) {
-                redirectAttributes.addFlashAttribute("errorMessage", "Partido no encontrado");
+                String errorMsg = messageSource.getMessage("msg.error.partido.notfound", null, locale);
+                redirectAttributes.addFlashAttribute("errorMessage", errorMsg);
                 return "redirect:/admin/partidos";
             }
             
@@ -704,11 +746,13 @@ public class AdminController {
             }
             
             partidoService.crearPartido(partido); // Reutilizar crearPartido que debería manejar tanto crear como actualizar
-            redirectAttributes.addFlashAttribute("successMessage", "Partido actualizado exitosamente");
+            String successMsg = messageSource.getMessage("msg.success.partido.updated", null, locale);
+            redirectAttributes.addFlashAttribute("successMessage", successMsg);
             return "redirect:/admin/partidos";
             
         } catch (Exception e) {
-            model.addAttribute("errorMessage", "Error al actualizar el partido: " + e.getMessage());
+            String errorMsg = messageSource.getMessage("msg.error.update", null, locale);
+            model.addAttribute("errorMessage", errorMsg + ": " + e.getMessage());
             model.addAttribute("partido", partido);
             model.addAttribute("arbitros", arbitroService.findAll());
             model.addAttribute("equipos", equipoService.findAll());

@@ -1,9 +1,12 @@
 package eafit.caba_pro.controller;
 import java.time.YearMonth;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -42,6 +45,9 @@ public class ArbitroController {
     private final PdfService pdfGeneratorService;
     private final NotificacionService notificacionService;
 
+    @Autowired
+    private MessageSource messageSource;
+
     public ArbitroController(NotificacionService notificacionService,PdfService pdfGeneratorService, LiquidacionService liquidacionService, ArbitroService arbitroService, PartidoService partidoService, UsuarioService usuarioService, ReseñaService reseñaService) {
         this.notificacionService = notificacionService;
         this.pdfGeneratorService = pdfGeneratorService;
@@ -56,10 +62,10 @@ public class ArbitroController {
 
 
     @GetMapping
-    public String dashboard(Model model){
+    public String dashboard(Model model, Locale locale){
         Optional<Arbitro> arbitro = arbitroService.findByUsername(usuarioService.getCurrentUsername());
         if (arbitro.isPresent()) {
-            model.addAttribute("titulo", "Dashboard");
+            model.addAttribute("titulo", messageSource.getMessage("page.arbitro.dashboard", null, locale));
             model.addAttribute("nombre", arbitro.get().getNombre());
             model.addAttribute("arbitro", arbitro.get());
             Map<String, Object> estadisticas = partidoService.getEstadisticasArbitro(arbitro.get());
@@ -73,7 +79,7 @@ public class ArbitroController {
     }
 
     @GetMapping("/arbitros")
-    public String index(Model model) {
+    public String index(Model model, Locale locale) {
         model.addAttribute("arbitros", arbitroService.findAll());
         return "arbitro/peril";
     }
@@ -101,7 +107,7 @@ public class ArbitroController {
     @GetMapping("/calendario")
     public String calendario(@RequestParam(required = false) Integer year,
                              @RequestParam(required = false) Integer month,
-                             Model model) {
+                             Model model, Locale locale) {
         Optional<Arbitro> arbitroOpt = arbitroService.findByUsername(usuarioService.getCurrentUsername());
 
         if (!arbitroOpt.isPresent()) {
@@ -132,7 +138,7 @@ public class ArbitroController {
     }
 
     @GetMapping("/perfil")
-    public String perfil(Model model) {
+    public String perfil(Model model, Locale locale) {
         Optional<Arbitro> arbitroOpt = arbitroService.findByUsername(usuarioService.getCurrentUsername());
 
         if (!arbitroOpt.isPresent()) {
@@ -147,7 +153,7 @@ public class ArbitroController {
     }
 
     @GetMapping("/reseñas")
-    public String reseñas(Model model) {
+    public String reseñas(Model model, Locale locale) {
         Optional<Arbitro> arbitroOpt = arbitroService.findByUsername(usuarioService.getCurrentUsername());
 
         if (!arbitroOpt.isPresent()) {
@@ -165,7 +171,7 @@ public class ArbitroController {
     }
     
     @GetMapping("/partidos")
-    public String partidos(Model model) {
+    public String partidos(Model model, Locale locale) {
         Optional<Arbitro> arbitroOpt = arbitroService.findByUsername(usuarioService.getCurrentUsername());
 
         if (!arbitroOpt.isPresent()) {
@@ -188,7 +194,7 @@ public class ArbitroController {
     }
 
     @GetMapping("/liquidaciones")
-    public String liquidaciones(Model model) {
+    public String liquidaciones(Model model, Locale locale) {
         Optional<Arbitro> arbitroOpt = arbitroService.findByUsername(usuarioService.getCurrentUsername());
 
         if (!arbitroOpt.isPresent()) {
@@ -206,13 +212,13 @@ public class ArbitroController {
     // ========== ENDPOINTS DE DISPONIBILIDAD ==========
 
     @GetMapping("/disponibilidad")
-    public String mostrarDisponibilidad(Model model, Authentication authentication) {
+    public String mostrarDisponibilidad(Model model, Authentication authentication, Locale locale) {
         // Obtener el árbitro autenticado
         String username = authentication.getName();
         Optional<Arbitro> arbitroOpt = arbitroService.findByUsername(username);
         
         if (arbitroOpt.isEmpty()) {
-            model.addAttribute("errorMessage", "No se encontró el árbitro autenticado");
+            model.addAttribute("errorMessage", messageSource.getMessage("msg.error.arbitro.no.encontrado", null, locale));
             return "redirect:/login";
         }
 
@@ -235,13 +241,16 @@ public class ArbitroController {
     @PostMapping("/disponibilidad/confirmar")
     public String confirmarDisponibilidad(@RequestParam("partidoId") Long partidoId,
                                         Authentication authentication,
-                                        RedirectAttributes redirectAttributes) {
+                                        RedirectAttributes redirectAttributes,
+                                        Locale locale) {
         String username = authentication.getName();
         String resultado = arbitroService.confirmarDisponibilidad(partidoId, username);
         if (resultado.startsWith("SUCCESS:")) {
-            redirectAttributes.addFlashAttribute("successMessage", resultado.substring(8));
+            redirectAttributes.addFlashAttribute("successMessage", 
+                messageSource.getMessage("msg.success.disponibilidad.confirmada", null, locale));
         } else {
-            redirectAttributes.addFlashAttribute("errorMessage", resultado);
+            redirectAttributes.addFlashAttribute("errorMessage", 
+                messageSource.getMessage("msg.error.confirmar.disponibilidad", null, locale));
         }
 
         return "redirect:/arbitro/disponibilidad";
@@ -263,14 +272,17 @@ public class ArbitroController {
     public String rechazarYReasignar(@RequestParam("partidoId") Long partidoId,
                                    @RequestParam("nuevoArbitroId") Long nuevoArbitroId,
                                    Authentication authentication,
-                                   RedirectAttributes redirectAttributes) {
+                                   RedirectAttributes redirectAttributes,
+                                   Locale locale) {
         String username = authentication.getName();
         String resultado = arbitroService.reasignarPartido(partidoId, nuevoArbitroId, username);
         
         if (resultado.startsWith("SUCCESS:")) {
-            redirectAttributes.addFlashAttribute("successMessage", resultado.substring(8));
+            redirectAttributes.addFlashAttribute("successMessage", 
+                messageSource.getMessage("msg.success.partido.reasignado", null, locale));
         } else {
-            redirectAttributes.addFlashAttribute("errorMessage", resultado);
+            redirectAttributes.addFlashAttribute("errorMessage", 
+                messageSource.getMessage("msg.error.reasignar.partido", null, locale));
         }
 
         return "redirect:/arbitro/disponibilidad";
@@ -279,14 +291,17 @@ public class ArbitroController {
     @PostMapping("/disponibilidad/no-disponible")
     public String marcarNoDisponible(@RequestParam("partidoId") Long partidoId,
                                    Authentication authentication,
-                                   RedirectAttributes redirectAttributes) {
+                                   RedirectAttributes redirectAttributes,
+                                   Locale locale) {
         String username = authentication.getName();
         String resultado = arbitroService.marcarNoDisponible(partidoId, username);
         
         if (resultado.startsWith("SUCCESS:")) {
-            redirectAttributes.addFlashAttribute("successMessage", resultado.substring(8));
+            redirectAttributes.addFlashAttribute("successMessage", 
+                messageSource.getMessage("msg.success.no.disponible", null, locale));
         } else {
-            redirectAttributes.addFlashAttribute("errorMessage", resultado);
+            redirectAttributes.addFlashAttribute("errorMessage", 
+                messageSource.getMessage("msg.error.marcar.no.disponible", null, locale));
         }
 
         return "redirect:/arbitro/disponibilidad";
@@ -294,7 +309,7 @@ public class ArbitroController {
 
 
     @GetMapping("/notificaciones")
-    public String notificaciones(Model model){
+    public String notificaciones(Model model, Locale locale){
         Optional<Arbitro> arbitroOpt = arbitroService.findByUsername(usuarioService.getCurrentUsername());
 
         if (!arbitroOpt.isPresent()) {

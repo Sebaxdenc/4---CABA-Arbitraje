@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html th:lang="${#locale}" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Crear Reseña - CABA Pro</title>
+    <title th:text="#{page.coach.crearResena} + ' - CABA Pro'">Crear Reseña - CABA Pro</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
@@ -15,19 +15,19 @@
         <!-- Main Content -->
         <div class="flex-1 md:ml-64">
             <!-- Top bar -->
-            <div th:replace="~{fragments/EntrenadorFragments/upBar :: upBar('Crear Reseña', ${entrenador.nombreCompleto})}"></div>
+            <div th:replace="~{fragments/EntrenadorFragments/upBar :: upBar(#{page.coach.crearResena}, ${entrenador.nombreCompleto})}"></div>
             
             <!-- Content -->
             <div class="p-6">
                 <!-- Header -->
                 <div class="mb-8">
-                    <h1 class="text-3xl font-bold text-gray-900 mb-2">Crear Nueva Reseña</h1>
-                    <p class="text-gray-600">Califica y comenta el desempeño de un árbitro</p>
+                    <h1 class="text-3xl font-bold text-gray-900 mb-2" th:text="#{coach.createReview.title}">Crear Nueva Reseña</h1>
+                    <p class="text-gray-600" th:text="#{coach.createReview.subtitle}">Califica y comenta el desempeño de un árbitro</p>
                 </div>
 
                 <!-- Mensajes de error/éxito -->
                 <div th:if="${error}" class="mb-6 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative">
-                    <strong class="font-bold">Error:</strong>
+                    <strong class="font-bold" th:text="#{message.error} + ':'">Error:</strong>
                     <span class="block sm:inline" th:text="${error}"></span>
                 </div>
 
@@ -44,11 +44,11 @@
                         <!-- Selección de Árbitro -->
                         <div class="mb-6">
                             <label for="arbitroId" class="block text-sm font-medium text-gray-700 mb-2">
-                                <i class="fas fa-user-tie mr-2"></i>Seleccionar Árbitro *
+                                <i class="fas fa-user-tie mr-2"></i><span th:text="#{coach.createReview.selectReferee} + ' *'">Seleccionar Árbitro *</span>
                             </label>
                             <select name="arbitroId" id="arbitroId" required
                                     class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
-                                <option value="">-- Selecciona un árbitro --</option>
+                                <option value="" th:text="'-- ' + #{coach.createReview.selectRefereePrompt} + ' --'">-- Selecciona un árbitro --</option>
                                 <option th:each="arbitro : ${arbitros}" 
                                         th:value="${arbitro.id}" 
                                         th:text="${arbitro.nombre + ' (' + arbitro.cedula + ')'}">
@@ -60,13 +60,13 @@
                         <!-- Selección de Partido (opcional) -->
                         <div class="mb-6">
                             <label for="partidoId" class="block text-sm font-medium text-gray-700 mb-2">
-                                <i class="fas fa-basketball-ball mr-2"></i>Partido Relacionado (Opcional)
+                                <i class="fas fa-basketball-ball mr-2"></i><span th:text="#{coach.createReview.relatedMatch}">Partido Relacionado (Opcional)</span>
                             </label>
                             <select name="partidoId" id="partidoId"
                                     class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
-                                <option value="">-- Selecciona primero un árbitro --</option>
+                                <option value="" th:text="'-- ' + #{coach.createReview.selectRefereeFirst} + ' --'">-- Selecciona primero un árbitro --</option>
                             </select>
-                            <p class="text-sm text-gray-500 mt-1">
+                            <p class="text-sm text-gray-500 mt-1" th:text="#{coach.createReview.selectRefereeFirstHint}">
                                 Primero selecciona un árbitro para ver sus partidos finalizados disponibles
                             </p>
                         </div>
@@ -74,7 +74,7 @@
                         <!-- Puntuación -->
                         <div class="mb-6">
                             <label for="puntuacion" class="block text-sm font-medium text-gray-700 mb-2">
-                                <i class="fas fa-star mr-2"></i>Puntuación *
+                                <i class="fas fa-star mr-2"></i><span th:text="#{coach.createReview.rating} + ' *'">Puntuación *</span>
                             </label>
                             <div class="flex items-center space-x-4">
                                 <div class="flex space-x-1" id="star-rating">
@@ -94,7 +94,7 @@
                                         <i class="fas fa-basketball-ball text-gray-300 text-2xl hover:text-yellow-400 transition-colors"></i>
                                     </button>
                                 </div>
-                                <span id="rating-text" class="text-sm text-gray-600">Selecciona una puntuación</span>
+                                <span id="rating-text" class="text-sm text-gray-600" th:text="#{coach.createReview.selectRating}">Selecciona una puntuación</span>
                             </div>
                             <input type="hidden" th:field="*{puntuacion}" id="puntuacion" required />
                             <div th:if="${#fields.hasErrors('puntuacion')}" class="text-red-600 text-sm mt-1">
@@ -105,15 +105,15 @@
                         <!-- Descripción -->
                         <div class="mb-6">
                             <label for="descripcion" class="block text-sm font-medium text-gray-700 mb-2">
-                                <i class="fas fa-comment mr-2"></i>Comentario *
+                                <i class="fas fa-comment mr-2"></i><span th:text="#{coach.createReview.comment} + ' *'">Comentario *</span>
                             </label>
                             <textarea th:field="*{descripcion}" id="descripcion" rows="4" required
-                                      placeholder="Describe tu experiencia con este árbitro..."
+                                      th:placeholder="#{coach.createReview.commentPlaceholder}"
                                       class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"></textarea>
                             <div th:if="${#fields.hasErrors('descripcion')}" class="text-red-600 text-sm mt-1">
                                 <span th:errors="*{descripcion}"></span>
                             </div>
-                            <p class="text-sm text-gray-500 mt-1">
+                            <p class="text-sm text-gray-500 mt-1" th:text="#{coach.createReview.commentHint}">
                                 Máximo 1000 caracteres. Sé específico y constructivo.
                             </p>
                         </div>
@@ -122,11 +122,11 @@
                         <div class="flex justify-between">
                             <a th:href="@{/coach}" 
                                class="px-6 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition-colors">
-                                <i class="fas fa-arrow-left mr-2"></i>Cancelar
+                                <i class="fas fa-arrow-left mr-2"></i><span th:text="#{button.cancel}">Cancelar</span>
                             </a>
                             <button type="submit" 
                                     class="px-6 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors">
-                                <i class="fas fa-save mr-2"></i>Crear Reseña
+                                <i class="fas fa-save mr-2"></i><span th:text="#{button.createReview}">Crear Reseña</span>
                             </button>
                         </div>
                     </form>
@@ -136,7 +136,7 @@
     </div>
 
     <!-- JavaScript para manejo de estrellas y partidos dinámicos -->
-    <script>
+    <script th:inline="javascript">
         document.addEventListener('DOMContentLoaded', function() {
             const starButtons = document.querySelectorAll('.star-btn');
             const ratingInput = document.getElementById('puntuacion');
@@ -145,37 +145,37 @@
             const partidoSelect = document.getElementById('partidoId');
             
             const ratingTexts = {
-                1: '1 Balón - Muy Malo',
-                2: '2 Balones - Malo',
-                3: '3 Balones - Regular',
-                4: '4 Balones - Bueno',
-                5: '5 Balones - Excelente'
+                1: /*[[#{rating.text1}]]*/ '1 Balón - Muy Malo',
+                2: /*[[#{rating.text2}]]*/ '2 Balones - Malo',
+                3: /*[[#{rating.text3}]]*/ '3 Balones - Regular',
+                4: /*[[#{rating.text4}]]*/ '4 Balones - Bueno',
+                5: /*[[#{rating.text5}]]*/ '5 Balones - Excelente'
             };
             
             // Función para cargar partidos dinámicamente
             function cargarPartidosPorArbitro(arbitroId) {
                 if (!arbitroId) {
                     // Si no hay árbitro seleccionado, limpiar la lista de partidos
-                    partidoSelect.innerHTML = '<option value="">-- Selecciona primero un árbitro --</option>';
+                    partidoSelect.innerHTML = '<option value="">' + /*[[#{coach.createReview.selectRefereeFirst}]]*/ '-- Selecciona primero un árbitro --' + '</option>';
                     partidoSelect.disabled = true;
                     return;
                 }
                 
                 // Mostrar loading
-                partidoSelect.innerHTML = '<option value="">Cargando partidos...</option>';
+                partidoSelect.innerHTML = '<option value="">' + /*[[#{coach.createReview.loadingMatches}]]*/ 'Cargando partidos...' + '</option>';
                 partidoSelect.disabled = true;
                 
                 // Hacer petición AJAX
                 fetch(`/coach/api/arbitro/${arbitroId}/partidos-finalizados`)
                     .then(response => {
                         if (!response.ok) {
-                            throw new Error('Error al cargar los partidos');
+                            throw new Error(/*[[#{message.error.loadMatches}]]*/ 'Error al cargar los partidos');
                         }
                         return response.json();
                     })
                     .then(partidos => {
                         // Limpiar las opciones
-                        partidoSelect.innerHTML = '<option value="">-- Ningún partido específico --</option>';
+                        partidoSelect.innerHTML = '<option value="">' + /*[[#{coach.createReview.noSpecificMatch}]]*/ '-- Ningún partido específico --' + '</option>';
                         
                         // Agregar los partidos finalizados
                         partidos.forEach(partido => {
@@ -192,7 +192,7 @@
                         if (partidos.length === 0) {
                             const option = document.createElement('option');
                             option.value = '';
-                            option.textContent = 'Este árbitro no tiene partidos finalizados';
+                            option.textContent = /*[[#{coach.createReview.noFinishedMatches}]]*/ 'Este árbitro no tiene partidos finalizados';
                             option.disabled = true;
                             partidoSelect.appendChild(option);
                         }

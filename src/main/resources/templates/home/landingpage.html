@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<html th:lang="${#locale}" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CABA Pro - Sistema de Arbitraje Profesional</title>
+    <title th:text="#{landing.title}">CABA Pro - Sistema de Arbitraje Profesional</title>
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -81,16 +81,33 @@
                 
                 <!-- Menú de navegación (desktop) -->
                 <div class="hidden md:flex items-center space-x-6">
-                    <a href="#inicio" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">Inicio</a>
-                    <a href="#servicios" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">Servicios</a>
-                    <a href="#caracteristicas" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">Características</a>
-                    <a href="#contacto" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">Contacto</a>
+                    <a href="#inicio" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200" th:text="#{landing.nav.home}">Inicio</a>
+                    <a href="#servicios" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200" th:text="#{landing.nav.services}">Servicios</a>
+                    <a href="#caracteristicas" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200" th:text="#{landing.nav.features}">Características</a>
+                    <a href="#contacto" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200" th:text="#{landing.nav.contact}">Contacto</a>
+                    
+                    <!-- Selector de idioma compacto -->
+                    <div class="relative inline-block ml-4">
+                        <button id="language-toggle-desktop" class="flex items-center space-x-2 text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">
+                            <i class="fas fa-globe"></i>
+                            <span th:text="${#locale.language == 'en' ? 'EN' : 'ES'}">ES</span>
+                            <i class="fas fa-chevron-down text-xs"></i>
+                        </button>
+                        <div id="language-menu-desktop" class="hidden absolute right-0 mt-2 w-32 bg-white rounded-md shadow-lg z-50 border border-gray-200">
+                            <a th:href="@{''(lang='es')}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded-t-md">
+                                🇪🇸 Español
+                            </a>
+                            <a th:href="@{''(lang='en')}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded-b-md">
+                                🇺🇸 English
+                            </a>
+                        </div>
+                    </div>
                 </div>
                 
                 <!-- Botón de login (desktop) -->
                 <div class="hidden md:flex items-center">
                     <a th:href="@{/login}" class="bg-blue-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-blue-700 transition-colors duration-200 shadow-md hover:shadow-lg">
-                        <i class="fas fa-sign-in-alt mr-2"></i>Iniciar Sesión
+                        <i class="fas fa-sign-in-alt mr-2"></i><span th:text="#{btn.login}">Iniciar Sesión</span>
                     </a>
                 </div>
                 
@@ -106,13 +123,29 @@
         <!-- Menú móvil -->
         <div id="mobile-menu" class="md:hidden hidden bg-white border-t shadow-lg">
             <div class="px-4 pt-2 pb-3 space-y-2">
-                <a href="#inicio" class="block px-3 py-2 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors duration-200">Inicio</a>
-                <a href="#servicios" class="block px-3 py-2 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors duration-200">Servicios</a>
-                <a href="#caracteristicas" class="block px-3 py-2 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors duration-200">Características</a>
-                <a href="#contacto" class="block px-3 py-2 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors duration-200">Contacto</a>
+                <a href="#inicio" class="block px-3 py-2 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors duration-200" th:text="#{landing.nav.home}">Inicio</a>
+                <a href="#servicios" class="block px-3 py-2 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors duration-200" th:text="#{landing.nav.services}">Servicios</a>
+                <a href="#caracteristicas" class="block px-3 py-2 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors duration-200" th:text="#{landing.nav.features}">Características</a>
+                <a href="#contacto" class="block px-3 py-2 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors duration-200" th:text="#{landing.nav.contact}">Contacto</a>
+                
+                <!-- Selector de idioma móvil -->
+                <div class="pt-2 border-t">
+                    <div class="px-3 py-2">
+                        <span class="text-xs text-gray-500 uppercase" th:text="#{landing.nav.language}">Idioma</span>
+                        <div class="mt-2 space-y-1">
+                            <a th:href="@{''(lang='es')}" class="block px-3 py-2 text-gray-700 hover:bg-blue-50 rounded-md">
+                                🇪🇸 Español
+                            </a>
+                            <a th:href="@{''(lang='en')}" class="block px-3 py-2 text-gray-700 hover:bg-blue-50 rounded-md">
+                                🇺🇸 English
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
                 <div class="pt-2">
                     <a th:href="@{/login}" class="block w-full text-center bg-blue-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-blue-700 transition-colors duration-200">
-                        <i class="fas fa-sign-in-alt mr-2"></i>Iniciar Sesión
+                        <i class="fas fa-sign-in-alt mr-2"></i><span th:text="#{btn.login}">Iniciar Sesión</span>
                     </a>
                 </div>
             </div>
@@ -125,21 +158,21 @@
             <div class="flex flex-col lg:flex-row items-center min-h-[80vh]">
                 <div class="lg:w-1/2 fade-in">
                     <h1 class="text-4xl lg:text-6xl font-bold mb-6 leading-tight">
-                        El Futuro del
-                        <span class="text-yellow-300">Arbitraje Deportivo</span>
+                        <span th:text="#{landing.hero.title.line1}">El Futuro del</span>
+                        <span class="text-yellow-300" th:text="#{landing.hero.title.line2}">Arbitraje Deportivo</span>
                     </h1>
-                    <p class="text-xl lg:text-2xl mb-8 text-blue-100 leading-relaxed">
+                    <p class="text-xl lg:text-2xl mb-8 text-blue-100 leading-relaxed" th:text="#{landing.hero.subtitle}">
                         Conectamos árbitros profesionales con entrenadores y equipos. 
                         Gestión inteligente, reseñas verificadas y excelencia en cada partido.
                     </p>
                     <div class="flex flex-col sm:flex-row gap-4">
                         <a th:href="@{/login}" class="bg-yellow-400 text-blue-900 px-8 py-3 rounded-lg font-semibold text-lg hover:bg-yellow-300 transition-all duration-200 inline-flex items-center justify-center shadow-lg hover:shadow-xl transform hover:-translate-y-1">
                             <i class="fas fa-play mr-2"></i>
-                            Comenzar Ahora
+                            <span th:text="#{landing.hero.button.start}">Comenzar Ahora</span>
                         </a>
                         <a href="#servicios" class="border-2 border-white text-white px-8 py-3 rounded-lg font-semibold text-lg hover:bg-white hover:text-blue-900 transition-all duration-200 inline-flex items-center justify-center">
                             <i class="fas fa-info-circle mr-2"></i>
-                            Conocer Más
+                            <span th:text="#{landing.hero.button.learnMore}">Conocer Más</span>
                         </a>
                     </div>
                 </div>
@@ -165,8 +198,8 @@
     <section id="servicios" class="py-20 bg-white">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center mb-16">
-                <h2 class="text-4xl font-bold text-gray-900 mb-4">Nuestros Servicios</h2>
-                <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+                <h2 class="text-4xl font-bold text-gray-900 mb-4" th:text="#{landing.services.title}">Nuestros Servicios</h2>
+                <p class="text-xl text-gray-600 max-w-3xl mx-auto" th:text="#{landing.services.subtitle}">
                     Ofrecemos una plataforma completa para la gestión de arbitraje deportivo con herramientas profesionales
                 </p>
             </div>
@@ -177,15 +210,15 @@
                     <div class="bg-blue-600 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6">
                         <i class="fas fa-user-tie text-2xl text-white"></i>
                     </div>
-                    <h3 class="text-2xl font-bold text-gray-900 mb-4">Para Árbitros</h3>
-                    <p class="text-gray-600 mb-6">
+                    <h3 class="text-2xl font-bold text-gray-900 mb-4" th:text="#{landing.services.referees.title}">Para Árbitros</h3>
+                    <p class="text-gray-600 mb-6" th:text="#{landing.services.referees.description}">
                         Gestiona tu calendario, recibe asignaciones automáticas y mantén tu perfil profesional actualizado.
                     </p>
                     <ul class="text-left text-gray-600 space-y-2">
-                        <li><i class="fas fa-check text-green-500 mr-2"></i>Calendario inteligente</li>
-                        <li><i class="fas fa-check text-green-500 mr-2"></i>Gestión de disponibilidad</li>
-                        <li><i class="fas fa-check text-green-500 mr-2"></i>Historial de partidos</li>
-                        <li><i class="fas fa-check text-green-500 mr-2"></i>Sistema de reseñas</li>
+                        <li><i class="fas fa-check text-green-500 mr-2"></i><span th:text="#{landing.services.referees.feature1}">Calendario inteligente</span></li>
+                        <li><i class="fas fa-check text-green-500 mr-2"></i><span th:text="#{landing.services.referees.feature2}">Gestión de disponibilidad</span></li>
+                        <li><i class="fas fa-check text-green-500 mr-2"></i><span th:text="#{landing.services.referees.feature3}">Historial de partidos</span></li>
+                        <li><i class="fas fa-check text-green-500 mr-2"></i><span th:text="#{landing.services.referees.feature4}">Sistema de reseñas</span></li>
                     </ul>
                 </div>
                 
@@ -194,15 +227,15 @@
                     <div class="bg-green-600 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6">
                         <i class="fas fa-clipboard-user text-2xl text-white"></i>
                     </div>
-                    <h3 class="text-2xl font-bold text-gray-900 mb-4">Para Entrenadores</h3>
-                    <p class="text-gray-600 mb-6">
+                    <h3 class="text-2xl font-bold text-gray-900 mb-4" th:text="#{landing.services.coaches.title}">Para Entrenadores</h3>
+                    <p class="text-gray-600 mb-6" th:text="#{landing.services.coaches.description}">
                         Solicita árbitros verificados, gestiona tus equipos y proporciona retroalimentación valiosa.
                     </p>
                     <ul class="text-left text-gray-600 space-y-2">
-                        <li><i class="fas fa-check text-green-500 mr-2"></i>Búsqueda de árbitros</li>
-                        <li><i class="fas fa-check text-green-500 mr-2"></i>Gestión de equipos</li>
-                        <li><i class="fas fa-check text-green-500 mr-2"></i>Sistema de reseñas</li>
-                        <li><i class="fas fa-check text-green-500 mr-2"></i>Estadísticas detalladas</li>
+                        <li><i class="fas fa-check text-green-500 mr-2"></i><span th:text="#{landing.services.coaches.feature1}">Búsqueda de árbitros</span></li>
+                        <li><i class="fas fa-check text-green-500 mr-2"></i><span th:text="#{landing.services.coaches.feature2}">Gestión de equipos</span></li>
+                        <li><i class="fas fa-check text-green-500 mr-2"></i><span th:text="#{landing.services.coaches.feature3}">Sistema de reseñas</span></li>
+                        <li><i class="fas fa-check text-green-500 mr-2"></i><span th:text="#{landing.services.coaches.feature4}">Estadísticas detalladas</span></li>
                     </ul>
                 </div>
                 
@@ -211,15 +244,15 @@
                     <div class="bg-purple-600 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6">
                         <i class="fas fa-cogs text-2xl text-white"></i>
                     </div>
-                    <h3 class="text-2xl font-bold text-gray-900 mb-4">Administración</h3>
-                    <p class="text-gray-600 mb-6">
+                    <h3 class="text-2xl font-bold text-gray-900 mb-4" th:text="#{landing.services.admin.title}">Administración</h3>
+                    <p class="text-gray-600 mb-6" th:text="#{landing.services.admin.description}">
                         Panel de control completo para gestionar toda la plataforma y usuarios del sistema.
                     </p>
                     <ul class="text-left text-gray-600 space-y-2">
-                        <li><i class="fas fa-check text-green-500 mr-2"></i>Panel de administración</li>
-                        <li><i class="fas fa-check text-green-500 mr-2"></i>Gestión de usuarios</li>
-                        <li><i class="fas fa-check text-green-500 mr-2"></i>Reportes y analytics</li>
-                        <li><i class="fas fa-check text-green-500 mr-2"></i>Configuración del sistema</li>
+                        <li><i class="fas fa-check text-green-500 mr-2"></i><span th:text="#{landing.services.admin.feature1}">Panel de administración</span></li>
+                        <li><i class="fas fa-check text-green-500 mr-2"></i><span th:text="#{landing.services.admin.feature2}">Gestión de usuarios</span></li>
+                        <li><i class="fas fa-check text-green-500 mr-2"></i><span th:text="#{landing.services.admin.feature3}">Reportes y analytics</span></li>
+                        <li><i class="fas fa-check text-green-500 mr-2"></i><span th:text="#{landing.services.admin.feature4}">Configuración del sistema</span></li>
                     </ul>
                 </div>
             </div>
@@ -230,8 +263,8 @@
     <section id="caracteristicas" class="py-20 bg-gray-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center mb-16">
-                <h2 class="text-4xl font-bold text-gray-900 mb-4">¿Por qué elegir CABA Pro?</h2>
-                <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+                <h2 class="text-4xl font-bold text-gray-900 mb-4" th:text="#{landing.features.title}">¿Por qué elegir CABA Pro?</h2>
+                <p class="text-xl text-gray-600 max-w-3xl mx-auto" th:text="#{landing.features.subtitle}">
                     Tecnología avanzada, seguridad garantizada y la mejor experiencia de usuario
                 </p>
             </div>
@@ -243,8 +276,8 @@
                             <i class="fas fa-shield-alt text-white"></i>
                         </div>
                         <div>
-                            <h3 class="text-xl font-bold text-gray-900 mb-2">Seguridad Garantizada</h3>
-                            <p class="text-gray-600">Sistema de autenticación robusto y protección de datos de nivel empresarial.</p>
+                            <h3 class="text-xl font-bold text-gray-900 mb-2" th:text="#{landing.features.security.title}">Seguridad Garantizada</h3>
+                            <p class="text-gray-600" th:text="#{landing.features.security.description}">Sistema de autenticación robusto y protección de datos de nivel empresarial.</p>
                         </div>
                     </div>
                     
@@ -253,8 +286,8 @@
                             <i class="fas fa-clock text-white"></i>
                         </div>
                         <div>
-                            <h3 class="text-xl font-bold text-gray-900 mb-2">Disponibilidad 24/7</h3>
-                            <p class="text-gray-600">Acceso completo a la plataforma en cualquier momento y desde cualquier dispositivo.</p>
+                            <h3 class="text-xl font-bold text-gray-900 mb-2" th:text="#{landing.features.availability.title}">Disponibilidad 24/7</h3>
+                            <p class="text-gray-600" th:text="#{landing.features.availability.description}">Acceso completo a la plataforma en cualquier momento y desde cualquier dispositivo.</p>
                         </div>
                     </div>
                     
@@ -263,8 +296,8 @@
                             <i class="fas fa-star text-white"></i>
                         </div>
                         <div>
-                            <h3 class="text-xl font-bold text-gray-900 mb-2">Sistema de Calificaciones</h3>
-                            <p class="text-gray-600">Reseñas y calificaciones transparentes para mantener la calidad del servicio.</p>
+                            <h3 class="text-xl font-bold text-gray-900 mb-2" th:text="#{landing.features.rating.title}">Sistema de Calificaciones</h3>
+                            <p class="text-gray-600" th:text="#{landing.features.rating.description}">Reseñas y calificaciones transparentes para mantener la calidad del servicio.</p>
                         </div>
                     </div>
                     
@@ -273,8 +306,8 @@
                             <i class="fas fa-mobile-alt text-white"></i>
                         </div>
                         <div>
-                            <h3 class="text-xl font-bold text-gray-900 mb-2">Diseño Responsivo</h3>
-                            <p class="text-gray-600">Interfaz optimizada para todos los dispositivos: móvil, tablet y escritorio.</p>
+                            <h3 class="text-xl font-bold text-gray-900 mb-2" th:text="#{landing.features.responsive.title}">Diseño Responsivo</h3>
+                            <p class="text-gray-600" th:text="#{landing.features.responsive.description}">Interfaz optimizada para todos los dispositivos: móvil, tablet y escritorio.</p>
                         </div>
                     </div>
                 </div>
@@ -548,6 +581,24 @@
                         mobileMenu.classList.add('hidden');
                         mobileMenuButton.querySelector('i').className = 'fas fa-bars text-xl';
                     });
+                });
+            }
+            
+            // Language selector toggle (desktop)
+            const languageToggle = document.getElementById('language-toggle-desktop');
+            const languageMenu = document.getElementById('language-menu-desktop');
+            
+            if (languageToggle && languageMenu) {
+                languageToggle.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    languageMenu.classList.toggle('hidden');
+                });
+                
+                // Cerrar al hacer click fuera
+                document.addEventListener('click', function(e) {
+                    if (!languageToggle.contains(e.target) && !languageMenu.contains(e.target)) {
+                        languageMenu.classList.add('hidden');
+                    }
                 });
             }
         });

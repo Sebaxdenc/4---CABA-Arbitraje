@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<html th:lang="${#locale}" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CABA Pro - Iniciar Sesión</title>
+    <title th:text="#{login.title}">CABA Pro - Iniciar Sesión</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -29,16 +29,38 @@
     </style>
 </head>
 <body class="gradient-bg min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+    <!-- Language Selector -->
+    <div class="absolute top-4 right-4 z-50">
+        <div class="relative">
+            <button id="languageButton" class="flex items-center space-x-2 bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-lg transition-all duration-300 backdrop-blur-sm border border-white/30">
+                <span id="currentLanguage" th:text="${#locale.language == 'es'} ? '🇪🇸 Español' : '🇺🇸 English'">🇪🇸 Español</span>
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                </svg>
+            </button>
+            <div id="languageMenu" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 border border-gray-200">
+                <a th:href="@{/login(lang='es')}" class="flex items-center px-4 py-2 text-gray-700 hover:bg-indigo-50 transition-colors">
+                    <span class="mr-3">🇪🇸</span>
+                    <span>Español</span>
+                </a>
+                <a th:href="@{/login(lang='en')}" class="flex items-center px-4 py-2 text-gray-700 hover:bg-indigo-50 transition-colors">
+                    <span class="mr-3">🇺🇸</span>
+                    <span>English</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
     <div class="max-w-md w-full space-y-8">
         <!-- Logo y Header -->
         <div class="text-center">
             <div class="mx-auto h-20 w-20 bg-white rounded-full flex items-center justify-center shadow-lg p-2">
-                <img th:src="@{/images/logo.png}" alt="CABA Pro Logo" class="h-16 w-16 object-contain">
+                <img th:src="@{/images/logo.png}" th:alt="#{login.logo.alt}" alt="CABA Pro Logo" class="h-16 w-16 object-contain">
             </div>
             <h2 class="mt-6 text-3xl font-extrabold text-white">
                 CABA Pro
             </h2>
-            <p class="mt-2 text-sm text-indigo-100">
+            <p class="mt-2 text-sm text-indigo-100" th:text="#{login.subtitle}">
                 Sistema de Gestión de Árbitros
             </p>
         </div>
@@ -48,7 +70,7 @@
             <form class="space-y-6" th:action="@{/login}" method="post">
                 <div>
                     <label for="username" class="block text-sm font-medium text-gray-700 mb-2">
-                        <i class="fas fa-user mr-2"></i>Usuario
+                        <i class="fas fa-user mr-2"></i><span th:text="#{login.username}">Usuario</span>
                     </label>
                     <input id="username" 
                            name="username" 
@@ -56,12 +78,12 @@
                            autocomplete="username" 
                            required 
                            class="appearance-none relative block w-full px-3 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm transition duration-200"
-                           placeholder="Ingresa tu usuario">
+                           th:placeholder="#{login.username.placeholder}">
                 </div>
 
                 <div>
                     <label for="password" class="block text-sm font-medium text-gray-700 mb-2">
-                        <i class="fas fa-lock mr-2"></i>Contraseña
+                        <i class="fas fa-lock mr-2"></i><span th:text="#{login.password}">Contraseña</span>
                     </label>
                     <div class="relative">
                         <input id="password" 
@@ -70,7 +92,7 @@
                                autocomplete="current-password" 
                                required 
                                class="appearance-none relative block w-full px-3 py-3 pr-10 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm transition duration-200"
-                               placeholder="Ingresa tu contraseña">
+                               th:placeholder="#{login.password.placeholder}">
                         <button type="button" 
                                 onclick="togglePassword()" 
                                 class="absolute inset-y-0 right-0 pr-3 flex items-center">
@@ -102,7 +124,7 @@
                         <span class="absolute left-0 inset-y-0 flex items-center pl-3">
                             <i class="fas fa-sign-in-alt text-indigo-500 group-hover:text-indigo-400"></i>
                         </span>
-                        Iniciar Sesión
+                        <span th:text="#{btn.login}">Iniciar Sesión</span>
                     </button>
                 </div>
 
@@ -112,14 +134,15 @@
 
         <!-- Footer -->
         <div class="text-center">
-            <p class="text-xs text-indigo-100">
+            <p class="text-xs text-indigo-100" th:text="#{login.footer}">
                 © 2025 CABA Pro. Todos los derechos reservados.
             </p>
         </div>
     </div>
 
-    <!-- JavaScript para toggle de contraseña -->
+    <!-- JavaScript para toggle de contraseña y menú de idiomas -->
     <script>
+        // Toggle password visibility
         function togglePassword() {
             const passwordInput = document.getElementById('password');
             const toggleIcon = document.getElementById('password-toggle');
@@ -135,8 +158,22 @@
             }
         }
 
-        // Animación de entrada
+        // Language selector toggle
         document.addEventListener('DOMContentLoaded', function() {
+            const languageButton = document.getElementById('languageButton');
+            const languageMenu = document.getElementById('languageMenu');
+
+            languageButton.addEventListener('click', function(e) {
+                e.stopPropagation();
+                languageMenu.classList.toggle('hidden');
+            });
+
+            // Close menu when clicking outside
+            document.addEventListener('click', function() {
+                languageMenu.classList.add('hidden');
+            });
+
+            // Animación de entrada
             const form = document.querySelector('.glass-effect');
             form.style.opacity = '0';
             form.style.transform = 'translateY(20px)';
@@ -146,19 +183,19 @@
                 form.style.opacity = '1';
                 form.style.transform = 'translateY(0)';
             }, 100);
-        });
+            }, 100);
 
-        // Efecto de focus en inputs
-        const inputs = document.querySelectorAll('input[type="text"], input[type="password"]');
-        inputs.forEach(input => {
-            input.addEventListener('focus', function() {
-                this.parentElement.classList.add('scale-105');
+            // Efecto de focus en inputs
+            const inputs = document.querySelectorAll('input[type="text"], input[type="password"]');
+            inputs.forEach(input => {
+                input.addEventListener('focus', function() {
+                    this.parentElement.classList.add('scale-105');
+                });
+                
+                input.addEventListener('blur', function() {
+                    this.parentElement.classList.remove('scale-105');
+                });
             });
-            
-            input.addEventListener('blur', function() {
-                this.parentElement.classList.remove('scale-105');
-            });
-        });
     </script>
 </body>
 </html>

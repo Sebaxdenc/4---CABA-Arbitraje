@@ -9,6 +9,7 @@ import eafit.caba_pro.service.PartidoService;
 import eafit.caba_pro.service.ArbitroService;
 import eafit.caba_pro.service.ReseñaService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -19,6 +20,7 @@ import jakarta.validation.Valid;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -38,8 +40,11 @@ public class EntrenadorController {
     @Autowired
     private ReseñaService reseñaService;
     
+    @Autowired
+    private MessageSource messageSource;
+    
     @GetMapping
-    public String panelCoach(Model model, Principal principal) {
+    public String panelCoach(Model model, Principal principal, Locale locale) {
         try {
             // Obtener el usuario autenticado
             String username = principal.getName();
@@ -81,13 +86,13 @@ public class EntrenadorController {
      * Ruta: /coach/partidos
      */
     @GetMapping("/partidos")
-    public String verPartidos(Model model, Principal principal, RedirectAttributes redirectAttributes) {
+    public String verPartidos(Model model, Principal principal, RedirectAttributes redirectAttributes, Locale locale) {
         try {
             String username = principal.getName();
             Optional<Entrenador> entrenadorOpt = entrenadorService.findByUsuarioUsername(username);
             
             if (entrenadorOpt.isEmpty()) {
-                redirectAttributes.addFlashAttribute("error", "No se encontró información del entrenador");
+                redirectAttributes.addFlashAttribute("error", messageSource.getMessage("msg.error.entrenador.no.encontrado", null, locale));
                 return "redirect:/coach";
             }
             
@@ -104,7 +109,7 @@ public class EntrenadorController {
             return "coach/partidos";
             
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("error", "Error al cargar los partidos");
+            redirectAttributes.addFlashAttribute("error", messageSource.getMessage("msg.error.cargar.partidos", null, locale));
             return "redirect:/coach";
         }
     }
@@ -114,13 +119,13 @@ public class EntrenadorController {
      * Ruta: /coach/crear-reseña
      */
     @GetMapping("/crear-reseña")
-    public String mostrarFormularioCrearReseña(Model model, Principal principal, RedirectAttributes redirectAttributes) {
+    public String mostrarFormularioCrearReseña(Model model, Principal principal, RedirectAttributes redirectAttributes, Locale locale) {
         try {
             String username = principal.getName();
             Optional<Entrenador> entrenadorOpt = entrenadorService.findByUsuarioUsername(username);
             
             if (entrenadorOpt.isEmpty()) {
-                redirectAttributes.addFlashAttribute("error", "No se encontró información del entrenador");
+                redirectAttributes.addFlashAttribute("error", messageSource.getMessage("msg.error.entrenador.no.encontrado", null, locale));
                 return "redirect:/coach";
             }
             
@@ -136,7 +141,7 @@ public class EntrenadorController {
             return "coach/crear-reseña";
             
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("error", "Error al cargar el formulario de reseña");
+            redirectAttributes.addFlashAttribute("error", messageSource.getMessage("msg.error.cargar.formulario.resena", null, locale));
             return "redirect:/coach";
         }
     }
@@ -153,14 +158,15 @@ public class EntrenadorController {
             @RequestParam(value = "partidoId", required = false) Long partidoId,
             Model model,
             Principal principal,
-            RedirectAttributes redirectAttributes) {
+            RedirectAttributes redirectAttributes,
+            Locale locale) {
         
         try {
             String username = principal.getName();
             Optional<Entrenador> entrenadorOpt = entrenadorService.findByUsuarioUsername(username);
             
             if (entrenadorOpt.isEmpty()) {
-                redirectAttributes.addFlashAttribute("error", "No se encontró información del entrenador");
+                redirectAttributes.addFlashAttribute("error", messageSource.getMessage("msg.error.entrenador.no.encontrado", null, locale));
                 return "redirect:/coach";
             }
             
@@ -169,7 +175,7 @@ public class EntrenadorController {
             // Validar que el árbitro existe
             Optional<Arbitro> arbitroOpt = arbitroService.findById(arbitroId);
             if (arbitroOpt.isEmpty()) {
-                redirectAttributes.addFlashAttribute("error", "El árbitro seleccionado no existe");
+                redirectAttributes.addFlashAttribute("error", messageSource.getMessage("msg.error.arbitro.no.existe", null, locale));
                 return "redirect:/coach/crear-reseña";
             }
             
@@ -183,14 +189,14 @@ public class EntrenadorController {
                     // Verificar que el partido pertenece al equipo del entrenador
                     if (!partido.getEquipoLocal().getNombre().equals(entrenador.getEquipo()) && 
                         !partido.getEquipoVisitante().getNombre().equals(entrenador.getEquipo())) {
-                        redirectAttributes.addFlashAttribute("error", "No puedes crear reseñas para partidos que no involucran a tu equipo");
+                        redirectAttributes.addFlashAttribute("error", messageSource.getMessage("msg.error.partido.no.pertenece.equipo", null, locale));
                         return "redirect:/coach/crear-reseña";
                     }
                     
                     // Verificar que no se haya creado una reseña previa para este partido y árbitro
                     var reseñasExistentes = reseñaService.findByArbitroAndPartidoAndEntrenador(arbitroOpt.get(), partido, entrenador.getId());
                     if (!reseñasExistentes.isEmpty()) {
-                        redirectAttributes.addFlashAttribute("error", "Ya has creado una reseña para este árbitro en este partido");
+                        redirectAttributes.addFlashAttribute("error", messageSource.getMessage("msg.error.resena.ya.existe", null, locale));
                         return "redirect:/coach/crear-reseña";
                     }
                 }
@@ -214,26 +220,26 @@ public class EntrenadorController {
             // Guardar la reseña
             reseñaService.save(nuevaReseña);
             
-            redirectAttributes.addFlashAttribute("mensaje", "Reseña creada exitosamente");
+            redirectAttributes.addFlashAttribute("mensaje", messageSource.getMessage("msg.success.resena.creada", null, locale));
             redirectAttributes.addFlashAttribute("tipoMensaje", "success");
             
             return "redirect:/coach";
             
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("error", "Error al crear la reseña: " + e.getMessage());
+            redirectAttributes.addFlashAttribute("error", messageSource.getMessage("msg.error.crear.resena", null, locale));
             return "redirect:/coach/crear-reseña";
         }
     }
 
     @GetMapping("/reseñas")
-    public String verReseñas(Model model, Principal principal, RedirectAttributes redirectAttributes) {
+    public String verReseñas(Model model, Principal principal, RedirectAttributes redirectAttributes, Locale locale) {
         
         try {
             String username = principal.getName();
             Optional<Entrenador> entrenadorOpt = entrenadorService.findByUsuarioUsername(username);
             
             if (entrenadorOpt.isEmpty()) {
-                redirectAttributes.addFlashAttribute("error", "No se encontró información del entrenador");
+                redirectAttributes.addFlashAttribute("error", messageSource.getMessage("msg.error.entrenador.no.encontrado", null, locale));
                 return "redirect:/coach";
             }
             
@@ -257,20 +263,20 @@ public class EntrenadorController {
             return "coach/resenas";
             
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("error", "Error al cargar las reseñas");
+            redirectAttributes.addFlashAttribute("error", messageSource.getMessage("msg.error.cargar.resenas", null, locale));
             return "redirect:/coach";
         }
     }
     
 
     @GetMapping("/perfil")
-    public String verPerfil(Model model, Principal principal, RedirectAttributes redirectAttributes) {
+    public String verPerfil(Model model, Principal principal, RedirectAttributes redirectAttributes, Locale locale) {
         try {
             String username = principal.getName();
             Optional<Entrenador> entrenadorOpt = entrenadorService.findByUsuarioUsername(username);
             
             if (entrenadorOpt.isEmpty()) {
-                redirectAttributes.addFlashAttribute("error", "No se encontró información del entrenador");
+                redirectAttributes.addFlashAttribute("error", messageSource.getMessage("msg.error.entrenador.no.encontrado", null, locale));
                 return "redirect:/coach";
             }
             
@@ -280,7 +286,7 @@ public class EntrenadorController {
             return "coach/perfil";
             
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("error", "Error al cargar el perfil");
+            redirectAttributes.addFlashAttribute("error", messageSource.getMessage("msg.error.cargar.perfil", null, locale));
             return "redirect:/coach";
         }
     }
@@ -291,14 +297,15 @@ public class EntrenadorController {
             @ModelAttribute("entrenador") Entrenador entrenadorActualizado,
             Model model,
             Principal principal,
-            RedirectAttributes redirectAttributes) {
+            RedirectAttributes redirectAttributes,
+            Locale locale) {
         
         try {
             String username = principal.getName();
             Optional<Entrenador> entrenadorOpt = entrenadorService.findByUsuarioUsername(username);
             
             if (entrenadorOpt.isEmpty()) {
-                redirectAttributes.addFlashAttribute("error", "No se encontró información del entrenador");
+                redirectAttributes.addFlashAttribute("error", messageSource.getMessage("msg.error.entrenador.no.encontrado", null, locale));
                 return "redirect:/coach";
             }
             
@@ -312,25 +319,25 @@ public class EntrenadorController {
             
             entrenadorService.save(entrenadorExistente);
             
-            redirectAttributes.addFlashAttribute("mensaje", "Perfil actualizado correctamente");
+            redirectAttributes.addFlashAttribute("mensaje", messageSource.getMessage("msg.success.perfil.actualizado", null, locale));
             redirectAttributes.addFlashAttribute("tipoMensaje", "success");
             
             return "redirect:/coach/perfil";
             
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("error", "Error al actualizar el perfil");
+            redirectAttributes.addFlashAttribute("error", messageSource.getMessage("msg.error.actualizar.perfil", null, locale));
             return "redirect:/coach/perfil";
         }
     }
     
     @GetMapping("/estadisticas")
-    public String verEstadisticas(Model model, Principal principal, RedirectAttributes redirectAttributes) {
+    public String verEstadisticas(Model model, Principal principal, RedirectAttributes redirectAttributes, Locale locale) {
         try {
             String username = principal.getName();
             Optional<Entrenador> entrenadorOpt = entrenadorService.findByUsuarioUsername(username);
             
             if (entrenadorOpt.isEmpty()) {
-                redirectAttributes.addFlashAttribute("error", "No se encontró información del entrenador");
+                redirectAttributes.addFlashAttribute("error", messageSource.getMessage("msg.error.entrenador.no.encontrado", null, locale));
                 return "redirect:/coach";
             }
             
@@ -350,7 +357,7 @@ public class EntrenadorController {
             return "coach/estadisticas";
             
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("error", "Error al cargar las estadísticas");
+            redirectAttributes.addFlashAttribute("error", messageSource.getMessage("msg.error.cargar.estadisticas", null, locale));
             return "redirect:/coach";
         }
     }
