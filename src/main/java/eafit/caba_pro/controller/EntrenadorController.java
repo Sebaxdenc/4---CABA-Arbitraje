@@ -19,8 +19,10 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import jakarta.validation.Valid;
 import java.security.Principal;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -331,7 +333,7 @@ public class EntrenadorController {
     }
     
     @GetMapping("/estadisticas")
-    public String verEstadisticas(Model model, Principal principal, RedirectAttributes redirectAttributes, Locale locale) {
+    public String obtenerEstadisticas(Model model, Principal principal, RedirectAttributes redirectAttributes, Locale locale) {
         try {
             String username = principal.getName();
             Optional<Entrenador> entrenadorOpt = entrenadorService.findByUsuarioUsername(username);
@@ -342,17 +344,30 @@ public class EntrenadorController {
             }
             
             Entrenador entrenador = entrenadorOpt.get();
-            String equipo = entrenador.getEquipo();
+            var equipo = entrenador.getEquipoAsociado();
             
-            // Obtener estadísticas detalladas
-            var estadisticas = partidoService.getEstadisticasDetalladasByEquipo(equipo);
-            var ultimosPartidos = partidoService.findUltimos5PartidosByEquipo(equipo);
-            var proximosPartidos = partidoService.findProximos5PartidosByEquipo(equipo);
+            Map<String, Object> estadisticas = new HashMap<>();
+            estadisticas.put("entrenador", entrenador);
+            estadisticas.put("equipo", equipo);
+            estadisticas.put("equipoNombre", equipo != null ? equipo.getNombre() : "Sin equipo");
+            estadisticas.put("equipoCiudad", equipo != null ? equipo.getCiudad() : "N/A");
+            estadisticas.put("equipoFundacion", equipo != null ? equipo.getFundacion() : null);
+            estadisticas.put("equipoEstado", equipo != null ? equipo.isEstado() : false);
+            estadisticas.put("equipoLogo", equipo != null ? equipo.getLogo() : "");
+            estadisticas.put("entrenadorNombre", entrenador.getNombreCompleto());
+            estadisticas.put("categoriaEntrenador", entrenador.getCategoria().getDisplayName());
+            estadisticas.put("experienciaEntrenador", entrenador.getExperiencia());
+            
+            // Agregar otras estadísticas
+            estadisticas.put("totalPartidos", 0);
+            estadisticas.put("partidosGanados", 0);
+            estadisticas.put("partidosPerdidos", 0);
+            estadisticas.put("porcentajeVictorias", 0.0);
             
             model.addAttribute("entrenador", entrenador);
             model.addAttribute("estadisticas", estadisticas);
-            model.addAttribute("ultimosPartidos", ultimosPartidos);
-            model.addAttribute("proximosPartidos", proximosPartidos);
+            model.addAttribute("ultimosPartidos", new ArrayList<>());
+            model.addAttribute("proximosPartidos", new ArrayList<>());
             
             return "coach/estadisticas";
             

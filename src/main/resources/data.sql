@@ -1,3 +1,4 @@
+-- Usuarios
 INSERT INTO usuario(username, password, role, email, activo) 
 VALUES ('user1', '{noop}1234', 'ROLE_ADMIN', 'admin@test.com', true);
 
@@ -16,7 +17,7 @@ VALUES ('paula.lp', '{noop}arbitro1234', 'ROLE_ARBITRO', 'pau@test.com', true);
 INSERT INTO usuario(username, password, role, email, activo) 
 VALUES ('sara', '{noop}12345', 'ROLE_ENTRENADOR', 'sara@test.com', true);
 
--- Escalafones disponibles
+-- Escalafones
 INSERT INTO escalafon (nombre, honorario_base) 
 VALUES ('INTERNACIONAL', 250000);
 
@@ -26,14 +27,12 @@ VALUES ('NACIONAL', 180000);
 INSERT INTO escalafon (nombre, honorario_base) 
 VALUES ('LOCAL', 120000);
 
---Arbitros
+-- Árbitros
 INSERT INTO arbitro (nombre, contraseña, username, cedula, phone, speciality, photo_data, photo_content_type, photo_filename, usuario_id, escalafon_id) 
 VALUES ('Paula Lop', '{noop}arbitro1234', 'paula.lp', '34567', '3222469936', 'Campo', NULL, NULL, NULL, 5, 1);
 
 INSERT INTO arbitro (nombre, contraseña, username, cedula, phone, speciality, photo_data, photo_content_type, photo_filename, usuario_id, escalafon_id) 
 VALUES ('Sebastian Medina', '{noop}arbitro123', 'sebastian.medina', '1058198772', '3222469936', 'Campo', NULL, NULL, NULL, 4, 1);
-
-
 
 -- Equipos
 INSERT INTO equipo(nombre, estado, ciudad, fundacion, logo)
@@ -45,7 +44,7 @@ VALUES ('Chicago Bulls', true, 'Illinois', 1996, 'https://www.citypng.com/public
 INSERT INTO equipo(nombre, estado, ciudad, fundacion, logo)
 VALUES ('Paisitas', false, 'Medellin', 2025, 'https://static.wikia.nocookie.net/logopedia/images/b/b4/Atl%C3%A9tico_Nacional_1.png');
 
--- Partidos para Sebastian Medina (arbitro_id = 2, porque es el segundo árbitro insertado)
+-- Partidos
 INSERT INTO partido (fecha, hora, equipo_local, equipo_visitante, estado, arbitro_id) 
 VALUES ('2025-10-05', '15:00', 1, 2, 'PROGRAMADO', 2);
 
@@ -70,17 +69,17 @@ VALUES ('2025-11-05', '18:30', 3, 2, 'PENDIENTE_CONFIRMACION', 2);
 INSERT INTO partido (fecha, hora, equipo_local, equipo_visitante, estado, arbitro_id) 
 VALUES ('2025-09-08', '20:00', 2, 3, 'FINALIZADO', 2);
 
--- Entrenadores (ajusta el nombre de tabla según sea necesario: entrenador vs entrenadores)
-INSERT INTO entrenadores (nombre_completo, cedula, email, telefono, equipo, experiencia, categoria, activo, fecha_creacion, usuario_id) 
-VALUES ('Carlos Rodriguez', '12345678', 'carlos.rodriguez@email.com', '3101234567', 'Lakers', 5, 'PROFESIONAL', true, CURRENT_TIMESTAMP, NULL);
+-- Entrenadores CON equipo_id
+INSERT INTO entrenadores (nombre_completo, cedula, email, telefono, equipo, experiencia, categoria, activo, fecha_creacion, usuario_id, equipo_id) 
+VALUES ('Carlos Rodriguez', '12345678', 'carlos.rodriguez@email.com', '3101234567', 'Lakers', 5, 'PROFESIONAL', true, CURRENT_TIMESTAMP, NULL, 1);
 
-INSERT INTO entrenadores (nombre_completo, cedula, email, telefono, equipo, experiencia, categoria, activo, fecha_creacion, usuario_id) 
-VALUES ('Sara López', '87654321', 'sara.lopez@email.com', '3101234568', 'Chicago Bulls', 5, 'PROFESIONAL', true, CURRENT_TIMESTAMP, 6);
+INSERT INTO entrenadores (nombre_completo, cedula, email, telefono, equipo, experiencia, categoria, activo, fecha_creacion, usuario_id, equipo_id) 
+VALUES ('Sara López', '87654321', 'sara.lopez@email.com', '3101234568', 'Chicago Bulls', 5, 'PROFESIONAL', true, CURRENT_TIMESTAMP, 6, 2);
 
-INSERT INTO entrenadores (nombre_completo, cedula, email, telefono, equipo, experiencia, categoria, activo, fecha_creacion, usuario_id) 
-VALUES ('Nicolás Ospina', '11223344', 'nicolas.ospina@email.com', '3101234569', 'Paisitas', 5, 'PROFESIONAL', true, CURRENT_TIMESTAMP, NULL);
+INSERT INTO entrenadores (nombre_completo, cedula, email, telefono, equipo, experiencia, categoria, activo, fecha_creacion, usuario_id, equipo_id) 
+VALUES ('Nicolás Ospina', '11223344', 'nicolas.ospina@email.com', '3101234569', 'Paisitas', 5, 'PROFESIONAL', true, CURRENT_TIMESTAMP, NULL, 3);
 
--- Reseñas para Sebastian Medina
+-- Reseñas
 INSERT INTO reseña (puntuacion, descripcion, fecha_creacion, arbitro_id, entrenador_id, partido_id) 
 VALUES (5, 'Excelente arbitraje, muy profesional y justo en todas sus decisiones. Mantuvo el control del partido en todo momento.', '2025-08-15 18:00:00', 2, 1, 3);
 
