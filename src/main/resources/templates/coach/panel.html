@@ -72,7 +72,7 @@
                                 </p>
                                 <p class="text-sm text-gray-600">
                                     <span class="font-medium" th:text="#{coach.team.experience} + ':'">Experiencia:</span> 
-                                    <span th:text="${entrenador.experienciaDescripcion}">Años</span>
+                                    <span th:text="${entrenador.experiencia} + ' ' + #{coach.profile.years}">Años</span>
                                 </p>
                                 <p class="text-sm text-gray-600" th:if="${entrenador.tieneEspecialidades()}">
                                     <span class="font-medium" th:text="#{coach.team.specialties} + ':'">Especialidades:</span> 
@@ -86,10 +86,7 @@
                                 <p class="text-2xl font-bold text-gray-900" th:text="${partidosEmpatados}">0</p>
                                 <p class="text-sm text-gray-500" th:text="#{coach.stats.draws}">Empates</p>
                             </div>
-                            <div class="text-center">
-                                <p class="text-2xl font-bold text-indigo-600" th:text="${entrenador.nivelExperiencia}">Nivel</p>
-                                <p class="text-sm text-gray-500" th:text="#{coach.team.level}">Nivel</p>
-                            </div>
+                            
                         </div>
                     </div>
                 </div>
@@ -127,7 +124,6 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                                 </svg>
                             </div>
-                            <p class="text-lg font-bold text-purple-900" th:text="${entrenador.nivelExperiencia}">Nivel</p>
                             <p class="text-sm text-purple-600 font-medium" th:text="#{coach.team.experience}">Experiencia</p>
                         </div>
                     </div>
