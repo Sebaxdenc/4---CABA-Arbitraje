@@ -103,7 +103,9 @@ public class AdminController {
 
     @GetMapping("/arbitros")
     public String arbitros(Model model, Locale locale) {
-        model.addAttribute("arbitros", arbitroService.findAll());
+        List<Arbitro> arbitros = arbitroService.findAll();
+        System.out.println("=== CARGANDO PÁGINA DE ÁRBITROS - TOTAL: " + arbitros.size() + " ===");
+        model.addAttribute("arbitros", arbitros);
         return "admin/arbitros";
     }
    
@@ -298,25 +300,32 @@ public class AdminController {
 
     @PostMapping("/arbitros/delete/{id}")
     public String delete(@PathVariable Long id, RedirectAttributes redirectAttributes, Locale locale) {
+        System.out.println("=== INTENTANDO ELIMINAR ÁRBITRO CON ID: " + id + " ===");
         try {
             boolean deleted = arbitroService.deleteById(id);
             if (deleted) {
+                System.out.println("=== ÁRBITRO ELIMINADO EXITOSAMENTE, ID: " + id + " ===");
                 String successMsg = messageSource.getMessage("msg.success.arbitro.deleted", null, locale);
                 redirectAttributes.addFlashAttribute("successMessage", successMsg);
             } else {
+                System.out.println("=== ÁRBITRO NO ENCONTRADO, ID: " + id + " ===");
                 String errorMsg = messageSource.getMessage("msg.error.notfound", null, locale);
                 redirectAttributes.addFlashAttribute("errorMessage", errorMsg);
             }
         } catch (DataIntegrityViolationException e) {
+            System.out.println("=== ERROR DE INTEGRIDAD AL ELIMINAR ÁRBITRO, ID: " + id + " ===");
             String errorMsg = messageSource.getMessage("msg.error.delete", null, locale);
             redirectAttributes.addFlashAttribute("errorMessage", errorMsg);
         } catch (RuntimeException e) {
+            System.out.println("=== ERROR RUNTIME AL ELIMINAR ÁRBITRO: " + e.getMessage() + " ===");
             redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
         } catch (Exception e) {
+            System.out.println("=== ERROR GENERAL AL ELIMINAR ÁRBITRO: " + e.getMessage() + " ===");
             String errorMsg = messageSource.getMessage("msg.error.general", null, locale);
             redirectAttributes.addFlashAttribute("errorMessage", errorMsg);
             System.err.println("Error al eliminar árbitro con ID " + id + ": " + e.getMessage());
         }
+        System.out.println("=== REDIRIGIENDO A /admin/arbitros ===");
         return "redirect:/admin/arbitros";
     }
 
