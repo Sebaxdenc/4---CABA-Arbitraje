@@ -16,6 +16,14 @@
     <header th:replace="~{admin/header :: header(#{page.admin.arbitros})}"></header>
 
     <main class="p-6 space-y-6">
+      <!-- Mensajes Flash -->
+      <div th:if="${successMessage}" class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative" role="alert">
+        <span class="block sm:inline" th:text="${successMessage}"></span>
+      </div>
+      <div th:if="${errorMessage}" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+        <span class="block sm:inline" th:text="${errorMessage}"></span>
+      </div>
+      
       <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-2">
         <h3 class="text-2xl font-semibold text-gray-800" th:text="#{page.admin.arbitros}">Árbitros</h3>
         <a th:href="@{/admin/arbitros/create}"
@@ -65,12 +73,11 @@
                 <a class="text-indigo-600 hover:text-indigo-900" th:href="@{/admin/arbitros/edit/{id}(id=${arb.id})}">
                   <i class="fas fa-edit mr-1"></i><span th:text="#{btn.edit}">Editar</span>
                 </a>
-                <form method="post" th:action="@{/admin/arbitros/delete/{id}(id=${arb.id})}" class="inline">
-                  <input type="hidden" th:name="${_csrf?.parameterName}" th:value="${_csrf?.token}">
-                  <button class="text-red-600 hover:text-red-900" type="submit" 
-                          th:attr="onclick='return confirm(\'' + #{confirm.delete.arbitro} + '\')'" >
-                    <i class="fas fa-trash mr-1"></i><span th:text="#{btn.delete}">Eliminar</span>
-                  </button>
+                <a href="#" class="text-red-600 hover:text-red-900" 
+                   th:onclick="|if(confirm('#{confirm.delete.arbitro}')) { document.getElementById('deleteForm' + ${arb.id}).submit(); } return false;|">
+                  <i class="fas fa-trash mr-1"></i><span th:text="#{btn.delete}">Eliminar</span>
+                </a>
+                <form th:id="|deleteForm${arb.id}|" method="post" th:action="@{/admin/arbitros/delete/{id}(id=${arb.id})}" style="display:none;">
                 </form>
               </td>
             </tr>

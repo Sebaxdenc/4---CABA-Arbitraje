@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import eafit.caba_pro.model.Arbitro;
+import eafit.caba_pro.model.Escalafon;
 import eafit.caba_pro.model.Partido;
 import eafit.caba_pro.model.Usuario;
 import eafit.caba_pro.repository.ArbitroRepository;
@@ -266,11 +267,31 @@ public class ArbitroService {
                                              "' porque tiene partidos asignados. Primero debe reasignar o eliminar los partidos.");
                 }
                 
-                // Eliminar de la base de datos (la imagen BLOB se elimina automáticamente)
-                arbitroRepository.deleteById(id);
-                System.out.println("Árbitro eliminado completamente: " + arbitro.getNombre());
+                System.out.println("DEBUG: Antes de eliminar - ID: " + arbitro.getId() + ", Nombre: " + arbitro.getNombre());
                 
-                return true;
+                // IMPORTANTE: Romper la relación bidireccional con Escalafon
+                Escalafon escalafon = arbitro.getEscalafon();
+                if (escalafon != null) {
+                    escalafon.getArbitros().remove(arbitro);
+                    arbitro.setEscalafon(null);
+                }
+                
+                // Eliminar usando delete() en lugar de deleteById()
+                arbitroRepository.delete(arbitro);
+                arbitroRepository.flush(); // Forzar el flush de la transacción
+                System.out.println("DEBUG: Después de flush()");
+                
+                // Verificar que realmente se eliminó
+                boolean exists = arbitroRepository.existsById(id);
+                System.out.println("DEBUG: ¿Aún existe en BD? " + exists);
+                
+                if (!exists) {
+                    System.out.println("Árbitro eliminado completamente: " + arbitro.getNombre());
+                    return true;
+                } else {
+                    System.err.println("ERROR: El árbitro NO se eliminó de la base de datos");
+                    return false;
+                }
             } else {
                 System.out.println("Árbitro no encontrado con ID: " + id);
                 return false;
@@ -280,6 +301,7 @@ public class ArbitroService {
             throw e;
         } catch (Exception e) {
             System.err.println("Error al eliminar árbitro con ID " + id + ": " + e.getMessage());
+            e.printStackTrace();
             throw new RuntimeException("Error interno al eliminar árbitro: " + e.getMessage(), e);
         }
     }
