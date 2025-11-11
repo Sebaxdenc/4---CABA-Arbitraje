@@ -66,6 +66,11 @@ public class Entrenador {
     @JoinColumn(name = "usuario_id", referencedColumnName = "id")
     private Usuario usuario;
 
+    // Relación con Equipo (ManyToOne)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "equipo_id", nullable = false)
+    private Equipo equipoAsociado;
+
     // Enum para categorías de entrenadores
     public enum Categoria {
         INFANTIL("Infantil"),
@@ -89,9 +94,6 @@ public class Entrenador {
     // ==================== CONSTRUCTORES ====================
 
     public Entrenador() {
-        this.activo = true;
-        this.fechaCreacion = LocalDateTime.now();
-        this.fechaActualizacion = LocalDateTime.now();
     }
 
     public Entrenador(String nombreCompleto, String cedula, String telefono, String email, 
@@ -104,6 +106,7 @@ public class Entrenador {
         this.equipo = equipo;
         this.categoria = categoria;
         this.experiencia = experiencia;
+        this.fechaCreacion = LocalDateTime.now();
     }
 
     // ==================== GETTERS Y SETTERS ====================
@@ -212,6 +215,14 @@ public class Entrenador {
         this.usuario = usuario;
     }
 
+    public Equipo getEquipoAsociado() {
+        return equipoAsociado;
+    }
+
+    public void setEquipoAsociado(Equipo equipoAsociado) {
+        this.equipoAsociado = equipoAsociado;
+    }
+
     // ==================== MÉTODOS DE UTILIDAD ====================
 
     /**
@@ -257,75 +268,9 @@ public class Entrenador {
     }
 
     /**
-     * Obtiene descripción de experiencia
+     * Verifica si tiene equipo asociado
      */
-    public String getExperienciaDescripcion() {
-        if (experiencia == null) return "No especificado";
-        if (experiencia == 0) return "Sin experiencia";
-        if (experiencia == 1) return "1 año";
-        return experiencia + " años";
-    }
-
-    /**
-     * Verifica si es un entrenador experimentado (más de 5 años)
-     */
-    public boolean esExperimentado() {
-        return experiencia != null && experiencia > 5;
-    }
-
-    /**
-     * Obtiene nivel de experiencia como texto
-     */
-    public String getNivelExperiencia() {
-        if (experiencia == null || experiencia == 0) return "Principiante";
-        if (experiencia <= 2) return "Novato";
-        if (experiencia <= 5) return "Intermedio";
-        if (experiencia <= 10) return "Experimentado";
-        return "Experto";
-    }
-
-    // ==================== MÉTODOS LIFECYCLE ====================
-
-    @PrePersist
-    protected void onCreate() {
-        fechaCreacion = LocalDateTime.now();
-        fechaActualizacion = LocalDateTime.now();
-        if (activo == null) {
-            activo = true;
-        }
-    }
-
-    @PreUpdate
-    protected void onUpdate() {
-        fechaActualizacion = LocalDateTime.now();
-    }
-
-    // ==================== MÉTODOS OBJECT ====================
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) return true;
-        if (obj == null || getClass() != obj.getClass()) return false;
-        
-        Entrenador that = (Entrenador) obj;
-        return id != null ? id.equals(that.id) : that.id == null;
-    }
-
-    @Override
-    public int hashCode() {
-        return id != null ? id.hashCode() : 0;
-    }
-
-    @Override
-    public String toString() {
-        return "Entrenador{" +
-                "id=" + id +
-                ", nombreCompleto='" + nombreCompleto + '\'' +
-                ", cedula='" + cedula + '\'' +
-                ", equipo='" + equipo + '\'' +
-                ", categoria=" + categoria +
-                ", experiencia=" + experiencia +
-                ", activo=" + activo +
-                '}';
+    public boolean tieneEquipoAsociado() {
+        return equipoAsociado != null;
     }
 }

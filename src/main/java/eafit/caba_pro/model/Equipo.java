@@ -21,9 +21,9 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "equipo")
-@Data // Generate getters and setters for all fields using lombok
-@AllArgsConstructor // Generate a contrustuctor with all the fields
-@NoArgsConstructor // Generates a constructor with no fields acordding to JPA
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class Equipo {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -48,13 +48,24 @@ public class Equipo {
     @Column(nullable = false)
     private String logo;
 
-    @OneToMany(mappedBy = "equipoLocal",fetch = FetchType.LAZY)
-    //@JsonManagedReference("local")
+    @OneToMany(mappedBy = "equipoLocal", fetch = FetchType.LAZY)
     @JsonIgnore
     private List<Partido> partidosLocal;
 
-    @OneToMany(mappedBy = "equipoVisitante",fetch = FetchType.LAZY)
-    //@JsonManagedReference("visitante")
+    @OneToMany(mappedBy = "equipoVisitante", fetch = FetchType.LAZY)
     @JsonIgnore
     private List<Partido> partidosVisitante;
-} 
+
+    // Relación con Entrenadores (OneToMany)
+    @OneToMany(mappedBy = "equipoAsociado", fetch = FetchType.LAZY)
+    @JsonIgnore
+    private List<Entrenador> entrenadores;
+
+    public List<Entrenador> getEntrenadores() {
+        return entrenadores;
+    }
+
+    public void setEntrenadores(List<Entrenador> entrenadores) {
+        this.entrenadores = entrenadores;
+    }
+}

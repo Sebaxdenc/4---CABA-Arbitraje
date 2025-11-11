@@ -19,8 +19,10 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import jakarta.validation.Valid;
 import java.security.Principal;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -331,7 +333,7 @@ public class EntrenadorController {
     }
     
     @GetMapping("/estadisticas")
-    public String verEstadisticas(Model model, Principal principal, RedirectAttributes redirectAttributes, Locale locale) {
+    public String obtenerEstadisticas(Model model, Principal principal, RedirectAttributes redirectAttributes, Locale locale) {
         try {
             String username = principal.getName();
             Optional<Entrenador> entrenadorOpt = entrenadorService.findByUsuarioUsername(username);
@@ -342,17 +344,58 @@ public class EntrenadorController {
             }
             
             Entrenador entrenador = entrenadorOpt.get();
-            String equipo = entrenador.getEquipo();
+            var equipo = entrenador.getEquipoAsociado();
+            String equipoNombre = equipo != null ? equipo.getNombre() : null;
             
-            // Obtener estadísticas detalladas
-            var estadisticas = partidoService.getEstadisticasDetalladasByEquipo(equipo);
-            var ultimosPartidos = partidoService.findUltimos5PartidosByEquipo(equipo);
-            var proximosPartidos = partidoService.findProximos5PartidosByEquipo(equipo);
+            // ✅ Obtener estadísticas REALES de la BD
+            int totalPartidos = partidoService.countPartidosByEquipo(equipoNombre);
+            int partidosGanados = partidoService.countPartidosGanadosByEquipo(equipoNombre);
+            int partidosPerdidos = partidoService.countPartidosPerdidosByEquipo(equipoNombre);
+            int partidosEmpatados = totalPartidos - partidosGanados - partidosPerdidos;
+            
+            double porcentajeVictorias = totalPartidos > 0 ? (partidosGanados * 100.0 / totalPartidos) : 0;
+            double porcentajeDerrotas = totalPartidos > 0 ? (partidosPerdidos * 100.0 / totalPartidos) : 0;
+            double porcentajeEmpates = totalPartidos > 0 ? (partidosEmpatados * 100.0 / totalPartidos) : 0;
+            
+            Map<String, Object> estadisticas = new HashMap<>();
+            estadisticas.put("entrenador", entrenador);
+            estadisticas.put("equipo", equipo);
+            estadisticas.put("equipoNombre", equipoNombre != null ? equipoNombre : "Sin equipo");
+            estadisticas.put("equipoCiudad", equipo != null ? equipo.getCiudad() : "N/A");
+            estadisticas.put("equipoFundacion", equipo != null ? equipo.getFundacion() : null);
+            estadisticas.put("equipoEstado", equipo != null ? equipo.isEstado() : false);
+            estadisticas.put("equipoLogo", equipo != null ? equipo.getLogo() : "");
+            estadisticas.put("entrenadorNombre", entrenador.getNombreCompleto());
+            estadisticas.put("categoriaEntrenador", entrenador.getCategoria().getDisplayName());
+            estadisticas.put("experienciaEntrenador", entrenador.getExperiencia());
+            
+            // ✅ Estadísticas reales
+            estadisticas.put("totalPartidos", totalPartidos);
+            estadisticas.put("partidosGanados", partidosGanados);
+            estadisticas.put("partidosPerdidos", partidosPerdidos);
+            estadisticas.put("partidosEmpatados", partidosEmpatados);
+            estadisticas.put("porcentajeVictorias", porcentajeVictorias);
+            estadisticas.put("porcentajeDerrotas", porcentajeDerrotas);
+            estadisticas.put("porcentajeEmpates", porcentajeEmpates);
+            
+            System.out.println("[DEBUG] equipoNombre = " + equipoNombre);
+
+            List<Partido> partidosTotales = partidoService.findAll();
+            long matchedByName = partidosTotales.stream()
+                .filter(p -> (p.getEquipoLocal()!=null && equipoNombre!=null && equipoNombre.equals(p.getEquipoLocal().getNombre()))
+                          || (p.getEquipoVisitante()!=null && equipoNombre!=null && equipoNombre.equals(p.getEquipoVisitante().getNombre())))
+                .count();
+
+            System.out.println("[DEBUG] partidosTotales.size=" + partidosTotales.size() + ", matchedByName=" + matchedByName);
+
+            // Exponer en la vista (temporal)
+            model.addAttribute("debug_totalPartidosEnBD", partidosTotales.size());
+            model.addAttribute("debug_partidosQueCoincidenNombre", matchedByName);
             
             model.addAttribute("entrenador", entrenador);
             model.addAttribute("estadisticas", estadisticas);
-            model.addAttribute("ultimosPartidos", ultimosPartidos);
-            model.addAttribute("proximosPartidos", proximosPartidos);
+            model.addAttribute("ultimosPartidos", partidoService.findUltimos5PartidosByEquipo(equipoNombre));
+            model.addAttribute("proximosPartidos", partidoService.findProximos5PartidosByEquipo(equipoNombre));
             
             return "coach/estadisticas";
             

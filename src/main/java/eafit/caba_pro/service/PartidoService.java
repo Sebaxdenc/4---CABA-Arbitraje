@@ -394,4 +394,13 @@ public List<Partido> findPartidosFinalizadosByArbitroYEquipo(Long arbitroId, Str
     Arbitro arbitro = arbitroOpt.get();
     return partidoRepository.findByArbitroAndEstadoAndEquipo(arbitro, Partido.EstadoPartido.FINALIZADO, equipoNombre);
 }
+
+/** Método de comprobación: cuenta en memoria comparando nombres de equipos */
+public int countPartidosByEquipoFallback(String equipoNombre) {
+    if (equipoNombre == null) return 0;
+    return (int) partidoRepository.findAll().stream()
+        .filter(p -> (p.getEquipoLocal()!=null && equipoNombre.equals(p.getEquipoLocal().getNombre()))
+                  || (p.getEquipoVisitante()!=null && equipoNombre.equals(p.getEquipoVisitante().getNombre())))
+        .count();
+}
 }
