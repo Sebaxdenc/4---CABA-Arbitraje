@@ -345,11 +345,22 @@ public class EntrenadorController {
             
             Entrenador entrenador = entrenadorOpt.get();
             var equipo = entrenador.getEquipoAsociado();
+            String equipoNombre = equipo != null ? equipo.getNombre() : null;
+            
+            // ✅ Obtener estadísticas REALES de la BD
+            int totalPartidos = partidoService.countPartidosByEquipo(equipoNombre);
+            int partidosGanados = partidoService.countPartidosGanadosByEquipo(equipoNombre);
+            int partidosPerdidos = partidoService.countPartidosPerdidosByEquipo(equipoNombre);
+            int partidosEmpatados = totalPartidos - partidosGanados - partidosPerdidos;
+            
+            double porcentajeVictorias = totalPartidos > 0 ? (partidosGanados * 100.0 / totalPartidos) : 0;
+            double porcentajeDerrotas = totalPartidos > 0 ? (partidosPerdidos * 100.0 / totalPartidos) : 0;
+            double porcentajeEmpates = totalPartidos > 0 ? (partidosEmpatados * 100.0 / totalPartidos) : 0;
             
             Map<String, Object> estadisticas = new HashMap<>();
             estadisticas.put("entrenador", entrenador);
             estadisticas.put("equipo", equipo);
-            estadisticas.put("equipoNombre", equipo != null ? equipo.getNombre() : "Sin equipo");
+            estadisticas.put("equipoNombre", equipoNombre != null ? equipoNombre : "Sin equipo");
             estadisticas.put("equipoCiudad", equipo != null ? equipo.getCiudad() : "N/A");
             estadisticas.put("equipoFundacion", equipo != null ? equipo.getFundacion() : null);
             estadisticas.put("equipoEstado", equipo != null ? equipo.isEstado() : false);
@@ -358,16 +369,33 @@ public class EntrenadorController {
             estadisticas.put("categoriaEntrenador", entrenador.getCategoria().getDisplayName());
             estadisticas.put("experienciaEntrenador", entrenador.getExperiencia());
             
-            // Agregar otras estadísticas
-            estadisticas.put("totalPartidos", 0);
-            estadisticas.put("partidosGanados", 0);
-            estadisticas.put("partidosPerdidos", 0);
-            estadisticas.put("porcentajeVictorias", 0.0);
+            // ✅ Estadísticas reales
+            estadisticas.put("totalPartidos", totalPartidos);
+            estadisticas.put("partidosGanados", partidosGanados);
+            estadisticas.put("partidosPerdidos", partidosPerdidos);
+            estadisticas.put("partidosEmpatados", partidosEmpatados);
+            estadisticas.put("porcentajeVictorias", porcentajeVictorias);
+            estadisticas.put("porcentajeDerrotas", porcentajeDerrotas);
+            estadisticas.put("porcentajeEmpates", porcentajeEmpates);
+            
+            System.out.println("[DEBUG] equipoNombre = " + equipoNombre);
+
+            List<Partido> partidosTotales = partidoService.findAll();
+            long matchedByName = partidosTotales.stream()
+                .filter(p -> (p.getEquipoLocal()!=null && equipoNombre!=null && equipoNombre.equals(p.getEquipoLocal().getNombre()))
+                          || (p.getEquipoVisitante()!=null && equipoNombre!=null && equipoNombre.equals(p.getEquipoVisitante().getNombre())))
+                .count();
+
+            System.out.println("[DEBUG] partidosTotales.size=" + partidosTotales.size() + ", matchedByName=" + matchedByName);
+
+            // Exponer en la vista (temporal)
+            model.addAttribute("debug_totalPartidosEnBD", partidosTotales.size());
+            model.addAttribute("debug_partidosQueCoincidenNombre", matchedByName);
             
             model.addAttribute("entrenador", entrenador);
             model.addAttribute("estadisticas", estadisticas);
-            model.addAttribute("ultimosPartidos", new ArrayList<>());
-            model.addAttribute("proximosPartidos", new ArrayList<>());
+            model.addAttribute("ultimosPartidos", partidoService.findUltimos5PartidosByEquipo(equipoNombre));
+            model.addAttribute("proximosPartidos", partidoService.findProximos5PartidosByEquipo(equipoNombre));
             
             return "coach/estadisticas";
             
