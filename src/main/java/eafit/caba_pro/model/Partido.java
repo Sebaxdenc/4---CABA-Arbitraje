@@ -38,7 +38,7 @@ public class Partido {
     
     @NotNull(message = "La fecha no puede ser nula")
     @Column(nullable = false)
-    private LocalDate fecha;
+    private LocalDate fecha;    
     
     @NotNull(message = "La hora no puede ser nula")
     @Column(nullable = false)
@@ -53,7 +53,13 @@ public class Partido {
     @JoinColumn(name = "arbitro_id")
     @JsonBackReference // Evitar serialización circular - lado "back"
     private Arbitro arbitro;
-    
+
+    @Column(nullable = true)
+    private String clima;
+
+    @Column(nullable = true)
+    private Integer temperatura;
+
     // Relación con reseñas (un partido puede tener múltiples reseñas)
     @OneToMany(mappedBy = "partido", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonManagedReference
@@ -78,13 +84,15 @@ public class Partido {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "torneo_id", nullable = true)
-    @JsonBackReference
     private Torneo torneo;
 
     public Torneo getTorneo() { return torneo; }
     public void setTorneo(Torneo torneo) { this.torneo = torneo; }
 
-    
+    public boolean esPartidoComputable(){
+        return LocalDate.now().plusDays(8).isBefore(fecha);
+    }
+
     // Enums
     public enum EstadoPartido {
         PROGRAMADO, EN_CURSO, FINALIZADO, PENDIENTE_CONFIRMACION, ARBITRO_NO_DISPONIBLE
@@ -131,5 +139,6 @@ public Integer getGolesVisitante() {
 public void setGolesVisitante(Integer golesVisitante) {
     this.golesVisitante = golesVisitante;
 }
+
     
 }
