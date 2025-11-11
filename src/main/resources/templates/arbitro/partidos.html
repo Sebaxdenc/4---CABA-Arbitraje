@@ -130,6 +130,17 @@
                                             <span th:text="${partido.hora}">15:00</span>
                                         </div>
                                     </div>
+                                    <!-- Información del clima -->
+                                    <div class="mt-3 flex items-center text-gray-700 text-sm space-x-3">
+                                        <div class="flex items-center">
+                                            <i class="fa-solid fa-temperature-half text-red-500 mr-2"></i>
+                                            <span th:text="${partido.temperatura != null} ? ${partido.temperatura + '°C'} : 'Sin datos'">22°C</span>
+                                        </div>
+                                        <div class="flex items-center">
+                                            <i class="fa-solid fa-cloud-sun text-blue-500 mr-2"></i>
+                                            <span th:text="${partido.clima != null} ? ${partido.clima} : 'Desconocido'">Despejado</span>
+                                        </div>
+                                    </div>
                                 </div>
                                 
                                 <div class="mt-4 lg:mt-0 lg:ml-6 flex flex-col lg:items-end space-y-2">
@@ -193,6 +204,17 @@
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                                             </svg>
                                             <span th:text="${partido.hora}">15:00</span>
+                                        </div>
+                                    </div>
+                                    <!-- Información del clima -->
+                                    <div class="mt-3 flex items-center text-gray-700 text-sm space-x-3">
+                                        <div class="flex items-center">
+                                            <i class="fa-solid fa-temperature-half text-red-500 mr-2"></i>
+                                            <span th:text="${partido.temperatura != null} ? ${partido.temperatura + '°C'} : 'Sin datos'">22°C</span>
+                                        </div>
+                                        <div class="flex items-center">
+                                            <i class="fa-solid fa-cloud-sun text-blue-500 mr-2"></i>
+                                            <span th:text="${partido.clima != null} ? ${partido.clima} : 'Desconocido'">Despejado</span>
                                         </div>
                                     </div>
                                 </div>
