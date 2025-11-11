@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<html th:lang="${#locale}" xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Gestión de Liquidaciones</title>
+  <title th:text="#{page.arbitro.liquidaciones}">Gestión de Liquidaciones</title>
 
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -30,26 +30,26 @@
   <main class="ml-0 md:ml-64 flex flex-col min-h-screen">
 
     <!-- Up bar -->
-    <div th:replace="~{fragments/ArbitroFragments/up_bar :: up_bar('Gestión de Liquidaciones', ${arbitro.nombre})}"></div>
+    <div th:replace="~{fragments/ArbitroFragments/up_bar :: up_bar(#{page.arbitro.liquidaciones}, ${arbitro.nombre})}"></div>
 
     <!-- Contenido -->
     <div id="content-container" class="flex-1 p-6 space-y-6">
-      <h3 class="text-2xl font-semibold text-gray-800">Resultados de Liquidaciones</h3>
+      <h3 class="text-2xl font-semibold text-gray-800" th:text="#{liquidaciones.results}">Resultados de Liquidaciones</h3>
 
       <div class="bg-white p-6 rounded-lg shadow-md">
         <div class="flex justify-between items-center mb-4">
-          <h4 class="text-lg font-semibold text-gray-800">Listado</h4>
+          <h4 class="text-lg font-semibold text-gray-800" th:text="#{liquidaciones.list}">Listado</h4>
         </div>
 
         <div class="overflow-x-auto">
           <table class="min-w-full border border-gray-200 rounded-lg overflow-hidden">
             <thead class="bg-gray-50">
               <tr>
-                <th class="px-4 py-2 text-left text-sm font-medium text-gray-600">Árbitro</th>
-                <th class="px-4 py-2 text-left text-sm font-medium text-gray-600">Periodo</th>
-                <th class="px-4 py-2 text-left text-sm font-medium text-gray-600">Total</th>
-                <th class="px-4 py-2 text-left text-sm font-medium text-gray-600">Estado</th>
-                <th class="px-4 py-2 text-center text-sm font-medium text-gray-600">Acciones</th>
+                <th class="px-4 py-2 text-left text-sm font-medium text-gray-600" th:text="#{table.header.arbitro}">Árbitro</th>
+                <th class="px-4 py-2 text-left text-sm font-medium text-gray-600" th:text="#{table.header.periodo}">Periodo</th>
+                <th class="px-4 py-2 text-left text-sm font-medium text-gray-600" th:text="#{table.header.total}">Total</th>
+                <th class="px-4 py-2 text-left text-sm font-medium text-gray-600" th:text="#{table.header.estado}">Estado</th>
+                <th class="px-4 py-2 text-center text-sm font-medium text-gray-600" th:text="#{table.header.acciones}">Acciones</th>
               </tr>
             </thead>
             <tbody class="divide-y divide-gray-200" th:if="${!liquidaciones.isEmpty()}">

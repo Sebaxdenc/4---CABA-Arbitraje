@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html th:lang="${#locale}" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mis Reseñas - CABA Pro</title>
+    <title th:text="#{page.coach.resenas} + ' - CABA Pro'">Mis Reseñas - CABA Pro</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
@@ -15,7 +15,7 @@
         <!-- Main Content -->
         <div class="flex-1 md:ml-64">
             <!-- Top bar -->
-            <div th:replace="~{fragments/EntrenadorFragments/upBar :: upBar('Mis Reseñas', ${entrenador.nombreCompleto})}"></div>
+            <div th:replace="~{fragments/EntrenadorFragments/upBar :: upBar(#{page.coach.resenas}, ${entrenador.nombreCompleto})}"></div>
             
             <!-- Content -->
             <div class="p-6">
@@ -23,12 +23,12 @@
                 <div class="mb-8">
                     <div class="flex justify-between items-center">
                         <div>
-                            <h1 class="text-3xl font-bold text-gray-900 mb-2">Mis Reseñas</h1>
-                            <p class="text-gray-600">Reseñas que has creado para árbitros</p>
+                            <h1 class="text-3xl font-bold text-gray-900 mb-2" th:text="#{coach.resenas.title}">Mis Reseñas</h1>
+                            <p class="text-gray-600" th:text="#{coach.resenas.subtitle}">Reseñas que has creado para árbitros</p>
                         </div>
                         <a th:href="@{/coach/crear-reseña}" 
                            class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors">
-                            <i class="fas fa-plus mr-2"></i>Nueva Reseña
+                            <i class="fas fa-plus mr-2"></i><span th:text="#{button.createReview}">Nueva Reseña</span>
                         </a>
                     </div>
                 </div>
@@ -37,19 +37,19 @@
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                     <div class="bg-white p-6 rounded-lg shadow-md text-center">
                         <div class="text-3xl font-bold text-blue-600 mb-2" th:text="${totalResenas}">0</div>
-                        <div class="text-gray-600 text-sm font-medium">Total de Reseñas</div>
+                        <div class="text-gray-600 text-sm font-medium" th:text="#{coach.resenas.totalReviews}">Total de Reseñas</div>
                     </div>
                     
                     <div class="bg-white p-6 rounded-lg shadow-md text-center">
                         <div class="text-3xl font-bold text-yellow-600 mb-2" th:text="${promedioCalificacion}">0.0</div>
-                        <div class="text-gray-600 text-sm font-medium">Calificación Promedio</div>
+                        <div class="text-gray-600 text-sm font-medium" th:text="#{coach.resenas.averageRating}">Calificación Promedio</div>
                     </div>
                     
                     <div class="bg-white p-6 rounded-lg shadow-md text-center">
                         <div class="text-3xl font-bold text-green-600 mb-2">
                             <span th:text="${#lists.size(#lists.select(resenas, r -> r.puntuacion >= 4))}">0</span>
                         </div>
-                        <div class="text-gray-600 text-sm font-medium">Reseñas Positivas (4-5 ⭐)</div>
+                        <div class="text-gray-600 text-sm font-medium" th:text="#{coach.resenas.positiveReviews}">Reseñas Positivas (4-5 ⭐)</div>
                     </div>
                 </div>
 
@@ -57,17 +57,17 @@
                 <div class="bg-white rounded-lg shadow-md">
                     <div class="p-6 border-b border-gray-200">
                         <h2 class="text-xl font-semibold text-gray-800">
-                            <i class="fas fa-star mr-2 text-yellow-600"></i>Todas las Reseñas
+                            <i class="fas fa-star mr-2 text-yellow-600"></i><span th:text="#{coach.resenas.allReviews}">Todas las Reseñas</span>
                         </h2>
                     </div>
                     
                     <div th:if="${#lists.isEmpty(resenas)}" class="p-8 text-center">
                         <i class="fas fa-comments text-gray-400 text-6xl mb-4"></i>
-                        <h3 class="text-lg font-medium text-gray-900 mb-2">No has creado reseñas aún</h3>
-                        <p class="text-gray-600 mb-4">Crea tu primera reseña para calificar el desempeño de un árbitro</p>
+                        <h3 class="text-lg font-medium text-gray-900 mb-2" th:text="#{coach.resenas.empty.title}">No has creado reseñas aún</h3>
+                        <p class="text-gray-600 mb-4" th:text="#{coach.resenas.empty.message}">Crea tu primera reseña para calificar el desempeño de un árbitro</p>
                         <a th:href="@{/coach/crear-reseña}" 
                            class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors">
-                            <i class="fas fa-plus mr-2"></i>Crear Reseña
+                            <i class="fas fa-plus mr-2"></i><span th:text="#{button.createReview}">Crear Reseña</span>
                         </a>
                     </div>
                     
@@ -98,7 +98,7 @@
                                     <div th:if="${resena.partido}" class="mb-3 p-3 bg-blue-50 rounded-lg">
                                         <p class="text-sm text-blue-800">
                                             <i class="fas fa-basketball-ball mr-2"></i>
-                                            <strong>Partido:</strong> 
+                                            <strong th:text="#{coach.resenas.match} + ':'">Partido:</strong> 
                                             <span th:text="${resena.partido.equipoLocal.nombre + ' vs ' + resena.partido.equipoVisitante.nombre}">
                                                 Equipo vs Equipo
                                             </span>
@@ -127,17 +127,17 @@
                             <div class="flex justify-between items-center">
                                 <span th:switch="${resena.puntuacion}"
                                       class="px-3 py-1 text-xs font-medium rounded-full">
-                                    <span th:case="5" class="bg-green-100 text-green-800">⭐ Excelente</span>
-                                    <span th:case="4" class="bg-blue-100 text-blue-800">⭐ Muy Bueno</span>
-                                    <span th:case="3" class="bg-yellow-100 text-yellow-800">⭐ Bueno</span>
-                                    <span th:case="2" class="bg-orange-100 text-orange-800">⭐ Regular</span>
-                                    <span th:case="1" class="bg-red-100 text-red-800">⭐ Malo</span>
-                                    <span th:case="*" class="bg-gray-100 text-gray-800">⭐ Sin clasificar</span>
+                                    <span th:case="5" class="bg-green-100 text-green-800" th:text="'⭐ ' + #{rating.excellent}">⭐ Excelente</span>
+                                    <span th:case="4" class="bg-blue-100 text-blue-800" th:text="'⭐ ' + #{rating.veryGood}">⭐ Muy Bueno</span>
+                                    <span th:case="3" class="bg-yellow-100 text-yellow-800" th:text="'⭐ ' + #{rating.good}">⭐ Bueno</span>
+                                    <span th:case="2" class="bg-orange-100 text-orange-800" th:text="'⭐ ' + #{rating.fair}">⭐ Regular</span>
+                                    <span th:case="1" class="bg-red-100 text-red-800" th:text="'⭐ ' + #{rating.poor}">⭐ Malo</span>
+                                    <span th:case="*" class="bg-gray-100 text-gray-800" th:text="'⭐ ' + #{rating.unrated}">⭐ Sin clasificar</span>
                                 </span>
                                 
                                 <!-- Información adicional del árbitro -->
                                 <div class="text-sm text-gray-500">
-                                    <span th:text="'Cédula: ' + ${resena.arbitro.cedula}">Cédula: 123456789</span>
+                                    <span th:text="#{form.cedula} + ': ' + ${resena.arbitro.cedula}">Cédula: 123456789</span>
                                 </div>
                             </div>
                         </div>

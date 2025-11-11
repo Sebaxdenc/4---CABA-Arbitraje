@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" th:lang="${#locale}">
 <head>
   <meta charset="UTF-8">
-  <title>Liquidaciones</title>
+  <title th:text="#{page.admin.liquidaciones}">Liquidaciones</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
@@ -10,13 +10,13 @@
   <aside th:replace="~{admin/sidebar :: sidebar('liquidaciones')}"></aside>
 
   <div class="flex-1 flex flex-col overflow-x-hidden overflow-y-auto">
-    <header th:replace="~{admin/header :: header('Gestión de Liquidaciones')}"></header>
+    <header th:replace="~{admin/header :: header(#{page.admin.liquidaciones})}"></header>
 
     <main class="p-6 space-y-6">
       
       <!-- Filtros -->
       <div class="bg-white p-6 rounded-lg shadow-md">
-        <h4 class="text-lg font-semibold text-gray-800 mb-4">Consultar Liquidaciones</h4>
+        <h4 class="text-lg font-semibold text-gray-800 mb-4" th:text="#{liquidaciones.consultar}">Consultar Liquidaciones</h4>
         
         <form method="get" action="#" class="flex flex-col sm:flex-row gap-4 items-center">
           <input type="month" name="periodo"
@@ -26,7 +26,8 @@
 
           <button type="submit"
                   class="px-4 py-2 bg-indigo-600 text-white rounded-lg shadow-md 
-                         hover:bg-indigo-700 transition-colors">
+                         hover:bg-indigo-700 transition-colors"
+                  th:text="#{btn.search}">
             Consultar
           </button>
         </form>
@@ -35,12 +36,13 @@
       <!-- Tabla de liquidaciones -->
       <div class="bg-white p-6 rounded-lg shadow-md">
         <div class="flex justify-between items-center mb-4">
-          <h4 class="text-lg font-semibold text-gray-800">Resultados</h4>
+          <h4 class="text-lg font-semibold text-gray-800" th:text="#{liquidaciones.resultados}">Resultados</h4>
           <form method="post" th:action="@{/admin/liquidaciones/generar}">
             <input type="hidden" name="periodo" th:value="${periodoSeleccionado}" />
             <button type="submit"
                     class="px-4 py-2 bg-green-600 text-white rounded-lg shadow-md 
-                           hover:bg-green-700 transition-colors">
+                           hover:bg-green-700 transition-colors"
+                    th:text="#{liquidaciones.generar}">
               Generar Liquidaciones
             </button>
           </form>
@@ -49,11 +51,11 @@
         <table class="min-w-full border border-gray-200 rounded-lg overflow-hidden">
           <thead class="bg-gray-50">
             <tr>
-              <th class="px-4 py-2 text-left text-sm font-medium text-gray-600">Árbitro</th>
-              <th class="px-4 py-2 text-left text-sm font-medium text-gray-600">Periodo</th>
-              <th class="px-4 py-2 text-left text-sm font-medium text-gray-600">Total</th>
-              <th class="px-4 py-2 text-left text-sm font-medium text-gray-600">Estado</th>
-              <th class="px-4 py-2 text-center text-sm font-medium text-gray-600">Acciones</th>
+              <th class="px-4 py-2 text-left text-sm font-medium text-gray-600" th:text="#{table.arbitro}">Árbitro</th>
+              <th class="px-4 py-2 text-left text-sm font-medium text-gray-600" th:text="#{table.periodo}">Periodo</th>
+              <th class="px-4 py-2 text-left text-sm font-medium text-gray-600" th:text="#{table.total}">Total</th>
+              <th class="px-4 py-2 text-left text-sm font-medium text-gray-600" th:text="#{table.estado}">Estado</th>
+              <th class="px-4 py-2 text-center text-sm font-medium text-gray-600" th:text="#{table.acciones}">Acciones</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-gray-200" th:if="${!liquidaciones.isEmpty()}">
@@ -62,7 +64,7 @@
               <td class="px-4 py-2 text-sm text-gray-800" th:text="${liq.periodo}"></td>
               <td class="px-4 py-2 text-sm text-gray-800" th:text="${'$' + #numbers.formatDecimal(liq.total,1,'POINT',2,'COMMA')}"></td>
               <td class="px-4 py-2 text-sm">
-                <span th:text="${liq.estado}"></span>
+                <span th:text="#{${'estado.liquidacion.' + liq.estado}}"></span>
               </td>
               <td class="px-4 py-2 flex justify-center gap-2">
                 <!-- Botón pagar -->
@@ -71,21 +73,22 @@
                   <button type="submit"
                           class="px-3 py-1 bg-yellow-500 text-white text-sm rounded-md 
                                  hover:bg-yellow-600 transition-colors"
-                          th:disabled="${liq.estado == 'PAGADA'}">
+                          th:disabled="${liq.estado == 'PAGADA'}"
+                          th:text="#{btn.pay}">
                     Pagar
                   </button>
                 </form>
                 <!-- Botón PDF -->
                 <a th:href="@{'/admin/liquidaciones/' + ${liq.id}}" target="_blank"
                      class="px-3 py-1 bg-gray-700 text-white text-sm rounded-md hover:bg-gray-800 transition-colors flex items-center gap-2">
-                    <i class="fa-solid fa-file-pdf"></i> PDF
+                    <i class="fa-solid fa-file-pdf"></i> <span th:text="#{btn.pdf}">PDF</span>
                 </a>
               </td>
             </tr>
           </tbody>
           <tbody th:if="${liquidaciones.isEmpty()}">
             <tr>
-              <td colspan="5" class="px-4 py-4 text-center text-gray-500 text-sm">
+              <td colspan="5" class="px-4 py-4 text-center text-gray-500 text-sm" th:text="#{liquidaciones.noData}">
                 No hay liquidaciones para este periodo.
               </td>
             </tr>

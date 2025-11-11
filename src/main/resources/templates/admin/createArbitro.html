@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html th:lang="${#locale}" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title th:text="${modoEdicion != null ? 'Editar Árbitro' : 'Crear Árbitro'}">Crear Árbitro</title>
+    <title th:text="${modoEdicion != null} ? #{page.admin.arbitros.edit} : #{page.admin.arbitros.create}">Crear Árbitro</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -23,7 +23,7 @@
         <div class="row justify-content-center">
             <div class="col-md-8">
                 <div class="card">
-                    <div class="card-header" th:text="${modoEdicion != null ? 'Editar Árbitro' : 'Crear Nuevo Árbitro'}">Crear Nuevo Árbitro</div>
+                    <div class="card-header" th:text="${modoEdicion != null} ? #{page.admin.arbitros.edit} : #{page.admin.arbitros.create}">Crear Nuevo Árbitro</div>
                     <div class="card-body">
                         <!-- Mensaje de error general -->
                         <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
@@ -32,7 +32,7 @@
                             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                         </div>
                         
-                        <form th:action="${modoEdicion != null ? '/admin/arbitros/update/' + arbitro.id : '/admin/arbitros/save'}" 
+                        <form th:action="@{${modoEdicion != null ? '/admin/arbitros/update/' + arbitro.id : '/admin/arbitros/save'}}" 
                               method="post" th:object="${arbitro}" enctype="multipart/form-data">
                             
                             <!-- ID oculto para edición -->
@@ -48,7 +48,7 @@
                             <!-- Errores de validación específicos -->
                             <div th:if="${#fields.hasErrors('*')}" class="alert alert-warning alert-dismissible fade show" role="alert">
                                 <i class="fas fa-exclamation-circle me-2"></i>
-                                <strong>Por favor corrige los siguientes errores:</strong>
+                                <strong th:text="#{msg.error.form.validation}">Por favor corrige los siguientes errores:</strong>
                                 <ul class="mb-0 mt-2">
                                     <li th:each="err : ${#fields.errors('*')}" th:text="${err}"></li>
                                 </ul>
@@ -56,20 +56,20 @@
                             </div>
                             
                             <div class="mb-3">
-                                <label for="nombre" class="form-label">Nombre <span class="text-danger">*</span></label>
+                                <label for="nombre" class="form-label" th:text="#{label.nombre}">Nombre</label><span class="text-danger">*</span>
                                 <input type="text" id="nombre" class="form-control" th:field="*{nombre}" 
                                        th:classappend="${#fields.hasErrors('nombre')} ? 'is-invalid' : ''" 
-                                       required maxlength="100" placeholder="Nombre completo del árbitro">
+                                       required maxlength="100" th:placeholder="#{placeholder.nombre.completo}">
                                 <div class="invalid-feedback" th:if="${#fields.hasErrors('nombre')}" th:errors="*{nombre}">
                                     Error en nombre
                                 </div>
                             </div>
 
                             <div class="mb-3">
-                                <label for="username" class="form-label">Nombre de Usuario <span class="text-danger">*</span></label>
+                                <label for="username" class="form-label" th:text="#{label.username}">Nombre de Usuario</label><span class="text-danger">*</span>
                                 <input type="text" id="username" class="form-control" th:field="*{username}" 
                                        th:classappend="${#fields.hasErrors('username')} ? 'is-invalid' : ''"
-                                       required maxlength="100" placeholder="Ej: juan.perez"
+                                       required maxlength="100" th:placeholder="#{placeholder.username}"
                                        onchange="updateHiddenUsername()" onkeyup="updateHiddenUsername()">
                                 <div class="invalid-feedback" th:if="${#fields.hasErrors('username')}" th:errors="*{username}">
                                     Error en nombre de usuario
@@ -77,10 +77,10 @@
                             </div>
 
                             <div class="mb-3">
-                                <label for="contraseña" class="form-label">Contraseña <span class="text-danger">*</span></label>
+                                <label for="contraseña" class="form-label" th:text="#{label.password}">Contraseña</label><span class="text-danger">*</span>
                                 <input type="password" id="contraseña" class="form-control" th:field="*{contraseña}" 
                                        th:classappend="${#fields.hasErrors('contraseña')} ? 'is-invalid' : ''"
-                                       required maxlength="100" placeholder="Contraseña del árbitro"
+                                       required maxlength="100" th:placeholder="#{placeholder.password}"
                                        onchange="updateHiddenPassword()" onkeyup="updateHiddenPassword()">
                                 <div class="invalid-feedback" th:if="${#fields.hasErrors('contraseña')}" th:errors="*{contraseña}">
                                     Error en contraseña
@@ -88,10 +88,10 @@
                             </div>
 
                             <div class="mb-3">
-                                <label for="email" class="form-label">Email <span class="text-danger">*</span></label>
+                                <label for="email" class="form-label" th:text="#{label.email}">Email</label><span class="text-danger">*</span>
                                 <input type="email" id="email" class="form-control" th:field="*{usuario.email}"
                                        th:classappend="${#fields.hasErrors('usuario.email')} ? 'is-invalid' : ''"
-                                       required maxlength="100" placeholder="Ej: juan.perez@email.com"
+                                       required maxlength="100" th:placeholder="#{placeholder.email}"
                                        onchange="updateHiddenEmail()" onkeyup="updateHiddenEmail()">
                                 <div class="invalid-feedback" th:if="${#fields.hasErrors('usuario.email')}" th:errors="*{usuario.email}">
                                     Error en email
@@ -99,10 +99,10 @@
                             </div>
 
                             <div class="mb-3">
-                                <label for="cedula" class="form-label">Cédula <span class="text-danger">*</span></label>
+                                <label for="cedula" class="form-label" th:text="#{label.cedula}">Cédula</label><span class="text-danger">*</span>
                                 <input type="text" id="cedula" class="form-control" th:field="*{cedula}" 
                                        th:classappend="${#fields.hasErrors('cedula')} ? 'is-invalid' : ''"
-                                       pattern="[0-9]{8,20}" inputmode="numeric" placeholder="Ej: 12345678" 
+                                       pattern="[0-9]{8,20}" inputmode="numeric" th:placeholder="#{placeholder.cedula}" 
                                        required maxlength="20">
                                 <div class="invalid-feedback" th:if="${#fields.hasErrors('cedula')}" th:errors="*{cedula}">
                                     Error en cédula
@@ -110,10 +110,10 @@
                             </div>
 
                             <div class="mb-3">
-                                <label for="phone" class="form-label">Teléfono <span class="text-danger">*</span></label>
+                                <label for="phone" class="form-label" th:text="#{label.telefono}">Teléfono</label><span class="text-danger">*</span>
                                 <input type="text" id="phone" class="form-control" th:field="*{phone}" 
                                        th:classappend="${#fields.hasErrors('phone')} ? 'is-invalid' : ''"
-                                       pattern="[0-9]{10,15}" inputmode="numeric" placeholder="Ej: 3001234567" 
+                                       pattern="[0-9]{10,15}" inputmode="numeric" th:placeholder="#{placeholder.telefono}" 
                                        required maxlength="15">
                                 <div class="invalid-feedback" th:if="${#fields.hasErrors('phone')}" th:errors="*{phone}">
                                     Error en teléfono
@@ -121,54 +121,52 @@
                             </div>
 
                             <div class="mb-3">
-                                <label for="photoFile" class="form-label">Foto del Árbitro</label>
+                                <label for="photoFile" class="form-label" th:text="#{label.foto.arbitro}">Foto del Árbitro</label>
                                 <input type="file" id="photoFile" name="photoFile" class="form-control" accept="image/*" onchange="previewImage(this)">
-                                <small class="form-text text-muted">Selecciona una imagen (JPG, PNG, GIF). Máximo 5MB.</small>
+                                <small class="form-text text-muted" th:text="#{help.foto}">Selecciona una imagen (JPG, PNG, GIF). Máximo 5MB.</small>
                                 <div id="imagePreview" class="mt-3" style="display: none;">
                                     <img id="previewImg" src="#" alt="Vista previa" style="max-width: 200px; max-height: 200px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
                                     <div class="mt-2">
                                         <button type="button" class="btn btn-sm btn-danger" onclick="removeImagePreview()">
-                                            <i class="fas fa-trash"></i> Eliminar imagen
+                                            <i class="fas fa-trash"></i><span th:text="#{btn.delete.image}">Eliminar imagen</span>
                                         </button>
                                     </div>
                                 </div>
                             </div>
 
                             <div class="mb-3">
-                                <label for="speciality" class="form-label">Especialidad <span class="text-danger">*</span></label>
+                                <label for="speciality" class="form-label" th:text="#{label.especialidad}">Especialidad</label><span class="text-danger">*</span>
                                 <select id="speciality" class="form-control" th:field="*{speciality}" 
                                         th:classappend="${#fields.hasErrors('speciality')} ? 'is-invalid' : ''" required>
-                                    <option value="">Seleccione una especialidad</option>
-                                    <option value="Mesa">Mesa</option>
-                                    <option value="Campo">Campo</option>
+                                    <option value="" th:text="#{placeholder.select}">Seleccione una especialidad</option>
+                                    <option value="Mesa" th:text="#{especialidad.MESA}">Mesa</option>
+                                    <option value="Campo" th:text="#{especialidad.CAMPO}">Campo</option>
                                 </select>
                                 <div class="invalid-feedback" th:if="${#fields.hasErrors('speciality')}" th:errors="*{speciality}">
                                     Error en especialidad
                                 </div>
-                                <small class="form-text text-muted">Campo obligatorio</small>
+                                <small class="form-text text-muted" th:text="#{help.required}">Campo obligatorio</small>
                             </div>
 
-                            <!-- Escalafón (reemplaza el campo scale) -->
-                            <div class="mb-3">
-                                <label for="escalafon" class="form-label">Escalafón <span class="text-danger">*</span></label>
-                                <select id="escalafon" class="form-control" th:field="*{escalafon.id}" 
-                                        th:classappend="${#fields.hasErrors('escalafon.nombre')} ? 'is-invalid' : ''" required>
-                                    <option value="">Seleccione un escalafón</option>
-                                    <option th:each="escalafon : ${escalafones}" 
-                                            th:value="${escalafon.id}" 
-                                            th:text="${escalafon.nombre}">
-                                        Escalafón
-                                    </option>
-                                </select>
-                                <div class="invalid-feedback" th:if="${#fields.hasErrors('escalafon.nombre')}" th:errors="*{escalafon}">
-                                    Error en escalafón
-                                </div>
-                                <small class="form-text text-muted">Campo obligatorio</small>
-                            </div>
-
-                            <div class="d-flex justify-content-between">
-                                <a th:href="@{/admin/arbitros}" class="btn btn-secondary">Cancelar</a>
-                                <input type="submit" class="btn btn-primary" th:value="${modoEdicion != null ? 'Actualizar Árbitro' : 'Guardar Árbitro'}">
+            <!-- Escalafón (reemplaza el campo scale) -->
+            <div class="mb-3">
+                <label for="escalafon" class="form-label" th:text="#{label.escalafon}">Escalafón</label><span class="text-danger">*</span>
+                <select id="escalafon" class="form-control" th:field="*{escalafon.id}" 
+                        th:classappend="${#fields.hasErrors('escalafon')} ? 'is-invalid' : ''" required>
+                    <option value="" th:text="#{placeholder.select.escalafon}">Seleccione un escalafón</option>
+                    <option th:each="esc : ${escalafones}" 
+                            th:value="${esc.id}" 
+                            th:text="#{'escalafon.' + ${esc.nombre}}">
+                        Escalafón
+                    </option>
+                </select>
+                <div class="invalid-feedback" th:if="${#fields.hasErrors('escalafon')}" th:errors="*{escalafon}">
+                    Error en escalafón
+                </div>
+                <small class="form-text text-muted" th:text="#{help.required}">Campo obligatorio</small>
+            </div>                            <div class="d-flex justify-content-between">
+                                <a th:href="@{/admin/arbitros}" class="btn btn-secondary" th:text="#{btn.cancel}">Cancelar</a>
+                                <input type="submit" class="btn btn-primary" th:value="${modoEdicion != null} ? #{btn.update} : #{btn.save}">
                             </div>
                         </form>
                     </div>

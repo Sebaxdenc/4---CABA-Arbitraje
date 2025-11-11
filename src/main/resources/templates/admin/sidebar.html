@@ -11,7 +11,7 @@
       <img th:src="@{/images/logo.png}" alt="Logo" class="h-10 w-auto">
       <div>
         <h1 class="text-xl font-bold text-gray-800">CABA PRO</h1>
-        <p class="text-sm text-gray-500 mt-1">Gestión de Arbitraje</p>
+        <p class="text-sm text-gray-500 mt-1" th:text="#{app.subtitle}">Gestión de Arbitraje</p>
       </div>
     </div>
     <button id="menu-close" class="md:hidden p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500">
@@ -23,7 +23,7 @@
   </div>
 
   <nav class="p-4 space-y-2" sec:authorize="hasRole('ADMIN')">
-    <h2 class="text-xs uppercase font-semibold text-gray-400 mt-4 mb-2">Panel de Administrador</h2>
+    <h2 class="text-xs uppercase font-semibold text-gray-400 mt-4 mb-2" th:text="#{page.admin.dashboard}">Panel de Administrador</h2>
 
     <a th:href="@{/admin}"
        class="flex items-center space-x-3 p-3 rounded-lg transition-colors duration-200"
@@ -31,7 +31,7 @@
       <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
         <path fill-rule="evenodd" d="M7.5 14.25v2.25m3-4.5v4.5m3-6.75v6.75m3-9v9M6 20.25h12A2.25 2.25 0 0 0 20.25 18V6A2.25 2.25 0 0 0 18 3.75H6A2.25 2.25 0 0 0 3.75 6v12A2.25 2.25 0 0 0 6 20.25Z" clip-rule="evenodd"/>
       </svg>
-      <span>Dashboard</span>
+      <span th:text="#{nav.dashboard}">Dashboard</span>
     </a>
 
     <a th:href="@{/admin/arbitros}"
@@ -40,7 +40,7 @@
       <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
         <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"/>
       </svg>
-      <span>Gestión de Árbitros</span>
+      <span th:text="#{page.admin.arbitros}">Gestión de Árbitros</span>
     </a>
 
     <a th:href="@{/admin/partidos}"
@@ -51,7 +51,7 @@
               d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z"
               clip-rule="evenodd"/>
       </svg>
-      <span>Programación de Partidos</span>
+      <span th:text="#{page.admin.partidos}">Programación de Partidos</span>
     </a>
 
     <a th:href="@{/admin/torneos}"
@@ -62,7 +62,7 @@
               d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z"
               clip-rule="evenodd"/>
       </svg>
-      <span>Gestión de Torneos</span>
+      <span th:text="#{page.admin.torneos}">Gestión de Torneos</span>
     </a>
     <a th:href="@{/admin/liquidaciones}"
        class="flex items-center space-x-3 p-3 rounded-lg transition-colors duration-200"
@@ -72,7 +72,7 @@
               d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z"
               clip-rule="evenodd"/>
       </svg>
-      <span>Liquidaciones</span>
+      <span th:text="#{nav.liquidaciones}">Liquidaciones</span>
     </a>
 
     <a th:href="@{/admin/notificaciones}" 
@@ -81,7 +81,7 @@
         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
             <path d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z" />
         </svg>
-        <span>Notificaciones</span>
+        <span th:text="#{nav.notificaciones}">Notificaciones</span>
     </a>
 </nav>
 </aside>

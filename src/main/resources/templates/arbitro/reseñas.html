@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<html th:lang="${#locale}" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mis Reseñas - <span th:text="${arbitro.nombre}"></span></title>
+    <title th:text="#{page.arbitro.resenas} + ' - ' + ${arbitro.nombre}">Mis Reseñas</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -25,20 +25,20 @@
     <!-- Contenido Principal -->
     <main class="ml-0 md:ml-64 flex flex-col min-h-screen">
 
-        <div th:replace="~{fragments/ArbitroFragments/up_bar :: up_bar('Mis Reseñas', ${arbitro.nombre})}"></div>
+        <div th:replace="~{fragments/ArbitroFragments/up_bar :: up_bar(#{page.arbitro.resenas}, ${arbitro.nombre})}"></div>
 
         <!-- Contenido de Mis Reseñas -->
         <div class="flex-1 p-6 space-y-6">
             
             <!-- Título de la página -->
             <div class="mb-6">
-                <h3 class="text-2xl font-semibold text-gray-800">Mis Reseñas</h3>
-                <p class="text-gray-600 mt-1">Opiniones y valoraciones de los entrenadores sobre tu desempeño</p>
+                <h3 class="text-2xl font-semibold text-gray-800" th:text="#{page.arbitro.resenas}">Mis Reseñas</h3>
+                <p class="text-gray-600 mt-1" th:text="#{resenas.subtitle}">Opiniones y valoraciones de los entrenadores sobre tu desempeño</p>
             </div>
 
             <!-- Estadísticas Generales -->
             <div class="bg-white p-6 rounded-lg shadow-md">
-                <h4 class="text-lg font-semibold text-gray-800 mb-4 pb-4 border-b border-gray-200">Resumen de Valoraciones</h4>
+                <h4 class="text-lg font-semibold text-gray-800 mb-4 pb-4 border-b border-gray-200" th:text="#{resenas.summary}">Resumen de Valoraciones</h4>
                 
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
                     <!-- Promedio General -->
@@ -46,8 +46,8 @@
                         <div class="bg-gradient-to-r from-orange-400 to-red-500 p-6 rounded-lg text-white">
                             <div class="text-3xl font-bold mb-2" th:text="${estadisticasReseñas.promedioFormateado}">0.0</div>
                             <div class="text-lg mb-2" th:text="${estadisticasReseñas.promedioBalones}">⚪⚪⚪⚪⚪</div>
-                            <div class="text-sm opacity-90">Promedio General</div>
-                            <div class="text-xs opacity-75 mt-1" th:text="'Basado en ' + ${estadisticasReseñas.total} + ' reseñas'">Basado en 0 reseñas</div>
+                            <div class="text-sm opacity-90" th:text="#{resenas.average}">Promedio General</div>
+                            <div class="text-xs opacity-75 mt-1" th:text="#{resenas.basedOn(${estadisticasReseñas.total})}">Basado en 0 reseñas</div>
                         </div>
                     </div>
                     
@@ -107,14 +107,14 @@
             <!-- Lista de Reseñas -->
             <div class="bg-white rounded-lg shadow-md">
                 <div class="p-6 border-b border-gray-200">
-                    <h4 class="text-lg font-semibold text-gray-800">Todas las Reseñas</h4>
+                    <h4 class="text-lg font-semibold text-gray-800" th:text="#{resenas.all}">Todas las Reseñas</h4>
                 </div>
                 
                 <!-- Mensaje si no hay reseñas -->
                 <div th:if="${#lists.isEmpty(reseñas)}" class="p-8 text-center">
                     <div class="text-6xl mb-4">🏀</div>
-                    <h5 class="text-xl font-medium text-gray-700 mb-2">¡Aún no tienes reseñas!</h5>
-                    <p class="text-gray-500">Las reseñas de los entrenadores aparecerán aquí una vez que arbitres algunos partidos.</p>
+                    <h5 class="text-xl font-medium text-gray-700 mb-2" th:text="#{resenas.empty.title}">¡Aún no tienes reseñas!</h5>
+                    <p class="text-gray-500" th:text="#{resenas.empty.message}">Las reseñas de los entrenadores aparecerán aquí una vez que arbitres algunos partidos.</p>
                 </div>
                 
                 <!-- Lista de reseñas -->
@@ -135,7 +135,7 @@
                                 <!-- Header de la reseña -->
                                 <div class="flex items-center justify-between mb-3 pb-3 border-b border-gray-100">
                                     <div>
-                                        <h6 class="text-lg font-medium text-gray-900" th:text="${reseña.entrenador?.nombreCompleto ?: 'Entrenador Anónimo'}">Nombre del Entrenador</h6>
+                                        <h6 class="text-lg font-medium text-gray-900" th:text="${reseña.entrenador?.nombreCompleto ?: #messages.msg('resenas.coach.anonymous')}">Nombre del Entrenador</h6>
                                         <p class="text-sm text-gray-500" th:text="${reseña.entrenador?.equipo ?: ''}">Equipo</p>
                                     </div>
                                     <div class="text-right">
@@ -150,27 +150,27 @@
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-4m-5 0H3m2 0h4M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                                         </svg>
-                                        <span class="text-sm font-medium text-blue-800">Información del Partido</span>
+                                        <span class="text-sm font-medium text-blue-800" th:text="#{resenas.match.info}">Información del Partido</span>
                                     </div>
                                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-blue-700">
                                         <div>
-                                            <span class="font-medium">Enfrentamiento:</span>
+                                            <span class="font-medium" th:text="#{resenas.match.teams} + ':'">Enfrentamiento:</span>
                                             <div th:text="${reseña.partido.equipoLocal.nombre + ' vs ' + reseña.partido.equipoVisitante.nombre}">Equipo A vs Equipo B</div>
                                         </div>
                                         <div>
-                                            <span class="font-medium">Fecha y Hora:</span>
+                                            <span class="font-medium" th:text="#{resenas.match.dateTime} + ':'">Fecha y Hora:</span>
                                             <div th:text="${#temporals.format(reseña.partido.fecha, 'dd/MM/yyyy') + ' - ' + #temporals.format(reseña.partido.hora, 'HH:mm')}">Fecha y hora</div>
                                         </div>
                                         <div>
-                                            <span class="font-medium">Estado:</span>
-                                            <div th:text="${reseña.partido.estado}">Estado</div>
+                                            <span class="font-medium" th:text="#{resenas.match.status} + ':'">Estado:</span>
+                                            <div th:text="#{${'estado.' + reseña.partido.estado}}">Estado</div>
                                         </div>
                                     </div>
                                 </div>
                                 
                                 <!-- Descripción de la reseña -->
                                 <div class="mb-4">
-                                    <h6 class="text-sm font-medium text-gray-700 mb-2">Comentarios del Entrenador:</h6>
+                                    <h6 class="text-sm font-medium text-gray-700 mb-2" th:text="#{resenas.coach.comments} + ':'">Comentarios del Entrenador:</h6>
                                     <p class="text-gray-700 leading-relaxed bg-gray-50 p-4 rounded-lg" th:text="${reseña.descripcion}">
                                         Descripción de la reseña del entrenador sobre el desempeño del árbitro en el partido.
                                     </p>

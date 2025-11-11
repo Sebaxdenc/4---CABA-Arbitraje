@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<html th:lang="${#locale}" xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Notificaciones</title>
+  <title th:text="#{page.notificaciones}">Notificaciones</title>
 
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -30,11 +30,11 @@
   <main class="ml-0 md:ml-64 flex flex-col min-h-screen">
 
     <!-- Up bar -->
-    <div th:replace="~{fragments/ArbitroFragments/up_bar :: up_bar('Notificaciones', ${arbitro.nombre})}"></div>
+    <div th:replace="~{fragments/ArbitroFragments/up_bar :: up_bar(#{page.notificaciones}, ${arbitro.nombre})}"></div>
 
     <!-- Contenido -->
     <div id="content-container" class="flex-1 p-6 space-y-6">
-      <h3 class="text-2xl font-semibold text-gray-800 mb-6">Notificaciones</h3>
+      <h3 class="text-2xl font-semibold text-gray-800 mb-6" th:text="#{page.notificaciones}">Notificaciones</h3>
 
       <div class="bg-white p-6 rounded-lg shadow-md">
         <ul class="divide-y divide-gray-200">
@@ -54,7 +54,7 @@
               <div>
                 <p class="font-semibold text-gray-800" th:text="${notif.mensaje}">Título de notificación</p>
                 <p class="text-sm text-gray-600">
-                  <span th:text="${notif.tipoDestinatario == 'ADMIN' ? 'Notificación para administradores' : 'Notificación para árbitro'}"></span>
+                  <span th:text="#{${'notificacion.tipo.' + notif.tipoDestinatario}}"></span>
                 </p>
                 <p class="text-xs text-gray-400 mt-1"
                    th:text="${#temporals.format(notif.fecha, 'dd/MM/yyyy HH:mm')}">Hace 5 minutos</p>
@@ -64,7 +64,7 @@
 
           <!-- Si no hay notificaciones -->
           <li th:if="${#lists.isEmpty(notificaciones)}" class="py-6 text-center text-gray-500">
-            No tienes notificaciones nuevas.
+            <span th:text="#{notificaciones.empty}">No tienes notificaciones nuevas.</span>
           </li>
         </ul>
       </div>

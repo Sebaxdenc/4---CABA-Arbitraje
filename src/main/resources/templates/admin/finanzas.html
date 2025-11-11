@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<html th:lang="${#locale}" xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8" />
-  <title>Gestión Financiera</title>
+  <title th:text="#{page.admin.finanzas}">Gestión Financiera</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
@@ -12,11 +12,11 @@
 
   <div class="flex-1 flex flex-col overflow-x-hidden overflow-y-auto">
 
-    <header th:replace="~{admin/header :: header('Gestión Financiera')}"></header>
+    <header th:replace="~{admin/header :: header(#{page.admin.finanzas})}"></header>
 
     <main class="p-6">
       <div class="bg-white p-6 rounded-lg shadow-md">
-        <h4 class="text-xl font-semibold text-gray-800 mb-4">
+        <h4 class="text-xl font-semibold text-gray-800 mb-4" th:text="#{page.admin.finanzas}">
           Finanzas
         </h4>
 
@@ -24,11 +24,11 @@
           <table class="min-w-full divide-y divide-gray-200">
             <thead class="bg-gray-50">
               <tr>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Árbitro</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Escalafón</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Partidos</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total a Pagar</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" th:text="#{table.header.arbitro}">Árbitro</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" th:text="#{table.header.escalafon}">Escalafón</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" th:text="#{table.header.partidos}">Partidos</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" th:text="#{finanzas.totalPagar}">Total a Pagar</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" th:text="#{table.header.estado}">Estado</th>
               </tr>
             </thead>
             <tbody class="bg-white divide-y divide-gray-200">
@@ -38,7 +38,7 @@
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">5</td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-semibold">$ 5,000</td>
                 <td class="px-6 py-4 whitespace-nowrap">
-                  <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
+                  <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800" th:text="#{estado.liquidacion.PENDIENTE}">
                     Pendiente
                   </span>
                 </td>
@@ -49,7 +49,7 @@
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">8</td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-semibold">$ 8,500</td>
                 <td class="px-6 py-4 whitespace-nowrap">
-                  <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                  <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800" th:text="#{estado.liquidacion.PAGADO}">
                     Pagado
                   </span>
                 </td>

@@ -2,7 +2,7 @@
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8">
-  <title>Gestión de Árbitros</title>
+  <title th:text="#{page.admin.arbitros}">Gestión de Árbitros</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -13,29 +13,30 @@
   <aside th:replace="~{admin/sidebar :: sidebar('arbitros')}"></aside>
 
   <div class="flex-1 overflow-x-hidden overflow-y-auto">
-    <header th:replace="~{admin/header :: header('Gestión de Árbitros')}"></header>
+    <header th:replace="~{admin/header :: header(#{page.admin.arbitros})}"></header>
 
     <main class="p-6 space-y-6">
       <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-2">
-        <h3 class="text-2xl font-semibold text-gray-800">Árbitros</h3>
+        <h3 class="text-2xl font-semibold text-gray-800" th:text="#{page.admin.arbitros}">Árbitros</h3>
         <a th:href="@{/admin/arbitros/create}"
-           class="mt-4 sm:mt-0 px-4 py-2 bg-indigo-600 text-white rounded-lg shadow hover:bg-indigo-700">+ Crear Árbitro</a>
+           class="mt-4 sm:mt-0 px-4 py-2 bg-indigo-600 text-white rounded-lg shadow hover:bg-indigo-700" 
+           th:text="#{btn.create.arbitro}">+ Crear Árbitro</a>
       </div>
 
       <div class="bg-white p-6 rounded-lg shadow">
-        <input type="text" placeholder="Buscar árbitro..."
+        <input type="text" th:placeholder="#{placeholder.search.arbitro}"
                class="w-full mb-4 px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500">
 
         <div class="overflow-x-auto">
           <table class="min-w-full divide-y divide-gray-200">
             <thead class="bg-gray-50">
             <tr>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nombre</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Documento</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Especialidad</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Escalafón</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Foto</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Acciones</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase" th:text="#{table.nombre}">Nombre</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase" th:text="#{table.documento}">Documento</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase" th:text="#{table.especialidad}">Especialidad</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase" th:text="#{table.escalafon}">Escalafón</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase" th:text="#{table.foto}">Foto</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase" th:text="#{table.acciones}">Acciones</th>
             </tr>
             </thead>
 
@@ -44,37 +45,37 @@
               <td class="px-6 py-4 text-sm font-medium text-gray-900" th:text="${arb.nombre}">Juan Pérez</td>
               <td class="px-6 py-4 text-sm text-gray-500" th:text="${arb.cedula}">CC</td>
               <td class="px-6 py-4 text-sm text-gray-500" th:text="${arb.speciality}">Campo</td>
-              <td class="px-6 py-4 text-sm text-gray-500" th:text="${arb.escalafon?.nombre}">FIBA</td>
+              <td class="px-6 py-4 text-sm text-gray-500" th:text="#{${'escalafon.' + arb.escalafon.nombre}}">FIBA</td>
               <td class="px-6 py-4 text-sm text-gray-500">
                 <div th:if="${arb.hasPhoto()}" class="flex items-center">
                   <img th:src="@{/admin/arbitros/{id}/photo(id=${arb.id})}" 
                        alt="Foto del árbitro" 
                        class="w-10 h-10 rounded-full object-cover border-2 border-gray-200"
                        onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
-                  <span class="hidden text-gray-400 text-xs ml-2">Error al cargar</span>
+                  <span class="hidden text-gray-400 text-xs ml-2" th:text="#{msg.error.photo.load}">Error al cargar</span>
                 </div>
                 <div th:unless="${arb.hasPhoto()}" class="flex items-center">
                   <div class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center">
                     <i class="fas fa-user text-gray-400"></i>
                   </div>
-                  <span class="ml-2 text-gray-400 text-xs">Sin foto</span>
+                  <span class="ml-2 text-gray-400 text-xs" th:text="#{msg.no.photo}">Sin foto</span>
                 </div>
               </td>
               <td class="px-6 py-4 text-sm font-medium space-x-2">
                 <a class="text-indigo-600 hover:text-indigo-900" th:href="@{/admin/arbitros/edit/{id}(id=${arb.id})}">
-                  <i class="fas fa-edit mr-1"></i>Editar
+                  <i class="fas fa-edit mr-1"></i><span th:text="#{btn.edit}">Editar</span>
                 </a>
                 <form method="post" th:action="@{/admin/arbitros/delete/{id}(id=${arb.id})}" class="inline">
                   <input type="hidden" th:name="${_csrf?.parameterName}" th:value="${_csrf?.token}">
                   <button class="text-red-600 hover:text-red-900" type="submit" 
-                          onclick="return confirm('¿Está seguro de que desea eliminar este árbitro?')">
-                    <i class="fas fa-trash mr-1"></i>Eliminar
+                          th:attr="onclick='return confirm(\'' + #{confirm.delete.arbitro} + '\')'" >
+                    <i class="fas fa-trash mr-1"></i><span th:text="#{btn.delete}">Eliminar</span>
                   </button>
                 </form>
               </td>
             </tr>
             <tr th:if="${#lists.isEmpty(arbitros)}">
-              <td colspan="6" class="px-6 py-6 text-center text-gray-500">No hay árbitros registrados.</td>
+              <td colspan="6" class="px-6 py-6 text-center text-gray-500" th:text="#{msg.no.arbitros}">No hay árbitros registrados.</td>
             </tr>
             </tbody>
           </table>

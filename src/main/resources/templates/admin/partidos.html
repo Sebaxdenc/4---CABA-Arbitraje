@@ -2,7 +2,7 @@
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8">
-  <title>Programación de Partidos</title>
+  <title th:text="#{page.admin.partidos}">Programación de Partidos</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -12,24 +12,24 @@
   <aside th:replace="~{admin/sidebar :: sidebar('partidos')}"></aside>
 
   <div class="flex-1 overflow-x-hidden overflow-y-hidden">
-    <header th:replace="~{admin/header :: header('Programación de Partidos')}"></header>
+    <header th:replace="~{admin/header :: header(#{page.admin.partidos})}"></header>
 
     <main class="p-6 space-y-6">
       <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-2">
-        <h3 class="text-2xl font-semibold text-gray-800">Partidos</h3>
+        <h3 class="text-2xl font-semibold text-gray-800" th:text="#{nav.partidos}">Partidos</h3>
         <a th:href="@{/admin/partidos/create}"
            class="mt-4 sm:mt-0 px-4 py-2 bg-indigo-600 text-white rounded-lg shadow hover:bg-indigo-700">
-           + Agendar Partido
+           <span th:text="'+ ' + #{btn.schedule.match}">+ Agendar Partido</span>
         </a>
       </div>
 
       <!-- ✅ Card con alto fijo y contenido scrollable -->
       <div class="bg-white p-6 rounded-lg shadow flex flex-col h-[75vh]">
-        <!-- Encabezado “sticky” dentro de la card -->
+        <!-- Encabezado "sticky" dentro de la card -->
         <div class="sticky top-0 bg-white z-10 pb-3">
-          <input type="text" placeholder="Buscar partido..."
+          <input type="text" th:placeholder="#{placeholder.buscar.partido}"
                  class="w-full mb-4 px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500">
-          <h4 class="text-lg font-semibold text-gray-800">Todos los partidos</h4>
+          <h4 class="text-lg font-semibold text-gray-800" th:text="#{table.all.matches}">Todos los partidos</h4>
         </div>
 
         <!-- Área que scrollea -->
@@ -43,28 +43,30 @@
               </div>
 
               <div class="mt-2 text-sm text-gray-500">
-                <p><strong>Hora:</strong> <span th:text="${partido.hora}"></span></p>
-                <p><strong>Estado:</strong> <span th:text="${partido.estado}"></span></p>
-                <p><strong>Árbitro:</strong>
-                  <span th:text="${partido.arbitro != null ? partido.arbitro.nombre : 'Sin asignar'}"></span>
+                <p><strong th:text="#{label.hora} + ':'">Hora:</strong> <span th:text="${partido.hora}"></span></p>
+                <p><strong th:text="#{label.estado} + ':'">Estado:</strong> <span th:text="#{${'estado.' + partido.estado}}"></span></p>
+                <p><strong th:text="#{label.arbitro} + ':'">Árbitro:</strong>
+                  <span th:text="${partido.arbitro != null} ? ${partido.arbitro.nombre} : #{msg.no.assigned}"></span>
                 </p>
               </div>
 
               <div class="mt-3 flex gap-2">
                 <a th:href="@{'/admin/partidos/edit/' + ${partido.id}}"
-                   class="px-3 py-1 bg-yellow-500 text-white rounded hover:bg-yellow-600">Editar</a>
+                   class="px-3 py-1 bg-yellow-500 text-white rounded hover:bg-yellow-600" th:text="#{btn.editar}">Editar</a>
 
                 <form th:action="@{'/admin/partidos/delete/' + ${partido.id}}" method="post" class="inline">
                   <input type="hidden" th:if="${_csrf != null}"
                          th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
                   <button type="submit"
                           class="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700"
-                          onclick="return confirm('¿Eliminar este partido?');">Eliminar</button>
+                          th:onclick="'return confirm(\'' + #{msg.confirm.delete.match} + '\');'">
+                    <span th:text="#{btn.eliminar}">Eliminar</span>
+                  </button>
                 </form>
               </div>
             </li>
 
-            <li th:if="${#lists.isEmpty(partidos)}" class="text-gray-500">
+            <li th:if="${#lists.isEmpty(partidos)}" class="text-gray-500" th:text="#{msg.no.matches}">
               No hay partidos registrados.
             </li>
           </ul>
